@@ -1,0 +1,446 @@
+<?php
+/**
+ * Customizer options.
+ *
+ * Everything an owner needs to launch the shop lives here: the announcement bar,
+ * hero slides, homepage sections, contact details and social profiles.
+ *
+ * @package Digital_Mudir_Dokan
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Register settings.
+ *
+ * @param WP_Customize_Manager $wp_customize Customizer instance.
+ */
+function dmd_customize_register( $wp_customize ) {
+
+	$wp_customize->get_setting( 'blogname' )->transport        = 'postMessage';
+	$wp_customize->get_setting( 'blogdescription' )->transport = 'postMessage';
+
+	$wp_customize->add_panel(
+		'dmd_panel',
+		array(
+			'title'    => __( 'Digital Mudir Dokan', 'digital-mudir-dokan' ),
+			'priority' => 20,
+		)
+	);
+
+	/* ---------------------------------------------------------------
+	 * Announcement bar
+	 * --------------------------------------------------------------- */
+	$wp_customize->add_section(
+		'dmd_topbar',
+		array(
+			'title' => __( 'Announcement bar', 'digital-mudir-dokan' ),
+			'panel' => 'dmd_panel',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'dmd_topbar_text',
+		array(
+			'default'           => __( 'আমাদের যে কোন পণ্য অর্ডার করতে WhatsApp করুন', 'digital-mudir-dokan' ),
+			'sanitize_callback' => 'wp_kses_post',
+			'transport'         => 'postMessage',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_topbar_text',
+		array(
+			'label'   => __( 'Message', 'digital-mudir-dokan' ),
+			'section' => 'dmd_topbar',
+			'type'    => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'dmd_topbar_show',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'dmd_sanitize_checkbox',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_topbar_show',
+		array(
+			'label'   => __( 'Show the announcement bar', 'digital-mudir-dokan' ),
+			'section' => 'dmd_topbar',
+			'type'    => 'checkbox',
+		)
+	);
+
+	/* ---------------------------------------------------------------
+	 * Hero slider
+	 * --------------------------------------------------------------- */
+	$wp_customize->add_section(
+		'dmd_hero',
+		array(
+			'title'       => __( 'Hero slider', 'digital-mudir-dokan' ),
+			'panel'       => 'dmd_panel',
+			'description' => __( 'Add up to four slides. A slide appears once it has an image or a headline.', 'digital-mudir-dokan' ),
+		)
+	);
+
+	$wp_customize->add_setting(
+		'dmd_hero_autoplay',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'dmd_sanitize_checkbox',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_hero_autoplay',
+		array(
+			'label'       => __( 'Advance slides automatically', 'digital-mudir-dokan' ),
+			'description' => __( 'Autoplay pauses on hover, on keyboard focus, and for visitors who prefer reduced motion.', 'digital-mudir-dokan' ),
+			'section'     => 'dmd_hero',
+			'type'        => 'checkbox',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'dmd_hero_speed',
+		array(
+			'default'           => 6,
+			'sanitize_callback' => 'absint',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_hero_speed',
+		array(
+			'label'       => __( 'Seconds per slide', 'digital-mudir-dokan' ),
+			'section'     => 'dmd_hero',
+			'type'        => 'number',
+			'input_attrs' => array(
+				'min' => 3,
+				'max' => 20,
+			),
+		)
+	);
+
+	for ( $i = 1; $i <= 4; $i++ ) {
+		$wp_customize->add_setting(
+			"dmd_slide_{$i}_image",
+			array( 'sanitize_callback' => 'esc_url_raw' )
+		);
+		$wp_customize->add_control(
+			new WP_Customize_Image_Control(
+				$wp_customize,
+				"dmd_slide_{$i}_image",
+				array(
+					/* translators: %d: slide number. */
+					'label'   => sprintf( __( 'Slide %d — image', 'digital-mudir-dokan' ), $i ),
+					'section' => 'dmd_hero',
+				)
+			)
+		);
+
+		$wp_customize->add_setting(
+			"dmd_slide_{$i}_title",
+			array( 'sanitize_callback' => 'sanitize_text_field' )
+		);
+		$wp_customize->add_control(
+			"dmd_slide_{$i}_title",
+			array(
+				/* translators: %d: slide number. */
+				'label'   => sprintf( __( 'Slide %d — headline', 'digital-mudir-dokan' ), $i ),
+				'section' => 'dmd_hero',
+				'type'    => 'text',
+			)
+		);
+
+		$wp_customize->add_setting(
+			"dmd_slide_{$i}_subtitle",
+			array( 'sanitize_callback' => 'sanitize_text_field' )
+		);
+		$wp_customize->add_control(
+			"dmd_slide_{$i}_subtitle",
+			array(
+				/* translators: %d: slide number. */
+				'label'   => sprintf( __( 'Slide %d — supporting line', 'digital-mudir-dokan' ), $i ),
+				'section' => 'dmd_hero',
+				'type'    => 'text',
+			)
+		);
+
+		$wp_customize->add_setting(
+			"dmd_slide_{$i}_cta_text",
+			array( 'sanitize_callback' => 'sanitize_text_field' )
+		);
+		$wp_customize->add_control(
+			"dmd_slide_{$i}_cta_text",
+			array(
+				/* translators: %d: slide number. */
+				'label'   => sprintf( __( 'Slide %d — button label', 'digital-mudir-dokan' ), $i ),
+				'section' => 'dmd_hero',
+				'type'    => 'text',
+			)
+		);
+
+		$wp_customize->add_setting(
+			"dmd_slide_{$i}_cta_url",
+			array( 'sanitize_callback' => 'esc_url_raw' )
+		);
+		$wp_customize->add_control(
+			"dmd_slide_{$i}_cta_url",
+			array(
+				/* translators: %d: slide number. */
+				'label'   => sprintf( __( 'Slide %d — button link', 'digital-mudir-dokan' ), $i ),
+				'section' => 'dmd_hero',
+				'type'    => 'url',
+			)
+		);
+	}
+
+	/* ---------------------------------------------------------------
+	 * Homepage sections
+	 * --------------------------------------------------------------- */
+	$wp_customize->add_section(
+		'dmd_homepage',
+		array(
+			'title' => __( 'Homepage sections', 'digital-mudir-dokan' ),
+			'panel' => 'dmd_panel',
+		)
+	);
+
+	$sections = array(
+		'dmd_home_top_title'   => array( __( 'Top selling — heading', 'digital-mudir-dokan' ), __( 'Top selling products', 'digital-mudir-dokan' ), 'text' ),
+		'dmd_home_top_count'   => array( __( 'Top selling — how many products', 'digital-mudir-dokan' ), 4, 'number' ),
+		'dmd_home_all_title'   => array( __( 'All products — heading', 'digital-mudir-dokan' ), __( 'All products', 'digital-mudir-dokan' ), 'text' ),
+		'dmd_home_all_count'   => array( __( 'All products — how many products', 'digital-mudir-dokan' ), 12, 'number' ),
+		'dmd_home_video_title' => array( __( 'Video wall — heading', 'digital-mudir-dokan' ), __( 'See what they say about us', 'digital-mudir-dokan' ), 'text' ),
+		'dmd_home_blog_title'  => array( __( 'Blog — heading', 'digital-mudir-dokan' ), __( 'From our blog', 'digital-mudir-dokan' ), 'text' ),
+	);
+
+	foreach ( $sections as $key => $conf ) {
+		list( $label, $default, $type ) = $conf;
+
+		$wp_customize->add_setting(
+			$key,
+			array(
+				'default'           => $default,
+				'sanitize_callback' => 'number' === $type ? 'absint' : 'sanitize_text_field',
+			)
+		);
+		$wp_customize->add_control(
+			$key,
+			array(
+				'label'   => $label,
+				'section' => 'dmd_homepage',
+				'type'    => $type,
+			)
+		);
+	}
+
+	$wp_customize->add_setting(
+		'dmd_home_videos',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_textarea_field',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_home_videos',
+		array(
+			'label'       => __( 'YouTube links', 'digital-mudir-dokan' ),
+			'description' => __( 'One link per line. Leave empty to hide the video wall.', 'digital-mudir-dokan' ),
+			'section'     => 'dmd_homepage',
+			'type'        => 'textarea',
+		)
+	);
+
+	/* ---------------------------------------------------------------
+	 * Shop details
+	 * --------------------------------------------------------------- */
+	$wp_customize->add_section(
+		'dmd_contact',
+		array(
+			'title' => __( 'Shop details', 'digital-mudir-dokan' ),
+			'panel' => 'dmd_panel',
+		)
+	);
+
+	$contact_fields = array(
+		'dmd_whatsapp'      => array( __( 'WhatsApp number', 'digital-mudir-dokan' ), '+8801621611589' ),
+		'dmd_hotline'       => array( __( 'Hotline', 'digital-mudir-dokan' ), '09647460074' ),
+		'dmd_phone_1'       => array( __( 'Phone 1', 'digital-mudir-dokan' ), '+880 1621 611 589' ),
+		'dmd_phone_2'       => array( __( 'Phone 2', 'digital-mudir-dokan' ), '+880 1788 871 247' ),
+		'dmd_email_1'       => array( __( 'Email 1', 'digital-mudir-dokan' ), '' ),
+		'dmd_email_2'       => array( __( 'Email 2', 'digital-mudir-dokan' ), '' ),
+		'dmd_trade_license' => array( __( 'Trade licence number', 'digital-mudir-dokan' ), '' ),
+		'dmd_messenger_url' => array( __( 'Messenger link', 'digital-mudir-dokan' ), '' ),
+	);
+
+	foreach ( $contact_fields as $key => $conf ) {
+		$wp_customize->add_setting(
+			$key,
+			array(
+				'default'           => $conf[1],
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+		$wp_customize->add_control(
+			$key,
+			array(
+				'label'   => $conf[0],
+				'section' => 'dmd_contact',
+				'type'    => 'text',
+			)
+		);
+	}
+
+	$wp_customize->add_setting(
+		'dmd_address',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_textarea_field',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_address',
+		array(
+			'label'   => __( 'Shop address', 'digital-mudir-dokan' ),
+			'section' => 'dmd_contact',
+			'type'    => 'textarea',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'dmd_disclaimer',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'wp_kses_post',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_disclaimer',
+		array(
+			'label'       => __( 'Footer disclaimer', 'digital-mudir-dokan' ),
+			'description' => __( 'Shown above the copyright line.', 'digital-mudir-dokan' ),
+			'section'     => 'dmd_contact',
+			'type'        => 'textarea',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'dmd_payment_image',
+		array( 'sanitize_callback' => 'esc_url_raw' )
+	);
+	$wp_customize->add_control(
+		new WP_Customize_Image_Control(
+			$wp_customize,
+			'dmd_payment_image',
+			array(
+				'label'       => __( 'Payment methods strip', 'digital-mudir-dokan' ),
+				'description' => __( 'An image of the card and mobile banking logos you accept.', 'digital-mudir-dokan' ),
+				'section'     => 'dmd_contact',
+			)
+		)
+	);
+
+	/* ---------------------------------------------------------------
+	 * Delivery promises (single product page)
+	 * --------------------------------------------------------------- */
+	$wp_customize->add_section(
+		'dmd_delivery',
+		array(
+			'title' => __( 'Delivery', 'digital-mudir-dokan' ),
+			'panel' => 'dmd_panel',
+		)
+	);
+
+	$delivery = array(
+		'dmd_delivery_title'   => array( __( 'Heading', 'digital-mudir-dokan' ), __( 'ডেলিভারী টাইম:', 'digital-mudir-dokan' ) ),
+		'dmd_delivery_inside'  => array( __( 'Inside the city', 'digital-mudir-dokan' ), __( 'ঢাকার ভেতরে: ১-২ দিন', 'digital-mudir-dokan' ) ),
+		'dmd_delivery_outside' => array( __( 'Outside the city', 'digital-mudir-dokan' ), __( 'ঢাকার বাইরে: ২-৩ দিন', 'digital-mudir-dokan' ) ),
+	);
+
+	foreach ( $delivery as $key => $conf ) {
+		$wp_customize->add_setting(
+			$key,
+			array(
+				'default'           => $conf[1],
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+		$wp_customize->add_control(
+			$key,
+			array(
+				'label'   => $conf[0],
+				'section' => 'dmd_delivery',
+				'type'    => 'text',
+			)
+		);
+	}
+
+	$wp_customize->add_setting(
+		'dmd_order_button_text',
+		array(
+			'default'           => __( 'অর্ডার করুন', 'digital-mudir-dokan' ),
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_order_button_text',
+		array(
+			'label'       => __( 'Express order button label', 'digital-mudir-dokan' ),
+			'description' => __( 'Adds the product to the cart and goes straight to checkout.', 'digital-mudir-dokan' ),
+			'section'     => 'dmd_delivery',
+			'type'        => 'text',
+		)
+	);
+
+	/* ---------------------------------------------------------------
+	 * Social profiles
+	 * --------------------------------------------------------------- */
+	$wp_customize->add_section(
+		'dmd_social',
+		array(
+			'title' => __( 'Social profiles', 'digital-mudir-dokan' ),
+			'panel' => 'dmd_panel',
+		)
+	);
+
+	foreach ( array( 'facebook', 'tiktok', 'instagram', 'twitter', 'youtube' ) as $network ) {
+		$wp_customize->add_setting(
+			'dmd_social_' . $network,
+			array( 'sanitize_callback' => 'esc_url_raw' )
+		);
+		$wp_customize->add_control(
+			'dmd_social_' . $network,
+			array(
+				'label'   => ucfirst( $network ),
+				'section' => 'dmd_social',
+				'type'    => 'url',
+			)
+		);
+	}
+}
+add_action( 'customize_register', 'dmd_customize_register' );
+
+/**
+ * Checkbox sanitiser.
+ *
+ * @param mixed $checked Raw value.
+ * @return bool
+ */
+function dmd_sanitize_checkbox( $checked ) {
+	return ( isset( $checked ) && true === (bool) $checked );
+}
+
+/**
+ * Live preview script.
+ */
+function dmd_customize_preview_js() {
+	wp_enqueue_script(
+		'dmd-customizer',
+		DMD_URI . '/assets/js/customizer.js',
+		array( 'customize-preview' ),
+		DMD_VERSION,
+		true
+	);
+}
+add_action( 'customize_preview_init', 'dmd_customize_preview_js' );

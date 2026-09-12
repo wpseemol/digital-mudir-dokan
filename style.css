@@ -1,0 +1,22 @@
+/*
+Theme Name: Digital Mudir Dokan
+Theme URI: https://organicusers.com.bd/
+Author: Seemol Chakroborti
+Author URI: https://wpseemol.site/
+Description: Digital Mudir Dokan is a WooCommerce-first grocery and organic food theme built with Tailwind CSS and semantic, SEO-friendly HTML5. It ships tailored templates for the shop, single product, cart, checkout and account pages, a hero slider on the front page, and JSON-LD structured data for Organization, Product, Breadcrumb and Article.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.7
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: digital-mudir-dokan
+Tags: e-commerce, grocery, woocommerce, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, rtl-language-support, block-patterns
+WC requires at least: 7.0
+WC tested up to: 9.5
+
+Digital Mudir Dokan is distributed under the terms of the GNU GPL v2 or later.
+
+The compiled design lives in assets/css/theme.css. Edit assets/css/tailwind.src.css
+and run `npm run build:css` to regenerate it.
+*/
