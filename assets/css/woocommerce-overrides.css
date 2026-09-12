@@ -1,0 +1,19 @@
+/* 
+ * Forced WooCommerce overrides
+ * These styles are loaded with high priority to ensure they override WooCommerce defaults.
+ */
+
+.woocommerce-cart .wc-proceed-to-checkout a.checkout-button,
+.woocommerce-checkout button#place_order,
+.woocommerce button.button.alt,
+.woocommerce a.button.alt {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}

@@ -120,8 +120,9 @@ function dmd_assets() {
 		null
 	);
 
-	wp_enqueue_style( 'dmd-theme', DMD_URI . '/assets/css/theme.css', array(), DMD_VERSION );
-	wp_enqueue_style( 'dmd-style', get_stylesheet_uri(), array( 'dmd-theme' ), DMD_VERSION );
+	wp_enqueue_style( 'dmd-theme', DMD_URI . '/assets/css/theme.css', array(), time() );
+	wp_enqueue_style( 'dmd-overrides', DMD_URI . '/assets/css/woocommerce-overrides.css', array( 'dmd-theme' ), time() );
+	wp_enqueue_style( 'dmd-style', get_stylesheet_uri(), array( 'dmd-theme' ), time() );
 
 	wp_enqueue_script( 'dmd-theme', DMD_URI . '/assets/js/theme.js', array(), DMD_VERSION, true );
 

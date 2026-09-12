@@ -12,24 +12,24 @@ get_header();
 while ( have_posts() ) :
 	the_post();
 	?>
-	<div class="bg-surface py-6">
-		<div class="dmd-container flex flex-wrap items-center justify-between gap-3">
-			<h1 class="m-0 text-xl font-bold sm:text-2xl"><?php the_title(); ?></h1>
-			<?php dmd_breadcrumbs(); ?>
-		</div>
-	</div>
+<div class="bg-surface py-6">
+    <div class="dmd-container flex flex-wrap items-center justify-between gap-3">
+        <h1 class="m-0 text-xl font-bold sm:text-2xl"><?php the_title(); ?></h1>
+        <?php dmd_breadcrumbs(); ?>
+    </div>
+</div>
 
-	<div class="dmd-container py-10">
-		<article id="post-<?php the_ID(); ?>" <?php post_class( 'dmd-page' ); ?>>
+<div class="dmd-container py-10">
+    <article id="post-<?php the_ID(); ?>" <?php post_class( 'dmd-page' ); ?>>
 
-			<?php if ( has_post_thumbnail() ) : ?>
-				<figure class="m-0 mb-8 overflow-hidden rounded-lg">
-					<?php the_post_thumbnail( 'large', array( 'class' => 'w-full object-cover' ) ); ?>
-				</figure>
-			<?php endif; ?>
+        <?php if ( has_post_thumbnail() ) : ?>
+        <figure class="m-0 mb-8 overflow-hidden rounded-lg">
+            <?php the_post_thumbnail( 'large', array( 'class' => 'w-full object-cover' ) ); ?>
+        </figure>
+        <?php endif; ?>
 
-			<div class="dmd-prose max-w-[70ch]">
-				<?php
+        <div class="dmd-prose ">
+            <?php
 				the_content();
 
 				wp_link_pages(
@@ -39,16 +39,16 @@ while ( have_posts() ) :
 					)
 				);
 				?>
-			</div>
+        </div>
 
-			<?php
+        <?php
 			if ( comments_open() || get_comments_number() ) {
 				comments_template();
 			}
 			?>
-		</article>
-	</div>
-	<?php
+    </article>
+</div>
+<?php
 endwhile;
 
 get_footer();

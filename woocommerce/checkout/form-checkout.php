@@ -18,9 +18,9 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 ?>
 <form name="checkout" method="post" class="checkout woocommerce-checkout" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
 
-	<div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
+	<div class="grid gap-8 grid-cols-1 lg:grid-cols-12 lg:items-start">
 
-		<div class="dmd-checkout-details">
+		<div class="dmd-checkout-details lg:col-span-7">
 			<?php if ( $checkout->get_checkout_fields() ) : ?>
 
 				<?php do_action( 'woocommerce_checkout_before_customer_details' ); ?>
@@ -44,7 +44,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 			<?php endif; ?>
 		</div>
 
-		<aside class="dmd-order-review lg:sticky lg:top-6" aria-labelledby="dmd-order-title">
+		<aside class="dmd-order-review lg:col-span-5 lg:sticky lg:top-6" aria-labelledby="dmd-order-title">
 			<h2 id="dmd-order-title" class="mb-4 mt-0 text-lg font-semibold">
 				<?php esc_html_e( 'Your order', 'digital-mudir-dokan' ); ?>
 			</h2>

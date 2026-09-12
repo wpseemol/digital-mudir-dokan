@@ -30,7 +30,7 @@ $dmd_social  = dmd_social_links();
 
 		<div class="dmd-container py-10 text-center">
 
-			<div class="dmd-footer-brand">
+			<div class="dmd-footer-brand flex flex-col items-center justify-center">
 				<?php if ( has_custom_logo() ) : ?>
 					<?php the_custom_logo(); ?>
 				<?php else : ?>

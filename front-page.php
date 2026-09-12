@@ -53,14 +53,14 @@ if ( is_page() && have_posts() ) {
 
 		if ( $dmd_content ) :
 			?>
-			<section class="dmd-front-content bg-white py-12">
-				<div class="dmd-container">
-					<div class="dmd-prose mx-auto max-w-[70ch]">
-						<?php the_content(); ?>
-					</div>
-				</div>
-			</section>
-			<?php
+<section class="dmd-front-content bg-white py-12">
+    <div class="dmd-container">
+        <div class="dmd-prose mx-auto max-w-[70ch]">
+            <?php the_content(); ?>
+        </div>
+    </div>
+</section>
+<?php
 		endif;
 	endwhile;
 }

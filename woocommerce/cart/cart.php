@@ -10,9 +10,9 @@ defined( 'ABSPATH' ) || exit;
 
 do_action( 'woocommerce_before_cart' );
 ?>
-<div class="dmd-cart grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+<div class="dmd-cart grid gap-8 grid-cols-1 lg:grid-cols-12 lg:items-start">
 
-	<form class="woocommerce-cart-form" action="<?php echo esc_url( wc_get_cart_url() ); ?>" method="post">
+	<form class="woocommerce-cart-form lg:col-span-8" action="<?php echo esc_url( wc_get_cart_url() ); ?>" method="post">
 		<?php do_action( 'woocommerce_before_cart_table' ); ?>
 
 		<div class="overflow-x-auto rounded-lg border border-line bg-white">
@@ -158,7 +158,7 @@ do_action( 'woocommerce_before_cart' );
 		<?php do_action( 'woocommerce_after_cart_table' ); ?>
 	</form>
 
-	<aside class="cart-collaterals" aria-label="<?php esc_attr_e( 'Order summary', 'digital-mudir-dokan' ); ?>">
+	<aside class="cart-collaterals lg:col-span-4 lg:sticky lg:top-6" aria-label="<?php esc_attr_e( 'Order summary', 'digital-mudir-dokan' ); ?>">
 		<?php do_action( 'woocommerce_cart_collaterals' ); ?>
 	</aside>
 </div>

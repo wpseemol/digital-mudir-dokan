@@ -12,38 +12,38 @@ get_header();
 while ( have_posts() ) :
 	the_post();
 	?>
-	<div class="bg-surface py-4">
-		<div class="dmd-container"><?php dmd_breadcrumbs(); ?></div>
-	</div>
+<div class="bg-surface py-4">
+    <div class="dmd-container"><?php dmd_breadcrumbs(); ?></div>
+</div>
 
-	<div class="dmd-container py-10">
-		<div class="grid gap-8 <?php echo is_active_sidebar( 'sidebar-1' ) ? 'lg:grid-cols-[minmax(0,1fr)_300px]' : ''; ?>">
+<div class="dmd-container py-10">
+    <div class="grid gap-8 <?php echo is_active_sidebar( 'sidebar-1' ) ? 'lg:grid-cols-[minmax(0,1fr)_300px]' : ''; ?>">
 
-			<article id="post-<?php the_ID(); ?>" <?php post_class( 'dmd-single-post' ); ?>>
+        <article id="post-<?php the_ID(); ?>" <?php post_class( 'dmd-single-post' ); ?>>
 
-				<header class="mb-6">
-					<h1 class="m-0 text-2xl font-bold leading-tight sm:text-3xl"><?php the_title(); ?></h1>
+            <header class="mb-6">
+                <h1 class="m-0 text-2xl font-bold leading-tight sm:text-3xl"><?php the_title(); ?></h1>
 
-					<p class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted m-0">
-						<?php dmd_posted_on(); ?>
-						<span class="inline-flex items-center gap-1.5">
-							<?php dmd_the_icon( 'user', 15 ); ?>
-							<?php the_author(); ?>
-						</span>
-						<?php if ( has_category() ) : ?>
-							<span><?php the_category( ', ' ); ?></span>
-						<?php endif; ?>
-					</p>
-				</header>
+                <p class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted m-0">
+                    <?php dmd_posted_on(); ?>
+                    <span class="inline-flex items-center gap-1.5">
+                        <?php dmd_the_icon( 'user', 15 ); ?>
+                        <?php the_author(); ?>
+                    </span>
+                    <?php if ( has_category() ) : ?>
+                    <span><?php the_category( ', ' ); ?></span>
+                    <?php endif; ?>
+                </p>
+            </header>
 
-				<?php if ( has_post_thumbnail() ) : ?>
-					<figure class="m-0 mb-6 overflow-hidden rounded-lg">
-						<?php the_post_thumbnail( 'large', array( 'class' => 'w-full object-cover' ) ); ?>
-					</figure>
-				<?php endif; ?>
+            <?php if ( has_post_thumbnail() ) : ?>
+            <figure class="m-0 mb-6 overflow-hidden rounded-lg">
+                <?php the_post_thumbnail( 'large', array( 'class' => 'w-full object-cover' ) ); ?>
+            </figure>
+            <?php endif; ?>
 
-				<div class="dmd-prose max-w-[70ch]">
-					<?php
+            <div class="dmd-prose ">
+                <?php
 					the_content();
 
 					wp_link_pages(
@@ -53,15 +53,15 @@ while ( have_posts() ) :
 						)
 					);
 					?>
-				</div>
+            </div>
 
-				<?php if ( has_tag() ) : ?>
-					<footer class="mt-8 border-t border-line pt-5 text-sm">
-						<?php the_tags( '<span class="dmd-tags flex flex-wrap gap-2">', '', '</span>' ); ?>
-					</footer>
-				<?php endif; ?>
+            <?php if ( has_tag() ) : ?>
+            <footer class="mt-8 border-t border-line pt-5 text-sm">
+                <?php the_tags( '<span class="dmd-tags flex flex-wrap gap-2">', '', '</span>' ); ?>
+            </footer>
+            <?php endif; ?>
 
-				<?php
+            <?php
 				the_post_navigation(
 					array(
 						'class'              => 'dmd-post-nav mt-8 grid gap-4 border-t border-line pt-6 sm:grid-cols-2 text-sm',
@@ -75,12 +75,12 @@ while ( have_posts() ) :
 					comments_template();
 				}
 				?>
-			</article>
+        </article>
 
-			<?php get_sidebar(); ?>
-		</div>
-	</div>
-	<?php
+        <?php get_sidebar(); ?>
+    </div>
+</div>
+<?php
 endwhile;
 
 get_footer();
