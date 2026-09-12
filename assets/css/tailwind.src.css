@@ -72,6 +72,11 @@
    ------------------------------------------------------------------ */
 @layer components {
 
+  /* Site logo */
+  img.custom-logo {
+    @apply h-auto max-h-[56px] w-auto object-contain sm:max-h-[68px];
+  }
+
   .dmd-container {
     width: 100%;
     max-width: var(--dmd-container);

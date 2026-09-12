@@ -29,6 +29,38 @@ function dmd_customize_register( $wp_customize ) {
 	);
 
 	/* ---------------------------------------------------------------
+	 * Header
+	 * --------------------------------------------------------------- */
+	$wp_customize->add_section(
+		'dmd_header',
+		array(
+			'title' => __( 'Header', 'digital-mudir-dokan' ),
+			'panel' => 'dmd_panel',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'dmd_logo_alignment',
+		array(
+			'default'           => 'center',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_logo_alignment',
+		array(
+			'label'   => __( 'Logo alignment', 'digital-mudir-dokan' ),
+			'section' => 'dmd_header',
+			'type'    => 'radio',
+			'choices' => array(
+				'left'   => __( 'Left', 'digital-mudir-dokan' ),
+				'center' => __( 'Center', 'digital-mudir-dokan' ),
+				'right'  => __( 'Right', 'digital-mudir-dokan' ),
+			),
+		)
+	);
+
+	/* ---------------------------------------------------------------
 	 * Announcement bar
 	 * --------------------------------------------------------------- */
 	$wp_customize->add_section(

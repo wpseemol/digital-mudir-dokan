@@ -75,7 +75,18 @@ $dmd_contact = dmd_contact();
 				</div>
 
 				<!-- Centre: logo -->
-				<div class="dmd-branding text-center">
+				<?php
+				$alignment = get_theme_mod( 'dmd_logo_alignment', 'center' );
+				$align_class = 'text-center'; // Default
+				if ( 'left' === $alignment ) {
+					$align_class = 'justify-start';
+				} elseif ( 'right' === $alignment ) {
+					$align_class = 'justify-end';
+				} else {
+					$align_class = 'justify-center';
+				}
+				?>
+				<div class="dmd-branding flex <?php echo esc_attr( $align_class ); ?>">
 					<?php if ( has_custom_logo() ) : ?>
 						<?php the_custom_logo(); ?>
 					<?php else : ?>
