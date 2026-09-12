@@ -246,12 +246,26 @@
   .quantity input.qty::-webkit-outer-spin-button,
   .quantity input.qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
+  /* Sidebar sticky */
+  .dmd-shop-sidebar { @apply lg:sticky lg:top-24; }
+
   /* Product loop grid. WooCommerce prints the column count as a class on the
      product list, which the rules below map onto a responsive grid. */
   ul.products {
     @apply m-0 grid list-none grid-cols-2 gap-4 p-0;
   }
-  ul.products > li { @apply list-none; }
+  
+  /* Grid view */
+  ul.products.view-grid { @apply grid-cols-2; }
+  ul.products.view-grid > li { @apply flex flex-col; }
+
+  /* List view */
+  ul.products.view-list { @apply grid-cols-1 gap-6; }
+  ul.products.view-list > li { @apply flex flex-row items-center gap-4 p-4; }
+  ul.products.view-list > li .dmd-card__media { @apply w-32 shrink-0; }
+  ul.products.view-list > li .dmd-card__title { @apply mt-0; }
+  ul.products.view-list > li .dmd-card__actions { @apply mt-0 w-48 shrink-0; }
+
   ul.products.columns-2 { @apply sm:grid-cols-2; }
   ul.products.columns-3 { @apply sm:grid-cols-2 lg:grid-cols-3; }
   ul.products.columns-4 { @apply sm:grid-cols-2 lg:grid-cols-4; }

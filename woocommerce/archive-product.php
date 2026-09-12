@@ -79,6 +79,14 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 					</div>
 
 					<div class="flex items-center gap-4">
+						<div class="flex items-center gap-1 border-r border-line pr-4">
+							<button type="button" class="dmd-btn dmd-btn--ghost h-9 w-9 p-0" data-view-toggle="grid" aria-label="<?php esc_attr_e( 'Grid view', 'digital-mudir-dokan' ); ?>">
+								<?php dmd_the_icon( 'grid', 18 ); ?>
+							</button>
+							<button type="button" class="dmd-btn dmd-btn--ghost h-9 w-9 p-0" data-view-toggle="list" aria-label="<?php esc_attr_e( 'List view', 'digital-mudir-dokan' ); ?>">
+								<?php dmd_the_icon( 'list', 18 ); ?>
+							</button>
+						</div>
 						<?php woocommerce_result_count(); ?>
 						<?php woocommerce_catalog_ordering(); ?>
 					</div>

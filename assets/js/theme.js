@@ -267,6 +267,86 @@
 	}
 
 	/* ------------------------------------------------------------------
+	 * WooCommerce category toggle
+	 * ------------------------------------------------------------------ */
+	function initCategoryToggle() {
+		var widget = document.querySelector('.widget_product_categories');
+		if (!widget) {
+			return;
+		}
+
+		var list = widget.querySelector('ul');
+		if (!list) {
+			return;
+		}
+
+		var items = Array.prototype.slice.call(list.children);
+		var limit = 8;
+
+		if (items.length <= limit) {
+			return;
+		}
+
+		// Hide excess items
+		items.forEach(function (item, index) {
+			if (index >= limit) {
+				item.classList.add('hidden');
+			}
+		});
+
+		// Create toggle button
+		var button = document.createElement('button');
+		button.className = 'dmd-btn dmd-btn--ghost dmd-btn--block mt-3 text-xs';
+		button.innerHTML = 'আরও দেখুন +';
+		button.type = 'button';
+
+		button.addEventListener('click', function () {
+			var isExpanded = button.getAttribute('aria-expanded') === 'true';
+			items.forEach(function (item, index) {
+				if (index >= limit) {
+					item.classList.toggle('hidden', isExpanded);
+				}
+			});
+
+			button.setAttribute('aria-expanded', !isExpanded);
+			button.innerHTML = !isExpanded ? 'কম দেখুন -' : 'আরও দেখুন +';
+		});
+
+		widget.appendChild(button);
+	}
+
+	/* ------------------------------------------------------------------
+	 * View Switcher (Grid/List)
+	 * ------------------------------------------------------------------ */
+	function initViewSwitcher() {
+		var container = document.querySelector('ul.products');
+		var toggles = document.querySelectorAll('[data-view-toggle]');
+
+		if (!container || toggles.length === 0) {
+			return;
+		}
+
+		function setView(view) {
+			localStorage.setItem('dmd_shop_view', view);
+			container.classList.remove('view-grid', 'view-list');
+			container.classList.add('view-' + view);
+
+			toggles.forEach(function (btn) {
+				btn.setAttribute('aria-pressed', btn.dataset.viewToggle === view);
+			});
+		}
+
+		var savedView = localStorage.getItem('dmd_shop_view') || 'grid';
+		setView(savedView);
+
+		toggles.forEach(function (btn) {
+			btn.addEventListener('click', function () {
+				setView(btn.dataset.viewToggle);
+			});
+		});
+	}
+
+	/* ------------------------------------------------------------------
 	 * Boot
 	 * ------------------------------------------------------------------ */
 	function boot() {
@@ -285,6 +365,8 @@
 		initQuantity(document);
 		initVideos();
 		initOrderNow();
+		initCategoryToggle();
+		initViewSwitcher();
 	}
 
 	if (document.readyState === 'loading') {

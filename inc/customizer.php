@@ -29,6 +29,33 @@ function dmd_customize_register( $wp_customize ) {
 	);
 
 	/* ---------------------------------------------------------------
+	 * Shop settings
+	 * --------------------------------------------------------------- */
+	$wp_customize->add_section(
+		'dmd_shop_settings',
+		array(
+			'title' => __( 'Shop settings', 'digital-mudir-dokan' ),
+			'panel' => 'dmd_panel',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'dmd_default_product_placeholder',
+		array( 'sanitize_callback' => 'esc_url_raw' )
+	);
+	$wp_customize->add_control(
+		new WP_Customize_Image_Control(
+			$wp_customize,
+			'dmd_default_product_placeholder',
+			array(
+				'label'       => __( 'Default Product Card Image (যদি প্রোডাক্টের ছবি না থাকে)', 'digital-mudir-dokan' ),
+				'description' => __( 'Upload a fallback image/logo to display on product cards when a product has no featured image uploaded.', 'digital-mudir-dokan' ),
+				'section'     => 'dmd_shop_settings',
+			)
+		)
+	);
+
+	/* ---------------------------------------------------------------
 	 * Header
 	 * --------------------------------------------------------------- */
 	$wp_customize->add_section(

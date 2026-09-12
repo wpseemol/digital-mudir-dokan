@@ -8,6 +8,21 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Get product placeholder URL.
+ *
+ * @return string
+ */
+function dmd_get_product_placeholder_url() {
+	$url = get_theme_mod( 'dmd_default_product_placeholder' );
+
+	if ( $url ) {
+		return esc_url( $url );
+	}
+
+	return wc_placeholder_img_src();
+}
+
+/**
  * Replace the plugin stylesheets with the theme build.
  *
  * @param array $styles Registered WooCommerce styles.
