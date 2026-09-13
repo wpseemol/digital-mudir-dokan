@@ -87,6 +87,28 @@ function dmd_customize_register( $wp_customize ) {
 		)
 	);
 
+	$wp_customize->add_setting(
+		'dmd_logo_width',
+		array(
+			'default'           => 180,
+			'sanitize_callback' => 'absint',
+			'transport'         => 'postMessage',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_logo_width',
+		array(
+			'label'       => __( 'Logo width (px)', 'digital-mudir-dokan' ),
+			'section'     => 'dmd_header',
+			'type'        => 'range',
+			'input_attrs' => array(
+				'min'  => 50,
+				'max'  => 400,
+				'step' => 5,
+			),
+		)
+	);
+
 	/* ---------------------------------------------------------------
 	 * Announcement bar
 	 * --------------------------------------------------------------- */
@@ -137,9 +159,29 @@ function dmd_customize_register( $wp_customize ) {
 	$wp_customize->add_section(
 		'dmd_hero',
 		array(
-			'title'       => __( 'Hero slider', 'digital-mudir-dokan' ),
+			'title'       => __( 'Hero slider / Banner', 'digital-mudir-dokan' ),
 			'panel'       => 'dmd_panel',
-			'description' => __( 'Add up to four slides. A slide appears once it has an image or a headline.', 'digital-mudir-dokan' ),
+			'description' => __( 'Add up to five slides. A slide appears once it has an image or a headline.', 'digital-mudir-dokan' ),
+		)
+	);
+
+	$wp_customize->add_setting(
+		'dmd_slider_width',
+		array(
+			'default'           => 'container',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_slider_width',
+		array(
+			'label'   => __( 'Container Width Mode', 'digital-mudir-dokan' ),
+			'section' => 'dmd_hero',
+			'type'    => 'select',
+			'choices' => array(
+				'container' => __( 'Boxed / Centered', 'digital-mudir-dokan' ),
+				'full'      => __( 'Full width', 'digital-mudir-dokan' ),
+			),
 		)
 	);
 
@@ -160,37 +202,16 @@ function dmd_customize_register( $wp_customize ) {
 	);
 
 	$wp_customize->add_setting(
-		'dmd_hero_speed',
-		array(
-			'default'           => 800,
-			'sanitize_callback' => 'absint',
-		)
-	);
-	$wp_customize->add_control(
-		'dmd_hero_speed',
-		array(
-			'label'       => __( 'Transition speed (ms)', 'digital-mudir-dokan' ),
-			'section'     => 'dmd_hero',
-			'type'        => 'number',
-			'input_attrs' => array(
-				'min'  => 300,
-				'max'  => 3000,
-				'step' => 100,
-			),
-		)
-	);
-
-	$wp_customize->add_setting(
-		'dmd_hero_delay',
+		'dmd_slider_delay',
 		array(
 			'default'           => 4000,
 			'sanitize_callback' => 'absint',
 		)
 	);
 	$wp_customize->add_control(
-		'dmd_hero_delay',
+		'dmd_slider_delay',
 		array(
-			'label'       => __( 'Autoplay delay (ms)', 'digital-mudir-dokan' ),
+			'label'       => __( 'Autoplay Delay / Slide Duration (ms)', 'digital-mudir-dokan' ),
 			'section'     => 'dmd_hero',
 			'type'        => 'number',
 			'input_attrs' => array(
@@ -201,7 +222,42 @@ function dmd_customize_register( $wp_customize ) {
 		)
 	);
 
-	for ( $i = 1; $i <= 4; $i++ ) {
+	$wp_customize->add_setting(
+		'dmd_slider_speed',
+		array(
+			'default'           => 800,
+			'sanitize_callback' => 'absint',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_slider_speed',
+		array(
+			'label'       => __( 'Transition Slide Speed (ms)', 'digital-mudir-dokan' ),
+			'section'     => 'dmd_hero',
+			'type'        => 'number',
+			'input_attrs' => array(
+				'min'  => 300,
+				'max'  => 3000,
+				'step' => 100,
+			),
+		)
+	);
+
+	// Fallback banner
+	$wp_customize->add_setting( 'dmd_hero_fallback_image', array( 'sanitize_callback' => 'esc_url_raw' ) );
+	$wp_customize->add_control(
+		new WP_Customize_Image_Control(
+			$wp_customize,
+			'dmd_hero_fallback_image',
+			array( 'label' => __( 'Fallback Banner Image', 'digital-mudir-dokan' ), 'section' => 'dmd_hero' )
+		)
+	);
+	$wp_customize->add_setting( 'dmd_hero_fallback_title', array( 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'dmd_hero_fallback_title', array( 'label' => __( 'Fallback Title', 'digital-mudir-dokan' ), 'section' => 'dmd_hero', 'type' => 'text' ) );
+	$wp_customize->add_setting( 'dmd_hero_fallback_url', array( 'sanitize_callback' => 'esc_url_raw' ) );
+	$wp_customize->add_control( 'dmd_hero_fallback_url', array( 'label' => __( 'Fallback Link', 'digital-mudir-dokan' ), 'section' => 'dmd_hero', 'type' => 'url' ) );
+
+	for ( $i = 1; $i <= 5; $i++ ) {
 		$wp_customize->add_setting(
 			"dmd_slide_{$i}_image",
 			array( 'sanitize_callback' => 'esc_url_raw' )

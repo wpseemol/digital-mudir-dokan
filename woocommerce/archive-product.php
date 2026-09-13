@@ -80,11 +80,31 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 
 					<div class="flex items-center gap-4">
 						<div class="flex items-center gap-1 border-r border-line pr-4">
-							<button type="button" class="dmd-btn dmd-btn--ghost h-9 w-9 p-0" data-view-toggle="grid" aria-label="<?php esc_attr_e( 'Grid view', 'digital-mudir-dokan' ); ?>">
-								<?php dmd_the_icon( 'grid', 18 ); ?>
+							<button type="button" 
+									class="dmd-view-toggle p-2 rounded-md transition-all duration-200 ease-in-out" 
+									data-view-toggle="grid" 
+									aria-label="<?php esc_attr_e( 'Grid view', 'digital-mudir-dokan' ); ?>" 
+									aria-pressed="true">
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dmd-icon">
+									<rect x="3" y="3" width="7" height="7" rx="1"></rect>
+									<rect x="14" y="3" width="7" height="7" rx="1"></rect>
+									<rect x="3" y="14" width="7" height="7" rx="1"></rect>
+									<rect x="14" y="14" width="7" height="7" rx="1"></rect>
+								</svg>
 							</button>
-							<button type="button" class="dmd-btn dmd-btn--ghost h-9 w-9 p-0" data-view-toggle="list" aria-label="<?php esc_attr_e( 'List view', 'digital-mudir-dokan' ); ?>">
-								<?php dmd_the_icon( 'list', 18 ); ?>
+							<button type="button" 
+									class="dmd-view-toggle p-2 rounded-md transition-all duration-200 ease-in-out" 
+									data-view-toggle="list" 
+									aria-label="<?php esc_attr_e( 'List view', 'digital-mudir-dokan' ); ?>" 
+									aria-pressed="false">
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dmd-icon">
+									<line x1="8" y1="6" x2="21" y2="6"></line>
+									<line x1="8" y1="12" x2="21" y2="12"></line>
+									<line x1="8" y1="18" x2="21" y2="18"></line>
+									<line x1="3" y1="6" x2="3.01" y2="6"></line>
+									<line x1="3" y1="12" x2="3.01" y2="12"></line>
+									<line x1="3" y1="18" x2="3.01" y2="18"></line>
+								</svg>
 							</button>
 						</div>
 						<?php woocommerce_result_count(); ?>

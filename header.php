@@ -77,6 +77,7 @@ $dmd_contact = dmd_contact();
 				<!-- Centre: logo -->
 				<?php
 				$alignment = get_theme_mod( 'dmd_logo_alignment', 'center' );
+				$logo_width = get_theme_mod( 'dmd_logo_width', 180 );
 				$align_class = 'text-center'; // Default
 				if ( 'left' === $alignment ) {
 					$align_class = 'justify-start';
@@ -86,6 +87,9 @@ $dmd_contact = dmd_contact();
 					$align_class = 'justify-center';
 				}
 				?>
+				<style>
+					.dmd-branding img { width: <?php echo esc_attr( $logo_width ); ?>px; }
+				</style>
 				<div class="dmd-branding flex <?php echo esc_attr( $align_class ); ?>">
 					<?php if ( has_custom_logo() ) : ?>
 						<?php the_custom_logo(); ?>
@@ -132,8 +136,9 @@ $dmd_contact = dmd_contact();
 			</div>
 
 			<!-- Search panel -->
-			<div id="dmd-search-panel" class="dmd-search-panel hidden pb-4" hidden>
+			<div id="dmd-search-panel" class="dmd-search-panel relative hidden pb-4" hidden>
 				<?php get_search_form(); ?>
+				<div id="dmd-live-search-results" class="absolute left-0 top-full z-50 w-full bg-white border border-line rounded-md shadow-lg mt-1 overflow-y-auto max-h-96 hidden"></div>
 			</div>
 		</div>
 
@@ -156,8 +161,14 @@ $dmd_contact = dmd_contact();
 		</nav>
 
 		<!-- Mobile navigation -->
-		<nav id="dmd-mobile-nav" class="dmd-mobile-nav hidden border-t border-line lg:hidden" aria-label="<?php esc_attr_e( 'Mobile', 'digital-mudir-dokan' ); ?>" hidden>
-			<div class="dmd-container py-3">
+		<nav id="dmd-mobile-nav" class="dmd-mobile-nav fixed inset-y-0 right-0 z-50 w-full max-w-xs transform bg-white shadow-xl transition-transform duration-300 ease-in-out translate-x-full lg:hidden" aria-label="<?php esc_attr_e( 'Mobile', 'digital-mudir-dokan' ); ?>">
+			<div class="h-full overflow-y-auto px-4 py-6">
+				<div class="flex items-center justify-between mb-6">
+					<span class="font-bold text-lg"><?php esc_html_e( 'Menu', 'digital-mudir-dokan' ); ?></span>
+					<button type="button" class="dmd-menu-toggle h-10 w-10 flex items-center justify-center rounded-full bg-surface" aria-expanded="false">
+						<?php dmd_the_icon( 'close', 20 ); ?>
+					</button>
+				</div>
 				<?php
 				wp_nav_menu(
 					array(

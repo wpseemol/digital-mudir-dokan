@@ -25,4 +25,9 @@
 			$('.dmd-topbar span').first().text(to);
 		});
 	});
+	wp.customize('dmd_logo_width', function (value) {
+		value.bind(function (to) {
+			$('.dmd-branding img').css('width', to + 'px');
+		});
+	});
 })(jQuery);

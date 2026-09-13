@@ -464,3 +464,57 @@ function dmd_single_order_now() {
 	echo '</div>';
 }
 add_action( 'woocommerce_after_add_to_cart_form', 'dmd_single_order_now', 5 );
+
+/* ---------------------------------------------------------------------------
+ * AJAX Live Search
+ * ------------------------------------------------------------------------- */
+
+/**
+ * Handle live search requests.
+ */
+function dmd_ajax_live_search() {
+	check_ajax_referer( 'dmd_search_nonce', 'nonce' );
+
+	$search_query = sanitize_text_field( wp_unslash( $_POST['query'] ) );
+
+	if ( empty( $search_query ) ) {
+		wp_send_json_error( __( 'Please enter a search term.', 'digital-mudir-dokan' ) );
+	}
+
+	$args = array(
+		'post_type'      => 'product',
+		'post_status'    => 'publish',
+		'posts_per_page' => 5,
+		's'              => $search_query,
+	);
+
+	$query = new WP_Query( $args );
+
+	if ( ! $query->have_posts() ) {
+		wp_send_json_error( __( 'No products found.', 'digital-mudir-dokan' ) );
+	}
+
+	ob_start();
+	while ( $query->have_posts() ) {
+		$query->the_post();
+		?>
+		<a href="<?php echo esc_url( get_permalink() ); ?>" class="dmd-search-result flex items-center gap-3 p-2 hover:bg-surface">
+			<?php if ( has_post_thumbnail() ) : ?>
+				<?php the_post_thumbnail( 'thumbnail', array( 'class' => 'h-10 w-10 object-cover rounded' ) ); ?>
+			<?php endif; ?>
+			<span class="text-sm font-medium"><?php the_title(); ?></span>
+		</a>
+		<?php
+	}
+	
+	// Add View all link
+	$search_url = add_query_arg( array( 's' => $search_query, 'post_type' => 'product' ), home_url( '/' ) );
+	echo '<a href="' . esc_url( $search_url ) . '" class="block p-2 mt-2 text-sm text-center text-green font-semibold hover:underline border-t border-line">' . esc_html__( 'View all results', 'digital-mudir-dokan' ) . '</a>';
+
+	wp_reset_postdata();
+	$output = ob_get_clean();
+
+	wp_send_json_success( $output );
+}
+add_action( 'wp_ajax_dmd_live_search', 'dmd_ajax_live_search' );
+add_action( 'wp_ajax_nopriv_dmd_live_search', 'dmd_ajax_live_search' );

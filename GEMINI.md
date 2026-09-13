@@ -99,3 +99,7 @@ Run these commands from the theme directory:
 
 ### Customizer Configurations
 All major customization parameters live inside **Appearance → Customize → Digital Mudir Dokan** panel. New homepage features or settings must follow the existing pattern in `inc/customizer.php` using WordPress Customizer controls and enqueued with postMessage transport for instant live-preview support in `assets/js/customizer.js`.
+
+### New Features & Customizer Updates
+- **Logo Width:** Adjustable via *Appearance → Customize → Digital Mudir Dokan → Header*.
+- **Hero Slider:** Supports both 'Boxed' and 'Full width' layout modes via *Appearance → Customize → Digital Mudir Dokan → Hero slider / Banner*.

@@ -17,3 +17,8 @@
   opacity: 1 !important;
   visibility: visible !important;
 }
+
+/* Ensure currency symbol is treated correctly */
+.woocommerce-Price-amount {
+  display: inline-block !important;
+}

@@ -156,7 +156,7 @@ function dmd_pagination() {
 /**
  * Hero slides.
  *
- * Slides are managed in the Customizer (up to four). Each slide can point at an
+ * Slides are managed in the Customizer (up to five). Each slide can point at an
  * image, a headline, a supporting line and a link.
  *
  * @return array
@@ -164,7 +164,7 @@ function dmd_pagination() {
 function dmd_get_hero_slides() {
 	$slides = array();
 
-	for ( $i = 1; $i <= 4; $i++ ) {
+	for ( $i = 1; $i <= 5; $i++ ) {
 		$image = get_theme_mod( "dmd_slide_{$i}_image" );
 		$title = get_theme_mod( "dmd_slide_{$i}_title" );
 
@@ -178,18 +178,6 @@ function dmd_get_hero_slides() {
 			'subtitle' => get_theme_mod( "dmd_slide_{$i}_subtitle" ),
 			'cta_text' => get_theme_mod( "dmd_slide_{$i}_cta_text" ),
 			'cta_url'  => get_theme_mod( "dmd_slide_{$i}_cta_url" ),
-		);
-	}
-
-	// Nothing configured yet — show one editorial placeholder so the front page
-	// never renders an empty band on a fresh install.
-	if ( ! $slides ) {
-		$slides[] = array(
-			'image'    => '',
-			'title'    => __( 'রোগ প্রতিরোধ ক্ষমতা বাড়ান', 'digital-mudir-dokan' ),
-			'subtitle' => __( 'সুস্থ থাকুন স্বাভাবিকভাবে — ১০০% খাঁটি ও প্রাকৃতিক পণ্য।', 'digital-mudir-dokan' ),
-			'cta_text' => __( 'Shop now', 'digital-mudir-dokan' ),
-			'cta_url'  => function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' ),
 		);
 	}
 

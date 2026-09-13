@@ -10,7 +10,66 @@
 	var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	/* ------------------------------------------------------------------
-	 * Disclosure toggles (mobile menu, search panel)
+	 * Mobile Navigation Drawer
+	 * ------------------------------------------------------------------ */
+	function initMobileMenu() {
+		var toggles = document.querySelectorAll('.dmd-menu-toggle');
+		var nav = document.getElementById('dmd-mobile-nav');
+		var body = document.body;
+
+		if (!toggles.length || !nav) return;
+
+		// Create backdrop
+		var backdrop = document.createElement('div');
+		backdrop.className = 'fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 opacity-0 hidden';
+		body.appendChild(backdrop);
+
+		function toggleMenu(open) {
+			toggles.forEach(toggle => toggle.setAttribute('aria-expanded', open ? 'true' : 'false'));
+			
+			if (open) {
+				nav.classList.remove('translate-x-full');
+				nav.classList.add('translate-x-0');
+			} else {
+				nav.classList.remove('translate-x-0');
+				nav.classList.add('translate-x-full');
+			}
+			
+			backdrop.classList.toggle('hidden', !open);
+			setTimeout(() => {
+				backdrop.classList.toggle('opacity-0', !open);
+			}, 10);
+			
+			body.classList.toggle('overflow-hidden', open);
+		}
+
+		toggles.forEach(toggle => {
+			toggle.addEventListener('click', function () {
+				var isOpen = toggle.getAttribute('aria-expanded') === 'true';
+				toggleMenu(!isOpen);
+			});
+		});
+
+		backdrop.addEventListener('click', function () {
+			toggleMenu(false);
+		});
+
+		nav.addEventListener('click', function (e) {
+			if (e.target.tagName === 'A') {
+				toggleMenu(false);
+			}
+		});
+
+		// Escape key
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && nav.classList.contains('translate-x-0')) {
+				toggleMenu(false);
+			}
+		});
+	}
+
+	/* ------------------------------------------------------------------
+	 * Disclosure toggles (search panel)
 	 * ------------------------------------------------------------------ */
 	function initToggle(button, panel) {
 		if (!button || !panel) {
@@ -199,10 +258,26 @@
 			return;
 		}
 
+		// Detect existing column class (e.g., columns-4)
+		var columnClass = Array.from(container.classList).find(c => c.startsWith('columns-'));
+
 		function setView(view) {
 			localStorage.setItem('dmd_shop_view', view);
-			container.classList.remove('view-grid', 'view-list');
-			container.classList.add('view-' + view);
+			
+			// Reset classes
+			container.classList.remove('view-grid', 'view-list', 'grid-cols-1');
+			if (columnClass) {
+				container.classList.remove(columnClass);
+			}
+
+			if (view === 'list') {
+				container.classList.add('view-list', 'grid-cols-1');
+			} else {
+				container.classList.add('view-grid');
+				if (columnClass) {
+					container.classList.add(columnClass);
+				}
+			}
 
 			toggles.forEach(function (btn) {
 				btn.setAttribute('aria-pressed', btn.dataset.viewToggle === view);
@@ -244,25 +319,30 @@
 	}
 
 	/* ------------------------------------------------------------------
-	 * Boot
+	 * Initialize Swiper.js
 	 * ------------------------------------------------------------------ */
-	function boot() {
-		// Initialize Swiper.js
 	function initHeroSlider() {
 		var slider = document.querySelector('.hero-swiper');
 		if (!slider) {
 			return;
 		}
 
-		var autoplay = slider.dataset.autoplay === 'true';
-		var speed = parseInt(slider.dataset.speed, 10) || 800;
-		var delay = parseInt(slider.dataset.delay, 10) || 4000;
+		var slides = slider.querySelectorAll('.swiper-slide');
+		if (slides.length <= 1) {
+			slider.querySelector('.swiper-button-prev-custom').style.display = 'none';
+			slider.querySelector('.swiper-button-next-custom').style.display = 'none';
+			return;
+		}
 
-		new Swiper('.hero-swiper', {
+		const isAutoplay = slider.dataset.autoplay !== 'false';
+		const delayTime = parseInt(slider.dataset.delay, 10) || 4000;
+		const speedTime = parseInt(slider.dataset.speed, 10) || 800;
+
+		new Swiper(slider, {
 			loop: true,
-			speed: speed,
-			autoplay: autoplay ? {
-				delay: delay,
+			speed: speedTime,
+			autoplay: isAutoplay ? {
+				delay: delayTime,
 				disableOnInteraction: false,
 				pauseOnMouseEnter: true,
 			} : false,
@@ -285,10 +365,7 @@
 	function boot() {
 		initHeroSlider();
 
-		initToggle(
-			document.querySelector('.dmd-menu-toggle'),
-			document.getElementById('dmd-mobile-nav')
-		);
+		initMobileMenu();
 
 		initToggle(
 			document.querySelector('.dmd-search-toggle'),

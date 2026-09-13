@@ -160,16 +160,16 @@
         @apply h-full w-full object-cover;
     }
     .dmd-card__title {
-        @apply mt-3 text-[15px] font-medium leading-snug;
+        @apply mt-3 text-[15px] font-medium leading-snug line-clamp-2;
     }
     .dmd-card__price {
         @apply mt-1 text-[15px] font-semibold text-green;
     }
     .dmd-card__price del {
-        @apply text-muted font-normal text-sm mr-1 no-underline line-through;
+        @apply text-muted font-normal text-xs mr-1.5 line-through decoration-muted;
     }
     .dmd-card__price ins {
-        @apply no-underline;
+        @apply no-underline text-green;
     }
     .dmd-card__actions {
         @apply mt-3 grid gap-2;
@@ -304,12 +304,32 @@
     /* Product loop grid. WooCommerce prints the column count as a class on the
      product list, which the rules below map onto a responsive grid. */
     ul.products {
-        @apply m-0 grid list-none grid-cols-2 gap-4 p-0;
+        @apply m-0 grid list-none gap-4 p-0 transition-all duration-300 ease-in-out;
+    }
+
+    ul.products > li {
+        @apply transition-all duration-300 ease-in-out;
+    }
+
+    .dmd-icon {
+        @apply block;
+    }
+
+    .dmd-view-toggle {
+        @apply bg-emerald-900 text-white transition-colors duration-300;
+    }
+
+    .dmd-view-toggle:hover {
+        @apply text-white;
+    }
+
+    .dmd-view-toggle[aria-pressed="true"] {
+        @apply bg-green text-white;
     }
 
     /* Grid view */
     ul.products.view-grid {
-        @apply grid-cols-2;
+        /* No specific column count here, let columns-X classes handle it */
     }
     ul.products.view-grid > li {
         @apply flex flex-col;
@@ -329,7 +349,7 @@
         @apply mt-0;
     }
     ul.products.view-list > li .dmd-card__actions {
-        @apply mt-0 w-48 shrink-0;
+        @apply mt-0 flex flex-col gap-2 w-48 shrink-0;
     }
 
     ul.products.columns-2 {
