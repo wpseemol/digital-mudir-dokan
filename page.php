@@ -19,7 +19,7 @@ while ( have_posts() ) :
     </div>
 </div>
 
-<div class="dmd-container py-10">
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl">
     <article id="post-<?php the_ID(); ?>" <?php post_class( 'dmd-page' ); ?>>
 
         <?php if ( has_post_thumbnail() ) : ?>

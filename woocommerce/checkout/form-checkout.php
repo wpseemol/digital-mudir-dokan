@@ -44,7 +44,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 			<?php endif; ?>
 		</div>
 
-		<aside class="dmd-order-review lg:col-span-5 lg:sticky lg:top-6" aria-labelledby="dmd-order-title">
+		<aside class="dmd-order-review lg:col-span-5" aria-labelledby="dmd-order-title">
 			<h2 id="dmd-order-title" class="mb-4 mt-0 text-lg font-semibold">
 				<?php esc_html_e( 'Your order', 'digital-mudir-dokan' ); ?>
 			</h2>

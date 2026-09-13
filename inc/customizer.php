@@ -153,29 +153,50 @@ function dmd_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'dmd_hero_autoplay',
 		array(
-			'label'       => __( 'Advance slides automatically', 'digital-mudir-dokan' ),
-			'description' => __( 'Autoplay pauses on hover, on keyboard focus, and for visitors who prefer reduced motion.', 'digital-mudir-dokan' ),
-			'section'     => 'dmd_hero',
-			'type'        => 'checkbox',
+			'label'   => __( 'Enable autoplay', 'digital-mudir-dokan' ),
+			'section' => 'dmd_hero',
+			'type'    => 'checkbox',
 		)
 	);
 
 	$wp_customize->add_setting(
 		'dmd_hero_speed',
 		array(
-			'default'           => 6,
+			'default'           => 800,
 			'sanitize_callback' => 'absint',
 		)
 	);
 	$wp_customize->add_control(
 		'dmd_hero_speed',
 		array(
-			'label'       => __( 'Seconds per slide', 'digital-mudir-dokan' ),
+			'label'       => __( 'Transition speed (ms)', 'digital-mudir-dokan' ),
 			'section'     => 'dmd_hero',
 			'type'        => 'number',
 			'input_attrs' => array(
-				'min' => 3,
-				'max' => 20,
+				'min'  => 300,
+				'max'  => 3000,
+				'step' => 100,
+			),
+		)
+	);
+
+	$wp_customize->add_setting(
+		'dmd_hero_delay',
+		array(
+			'default'           => 4000,
+			'sanitize_callback' => 'absint',
+		)
+	);
+	$wp_customize->add_control(
+		'dmd_hero_delay',
+		array(
+			'label'       => __( 'Autoplay delay (ms)', 'digital-mudir-dokan' ),
+			'section'     => 'dmd_hero',
+			'type'        => 'number',
+			'input_attrs' => array(
+				'min'  => 1000,
+				'max'  => 10000,
+				'step' => 500,
 			),
 		)
 	);

@@ -10,133 +10,6 @@
 	var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	/* ------------------------------------------------------------------
-	 * Hero slider
-	 * ------------------------------------------------------------------ */
-	function initSlider(root) {
-		var track = root.querySelector('[data-dmd-track]');
-		if (!track) {
-			return;
-		}
-
-		var slides = Array.prototype.slice.call(track.children);
-		if (slides.length < 2) {
-			return;
-		}
-
-		var dots = Array.prototype.slice.call(root.querySelectorAll('[data-dmd-dot]'));
-		var prev = root.querySelector('[data-dmd-prev]');
-		var next = root.querySelector('[data-dmd-next]');
-		var index = 0;
-		var timer = null;
-		var interval = parseInt(root.dataset.interval, 10) || 6000;
-		var autoplay = root.dataset.autoplay === 'true' && !prefersReducedMotion;
-
-		function render() {
-			track.style.transform = 'translateX(' + (index * -100) + '%)';
-
-			slides.forEach(function (slide, i) {
-				// Hide off-screen slides from assistive tech and tab order.
-				slide.setAttribute('aria-hidden', i === index ? 'false' : 'true');
-				slide.querySelectorAll('a, button').forEach(function (el) {
-					el.tabIndex = i === index ? 0 : -1;
-				});
-			});
-
-			dots.forEach(function (dot, i) {
-				dot.setAttribute('aria-current', i === index ? 'true' : 'false');
-			});
-		}
-
-		function goTo(target) {
-			index = (target + slides.length) % slides.length;
-			render();
-		}
-
-		function start() {
-			if (!autoplay) {
-				return;
-			}
-			stop();
-			timer = window.setInterval(function () {
-				goTo(index + 1);
-			}, interval);
-		}
-
-		function stop() {
-			if (timer) {
-				window.clearInterval(timer);
-				timer = null;
-			}
-		}
-
-		if (prev) {
-			prev.addEventListener('click', function () {
-				goTo(index - 1);
-				start();
-			});
-		}
-
-		if (next) {
-			next.addEventListener('click', function () {
-				goTo(index + 1);
-				start();
-			});
-		}
-
-		dots.forEach(function (dot) {
-			dot.addEventListener('click', function () {
-				goTo(parseInt(dot.dataset.dmdDot, 10));
-				start();
-			});
-		});
-
-		// Arrow keys when the carousel has focus.
-		root.addEventListener('keydown', function (event) {
-			if (event.key === 'ArrowLeft') {
-				goTo(index - 1);
-			} else if (event.key === 'ArrowRight') {
-				goTo(index + 1);
-			}
-		});
-
-		// Pause while the visitor is reading or interacting.
-		root.addEventListener('mouseenter', stop);
-		root.addEventListener('mouseleave', start);
-		root.addEventListener('focusin', stop);
-		root.addEventListener('focusout', start);
-
-		document.addEventListener('visibilitychange', function () {
-			if (document.hidden) {
-				stop();
-			} else {
-				start();
-			}
-		});
-
-		// Touch swipe.
-		var startX = null;
-		track.addEventListener('touchstart', function (event) {
-			startX = event.touches[0].clientX;
-			stop();
-		}, { passive: true });
-
-		track.addEventListener('touchend', function (event) {
-			if (startX === null) {
-				return;
-			}
-			var delta = event.changedTouches[0].clientX - startX;
-			if (Math.abs(delta) > 40) {
-				goTo(delta < 0 ? index + 1 : index - 1);
-			}
-			startX = null;
-			start();
-		});
-
-		render();
-		start();
-	}
-
-	/* ------------------------------------------------------------------
 	 * Disclosure toggles (mobile menu, search panel)
 	 * ------------------------------------------------------------------ */
 	function initToggle(button, panel) {
@@ -347,10 +220,70 @@
 	}
 
 	/* ------------------------------------------------------------------
+	 * Product description toggle
+	 * ------------------------------------------------------------------ */
+	function initDescriptionToggle() {
+		var wrapper = document.querySelector('[data-dmd-description-wrapper]');
+		if (!wrapper) {
+			return;
+		}
+
+		var content = wrapper.querySelector('[data-dmd-description-content]');
+		var fade = wrapper.querySelector('[data-dmd-description-fade]');
+		var toggle = wrapper.querySelector('[data-dmd-description-toggle]');
+		var text = toggle.querySelector('[data-dmd-toggle-text]');
+
+		toggle.addEventListener('click', function () {
+			var isExpanded = content.classList.contains('max-h-none');
+
+			content.classList.toggle('max-h-64', isExpanded);
+			content.classList.toggle('max-h-none', !isExpanded);
+			fade.classList.toggle('hidden', !isExpanded);
+			text.textContent = isExpanded ? 'বিস্তারিত দেখুন +' : 'কম দেখুন -';
+		});
+	}
+
+	/* ------------------------------------------------------------------
 	 * Boot
 	 * ------------------------------------------------------------------ */
 	function boot() {
-		document.querySelectorAll('[data-dmd-slider]').forEach(initSlider);
+		// Initialize Swiper.js
+	function initHeroSlider() {
+		var slider = document.querySelector('.hero-swiper');
+		if (!slider) {
+			return;
+		}
+
+		var autoplay = slider.dataset.autoplay === 'true';
+		var speed = parseInt(slider.dataset.speed, 10) || 800;
+		var delay = parseInt(slider.dataset.delay, 10) || 4000;
+
+		new Swiper('.hero-swiper', {
+			loop: true,
+			speed: speed,
+			autoplay: autoplay ? {
+				delay: delay,
+				disableOnInteraction: false,
+				pauseOnMouseEnter: true,
+			} : false,
+			navigation: {
+				prevEl: '.swiper-button-prev-custom',
+				nextEl: '.swiper-button-next-custom',
+			},
+			pagination: {
+				el: '.swiper-pagination-custom',
+				clickable: true,
+				bulletClass: 'w-3 h-3 rounded-full bg-white/60 inline-block cursor-pointer transition-all',
+				bulletActiveClass: '!w-8 !bg-emerald-600',
+			},
+		});
+	}
+
+	/* ------------------------------------------------------------------
+	 * Boot
+	 * ------------------------------------------------------------------ */
+	function boot() {
+		initHeroSlider();
 
 		initToggle(
 			document.querySelector('.dmd-menu-toggle'),
@@ -367,6 +300,7 @@
 		initOrderNow();
 		initCategoryToggle();
 		initViewSwitcher();
+		initDescriptionToggle();
 	}
 
 	if (document.readyState === 'loading') {

@@ -70,6 +70,11 @@ module.exports = {
     'woocommerce-tabs',
     'wp-caption',
     'wp-caption-text',
+    'wc-block-checkout__sidebar',
+    'woocommerce-form__label-for-checkbox',
+    'swiper-button-prev-custom',
+    'swiper-button-next-custom',
+    'swiper-pagination-custom',
     { pattern: /^(grid-cols|col-span)-(1|2|3|4|5|6|12)$/, variants: ['sm', 'md', 'lg', 'xl'] },
   ],
   theme: {
