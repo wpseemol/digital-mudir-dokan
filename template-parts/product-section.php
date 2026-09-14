@@ -57,25 +57,28 @@ $categories = get_terms( array(
 
     <ul class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 product-grid-fade">
         <?php 
-        $query_args = [ 'limit' => (int)$dmd_args['limit'], 'status' => 'publish' ];
+        $query_args = [ 
+            'post_type' => 'product',
+            'posts_per_page' => (int)$dmd_args['limit'], 
+            'post_status' => 'publish' 
+        ];
         if ($dmd_args['source'] === 'best_selling') {
             $query_args['orderby'] = 'meta_value_num';
             $query_args['meta_key'] = 'total_sales';
         }
-        $dmd_products = wc_get_products( $query_args );
+        
+        $products_query = new WP_Query( $query_args );
 
-        foreach ( $dmd_products as $product_obj ) : 
-            if ( ! $product_obj->is_visible() ) {
-                continue;
-            }
-
-            $GLOBALS['product'] = $product_obj;
-            setup_postdata( $product_obj->get_id() );
-            
-            wc_get_template_part( 'content', 'product' ); 
-        endforeach; 
-        wp_reset_postdata();
-        unset($GLOBALS['product']);
+        if ( $products_query->have_posts() ) :
+            while ( $products_query->have_posts() ) : $products_query->the_post();
+                global $product;
+                $product = wc_get_product( get_the_ID() );
+                if ( ! $product || ! $product->is_visible() ) continue;
+                
+                wc_get_template_part( 'content', 'product' ); 
+            endwhile;
+            wp_reset_postdata();
+        endif;
         ?>
     </ul>
 

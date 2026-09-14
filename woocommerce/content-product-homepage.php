@@ -50,7 +50,9 @@ if ( $is_on_sale && $regular_price && $product->get_sale_price() ) {
     <!-- Title and Price -->
     <div class="mb-3">
         <h3 class="text-sm md:text-base font-semibold text-gray-800 line-clamp-2 mb-1 leading-snug">
-            <a href="<?php the_permalink(); ?>" class="hover:text-emerald-700 transition-colors"><?php the_title(); ?></a>
+            <a href="<?php echo esc_url( get_permalink( $product->get_id() ) ); ?>" class="hover:text-emerald-700 transition-colors">
+                <?php echo esc_html( $product->get_name() ); ?>
+            </a>
         </h3>
         <div class="flex items-baseline gap-2 text-sm font-medium">
             <?php if ( $is_on_sale && $regular_price ) : ?>
