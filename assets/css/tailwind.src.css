@@ -7,14 +7,14 @@
    ------------------------------------------------------------------ */
 @layer base {
     :root {
-        --dmd-green: #00a63e;
+        --dmd-green: #113D21;
         --dmd-green-dark: #058a36;
         --dmd-green-soft: #e8f8ee;
         --dmd-ink: #1b1b1b;
         --dmd-muted: #6b7280;
         --dmd-surface: #f3f5f7;
         --dmd-line: #e6e9ec;
-        --dmd-sale: #00a63e;
+        --dmd-sale: #113D21;
         --dmd-radius: 8px;
         --dmd-container: 1200px;
     }

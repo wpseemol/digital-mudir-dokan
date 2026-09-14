@@ -243,6 +243,21 @@ function dmd_customize_register( $wp_customize ) {
 		)
 	);
 
+	$wp_customize->add_setting( 'dmd_hero_btn_bg', array( 'default' => '#113D21', 'sanitize_callback' => 'sanitize_hex_color' ) );
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'dmd_hero_btn_bg', array( 'label' => __( 'Hero button background', 'digital-mudir-dokan' ), 'section' => 'dmd_hero' ) ) );
+
+	$wp_customize->add_setting( 'dmd_hero_btn_text', array( 'default' => '#ffffff', 'sanitize_callback' => 'sanitize_hex_color' ) );
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'dmd_hero_btn_text', array( 'label' => __( 'Hero button text color', 'digital-mudir-dokan' ), 'section' => 'dmd_hero' ) ) );
+
+	$wp_customize->add_setting( 'dmd_hero_nav_bg', array( 'default' => '#ffffff', 'sanitize_callback' => 'sanitize_hex_color' ) );
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'dmd_hero_nav_bg', array( 'label' => __( 'Hero navigation button color', 'digital-mudir-dokan' ), 'section' => 'dmd_hero' ) ) );
+
+	$wp_customize->add_setting( 'dmd_hero_headline_color', array( 'default' => '#ffffff', 'sanitize_callback' => 'sanitize_hex_color' ) );
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'dmd_hero_headline_color', array( 'label' => __( 'Hero headline text color', 'digital-mudir-dokan' ), 'section' => 'dmd_hero' ) ) );
+
+	$wp_customize->add_setting( 'dmd_hero_subtitle_color', array( 'default' => '#ffffff', 'sanitize_callback' => 'sanitize_hex_color' ) );
+	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'dmd_hero_subtitle_color', array( 'label' => __( 'Hero supporting line text color', 'digital-mudir-dokan' ), 'section' => 'dmd_hero' ) ) );
+
 	// Fallback banner
 	$wp_customize->add_setting( 'dmd_hero_fallback_image', array( 'sanitize_callback' => 'esc_url_raw' ) );
 	$wp_customize->add_control(

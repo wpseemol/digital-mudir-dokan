@@ -78,7 +78,7 @@ function dmd_setup() {
 			array(
 				'name'  => __( 'Brand green', 'digital-mudir-dokan' ),
 				'slug'  => 'brand-green',
-				'color' => '#00a63e',
+				'color' => '#113D21',
 			),
 			array(
 				'name'  => __( 'Deep green', 'digital-mudir-dokan' ),

@@ -77,7 +77,7 @@ Run these commands from the theme directory:
 ### Styling & Tailwind CSS
 - **DO NOT** edit `assets/css/theme.css` directly. Make style changes in `assets/css/tailwind.src.css` or write standard utility classes in markup files (`.php` files).
 - Always use the preset theme design tokens for consistency:
-  - **Green (Brand):** `bg-green` (Primary #00a63e), `bg-green-dark` (Hover/Dark #058a36), `bg-green-soft` (Fills #e8f8ee)
+  - **Green (Brand):** `bg-green` (Primary #113D21), `bg-green-dark` (Hover/Dark #058a36), `bg-green-soft` (Fills #e8f8ee)
   - **Typography & Neutrals:** `text-ink` (#1b1b1b), `text-muted` (#6b7280), `border-line` (#e6e9ec), `bg-surface` (#f3f5f7)
   - **Fonts:** Display fonts inherit `font-display` (Poppins + Hind Siliguri); body text uses `font-bangla` (Hind Siliguri).
 - Ensure any added styles/custom selectors not explicitly visible in PHP files are registered in the `safelist` section of `tailwind.config.js`. Run `npm run audit:safelist` to identify missing selectors before staging.
