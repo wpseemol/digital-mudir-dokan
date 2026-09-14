@@ -40,9 +40,11 @@ $dmd_percentage = dmd_get_sale_percentage( $product );
                     )
                 );
             } else {
+                $category_image = dmd_get_category_thumbnail_url($product);
+                $image_src = $category_image ? $category_image : dmd_get_product_placeholder_url();
                 printf(
                     '<img src="%1$s" alt="%2$s" class="w-full h-full object-contain p-1" loading="lazy" decoding="async">',
-                    esc_url( dmd_get_product_placeholder_url() ),
+                    esc_url( $image_src ),
                     esc_attr( $product->get_name() )
                 );
             }

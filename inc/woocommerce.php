@@ -188,6 +188,24 @@ function dmd_get_sale_percentage( $product ) {
 }
 
 /**
+ * Get category thumbnail URL for a product.
+ *
+ * @param WC_Product $product Product.
+ * @return string|false
+ */
+function dmd_get_category_thumbnail_url( $product ) {
+    $terms = get_the_terms( $product->get_id(), 'product_cat' );
+    if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+        $term = reset( $terms );
+        $thumbnail_id = get_term_meta( $term->term_id, 'thumbnail_id', true );
+        if ( $thumbnail_id ) {
+            return wp_get_attachment_url( $thumbnail_id );
+        }
+    }
+    return false;
+}
+
+/**
  * Style the loop add-to-cart button without dropping the classes WooCommerce
  * needs for AJAX (`ajax_add_to_cart`, `product_type_*`).
  *

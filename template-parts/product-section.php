@@ -55,7 +55,7 @@ $categories = get_terms( array(
         <?php endif; ?>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 product-grid-fade">
+    <ul class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 product-grid-fade">
         <?php 
         $query_args = [ 'limit' => (int)$dmd_args['limit'], 'status' => 'publish' ];
         if ($dmd_args['source'] === 'best_selling') {
@@ -65,18 +65,17 @@ $categories = get_terms( array(
         $dmd_products = wc_get_products( $query_args );
 
         foreach ( $dmd_products as $product ) : 
-            $cat_slugs = [];
-            foreach( get_the_terms( $product->get_id(), 'product_cat' ) ?: [] as $term ) $cat_slugs[] = $term->slug;
+            if ( ! $product->is_visible() ) {
+                continue;
+            }
+
+            setup_postdata( $product->get_id() );
+            
+            wc_get_template_part( 'content', 'product' ); 
+        endforeach; 
+        wp_reset_postdata();
         ?>
-            <div class="product-card-item opacity-0 transition-opacity duration-500" data-category="<?php echo esc_attr( implode(' ', $cat_slugs) ); ?>">
-                <?php 
-                global $product;
-                $product = $product;
-                wc_get_template_part( 'content', 'product-homepage' ); 
-                ?>
-            </div>
-        <?php endforeach; ?>
-    </div>
+    </ul>
 
     <?php if ($dmd_args['show_link']) : ?>
         <div class="text-center mt-10">

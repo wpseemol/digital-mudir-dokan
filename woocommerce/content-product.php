@@ -1,9 +1,8 @@
 <?php
 /**
- * Product card used in every loop.
+ * Standardized Product card used in loops.
  *
  * @package Digital_Mudir_Dokan
- * @version 3.6.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -11,73 +10,77 @@ defined( 'ABSPATH' ) || exit;
 global $product;
 
 if ( empty( $product ) || ! $product->is_visible() ) {
-	return;
+    return;
 }
 
-$dmd_percentage = dmd_get_sale_percentage( $product );
-$dmd_is_hot     = $product->is_featured() || (int) $product->get_total_sales() > 0;
+$product_id    = $product->get_id();
+$image_id      = $product->get_image_id();
+$custom_ph     = get_theme_mod( 'dmd_default_product_placeholder', '' );
+
+if ( $image_id ) {
+    $img_url = wp_get_attachment_image_url( $image_id, 'woocommerce_thumbnail' );
+} elseif ( ! empty( $custom_ph ) ) {
+    $img_url = $custom_ph;
+} else {
+    $img_url = wc_placeholder_img_src( 'woocommerce_thumbnail' );
+}
+
+$regular_price = $product->get_regular_price();
+$sale_price    = $product->get_sale_price();
+$is_on_sale    = $product->is_on_sale();
+$percentage    = 0;
+
+if ( $is_on_sale && $regular_price && $sale_price ) {
+    $percentage = round( ( ( (float)$regular_price - (float)$sale_price ) / (float)$regular_price ) * 100 );
+}
 ?>
-<li <?php wc_product_class( 'dmd-card', $product ); ?>>
+<li <?php wc_product_class( 'product-card-item list-none flex flex-col justify-between bg-white rounded-2xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-all duration-300 relative group', $product ); ?> data-category="<?php echo esc_attr( implode( ' ', wp_get_post_terms( $product_id, 'product_cat', ['fields' => 'slugs'] ) ) ); ?>">
 
-	<div class="dmd-card__media">
-		<a class="block h-full w-full" href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true">
-			<?php
-			if ( has_post_thumbnail() ) {
-				echo wp_kses_post(
-					$product->get_image(
-						'dmd-product-card',
-						array(
-							'class'    => 'h-full w-full object-cover',
-							'loading'  => 'lazy',
-							'decoding' => 'async',
-						)
-					)
-				);
-			} else {
-				printf(
-					'<img src="%1$s" alt="%2$s" class="h-full w-full object-contain p-4" loading="lazy" decoding="async">',
-					esc_url( dmd_get_product_placeholder_url() ),
-					esc_attr( $product->get_name() )
-				);
-			}
-			?>
-		</a>
+  <div>
+    <!-- Discount Badge -->
+    <?php if ( $is_on_sale && $percentage > 0 ) : ?>
+      <span class="absolute top-3 left-3 z-10 w-8 h-8 rounded-full bg-emerald-700 text-white text-xs font-bold flex items-center justify-center shadow">
+        -<?php echo esc_html( $percentage ); ?>%
+      </span>
+    <?php endif; ?>
 
-		<div class="absolute left-3 top-3 z-10 flex flex-col items-start gap-1.5">
-			<?php if ( $dmd_percentage ) : ?>
-				<span class="dmd-badge dmd-badge--sale">
-					-<?php echo esc_html( $dmd_percentage ); ?>%
-					<span class="screen-reader-text"><?php esc_html_e( 'discount', 'digital-mudir-dokan' ); ?></span>
-				</span>
-			<?php endif; ?>
+    <!-- Product Thumbnail Container -->
+    <a href="<?php the_permalink(); ?>" class="block w-full aspect-square rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center mb-3 group-hover:opacity-95">
+      <img src="<?php echo esc_url( $img_url ); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+    </a>
 
-			<?php if ( ! $product->is_in_stock() ) : ?>
-				<span class="dmd-badge dmd-badge--out"><?php esc_html_e( 'Sold out', 'digital-mudir-dokan' ); ?></span>
-			<?php elseif ( $dmd_is_hot ) : ?>
-				<span class="dmd-badge dmd-badge--hot"><?php esc_html_e( 'Hot', 'digital-mudir-dokan' ); ?></span>
-			<?php endif; ?>
-		</div>
-	</div>
+    <!-- Title -->
+    <h3 class="text-sm md:text-base font-semibold text-gray-800 line-clamp-2 mb-2 leading-snug">
+      <a href="<?php the_permalink(); ?>" class="hover:text-emerald-700 transition-colors"><?php the_title(); ?></a>
+    </h3>
 
-	<div class="flex flex-col flex-grow">
-		<h3 class="dmd-card__title">
-			<a class="hover:text-green" href="<?php the_permalink(); ?>"><?php echo esc_html( $product->get_name() ); ?></a>
-		</h3>
+    <!-- Price Row -->
+    <div class="flex items-baseline gap-2 mb-4 text-sm font-medium">
+      <?php if ( $is_on_sale && $regular_price ) : ?>
+        <span class="text-gray-400 line-through text-xs font-normal"><?php echo wc_price( $regular_price ); ?></span>
+      <?php endif; ?>
+      <span class="text-emerald-700 font-bold text-base"><?php echo wc_price( $product->get_price() ); ?></span>
+    </div>
+  </div>
 
-		<?php if ( wc_review_ratings_enabled() && $product->get_average_rating() > 0 ) : ?>
-			<div class="mt-1">
-				<?php echo wp_kses_post( wc_get_rating_html( $product->get_average_rating(), $product->get_rating_count() ) ); ?>
-			</div>
-		<?php endif; ?>
+  <!-- Action Buttons -->
+  <div class="space-y-2 mt-auto pt-2">
+    <?php 
+    // Add to cart button
+    echo apply_filters( 'woocommerce_loop_add_to_cart_link',
+        sprintf( '<a href="%s" rel="nofollow" data-product_id="%s" data-product_sku="%s" class="%s">%s</a>',
+            esc_url( $product->add_to_cart_url() ),
+            esc_attr( $product->get_id() ),
+            esc_attr( $product->get_sku() ),
+            'button product_type_simple add_to_cart_button ajax_add_to_cart w-full py-2.5 px-4 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white text-sm font-semibold transition flex items-center justify-center gap-1 shadow-sm',
+            esc_html__( 'Add to cart', 'digital-mudir-dokan' )
+        ),
+        $product
+    );
+    ?>
+    <a href="<?php echo esc_url( wc_get_checkout_url() . '?add-to-cart=' . $product_id ); ?>" class="w-full py-2 px-4 rounded-xl bg-white border border-emerald-800 text-emerald-800 hover:bg-emerald-50 text-sm font-semibold transition flex items-center justify-center">
+      <?php esc_html_e( 'অর্ডার করুন', 'digital-mudir-dokan' ); ?>
+    </a>
+  </div>
 
-		<?php if ( $product->get_price_html() ) : ?>
-			<p class="dmd-card__price m-0"><?php echo wp_kses_post( $product->get_price_html() ); ?></p>
-		<?php endif; ?>
-	</div>
-
-	<div class="dmd-card__actions">
-		<?php woocommerce_template_loop_add_to_cart(); ?>
-
-		<?php dmd_order_now_button( $product, 'dmd-btn--outline dmd-btn--block' ); ?>
-	</div>
 </li>
