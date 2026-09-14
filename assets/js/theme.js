@@ -360,12 +360,68 @@
 	}
 
 	/* ------------------------------------------------------------------
+	 * Homepage Product Tab Filter
+	 * ------------------------------------------------------------------ */
+	function initProductTabs() {
+		var section = document.querySelector('.dmd-product-section[aria-labelledby="dmd-section-all-products"]');
+		if (!section) return;
+
+		var container = section.querySelector('.product-grid-container');
+		var tabs = section.querySelectorAll('.product-tabs button');
+		
+		if (!container || !tabs.length) return;
+
+		tabs.forEach(tab => {
+			tab.addEventListener('click', function() {
+				// Update active tab styles
+				tabs.forEach(t => t.classList.remove('bg-[#1B6A3B]', 'text-white', 'border-[#1B6A3B]'));
+				tab.classList.add('bg-[#1B6A3B]', 'text-white', 'border-[#1B6A3B]');
+
+				var category = tab.dataset.category;
+				var products = container.querySelectorAll('.product-item');
+
+				products.forEach(product => {
+					if (category === 'all' || product.dataset.categories.split(' ').includes(category)) {
+						product.classList.remove('hidden');
+					} else {
+						product.classList.add('hidden');
+					}
+				});
+			});
+		});
+	}
+
+	/* ------------------------------------------------------------------
+	 * FAQ Accordion
+	 * ------------------------------------------------------------------ */
+	function initFAQ() {
+		document.querySelectorAll('.faq-item').forEach(item => {
+			item.addEventListener('click', () => {
+				const answer = item.querySelector('.faq-answer');
+				const icon = item.querySelector('.faq-icon');
+				
+				// Close all other FAQs
+				document.querySelectorAll('.faq-answer').forEach(el => {
+					if (el !== answer) el.classList.add('hidden');
+				});
+				document.querySelectorAll('.faq-icon').forEach(el => {
+					if (el !== icon) el.textContent = '+';
+				});
+
+				answer.classList.toggle('hidden');
+				icon.textContent = answer.classList.contains('hidden') ? '+' : '-';
+			});
+		});
+	}
+
+	/* ------------------------------------------------------------------
 	 * Boot
 	 * ------------------------------------------------------------------ */
 	function boot() {
 		initHeroSlider();
-
-		initMobileMenu();
+		initProductTabs();
+		initFAQ();
+		// ...
 
 		initToggle(
 			document.querySelector('.dmd-search-toggle'),

@@ -283,7 +283,7 @@ function dmd_customize_register( $wp_customize ) {
 				"dmd_slide_{$i}_image",
 				array(
 					/* translators: %d: slide number. */
-					'label'   => sprintf( __( 'Slide %d — image', 'digital-mudir-dokan' ), $i ),
+					'label'   => sprintf( __( 'Slide %d — image (Recommended: 1600x620px)', 'digital-mudir-dokan' ), $i ),
 					'section' => 'dmd_hero',
 				)
 			)

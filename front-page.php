@@ -67,5 +67,6 @@ if ( is_page() && have_posts() ) {
 
 get_template_part( 'template-parts/video-wall' );
 get_template_part( 'template-parts/blog-strip' );
+get_template_part( 'template-parts/faq-section' );
 
 get_footer();
