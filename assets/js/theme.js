@@ -251,32 +251,22 @@
 	 * View Switcher (Grid/List)
 	 * ------------------------------------------------------------------ */
 	function initViewSwitcher() {
-		var container = document.querySelector('ul.products');
+		var container = document.querySelector('.shop-archive-products');
 		var toggles = document.querySelectorAll('[data-view-toggle]');
 
 		if (!container || toggles.length === 0) {
 			return;
 		}
 
-		// Detect existing column class (e.g., columns-4)
-		var columnClass = Array.from(container.classList).find(c => c.startsWith('columns-'));
-
 		function setView(view) {
 			localStorage.setItem('dmd_shop_view', view);
 			
-			// Reset classes
-			container.classList.remove('view-grid', 'view-list', 'grid-cols-1');
-			if (columnClass) {
-				container.classList.remove(columnClass);
-			}
-
 			if (view === 'list') {
-				container.classList.add('view-list', 'grid-cols-1');
+				container.classList.remove('grid-view');
+				container.classList.add('list-view');
 			} else {
-				container.classList.add('view-grid');
-				if (columnClass) {
-					container.classList.add(columnClass);
-				}
+				container.classList.remove('list-view');
+				container.classList.add('grid-view');
 			}
 
 			toggles.forEach(function (btn) {

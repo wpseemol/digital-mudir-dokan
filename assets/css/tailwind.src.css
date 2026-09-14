@@ -319,37 +319,26 @@
         @apply flex flex-col;
     }
 
-    /* List view */
-    ul.products.view-list {
+    /* Shop Archive Product Container */
+    .shop-archive-products.grid-view {
+        @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6;
+    }
+    .shop-archive-products.list-view {
         @apply grid-cols-1 gap-4;
     }
-    ul.products.view-list > li {
-        @apply flex-row items-center p-4 rounded-xl border border-gray-100 hover:border-emerald-200 shadow-sm hover:shadow-md transition-all duration-300;
-    }
-    /* Archive Product Cards (Grid/List View) */
-    .dmd-archive-card {
-        @apply transition-all duration-300 flex;
-    }
 
-    /* List view */
-    ul.products.view-list .dmd-archive-card {
-        @apply flex-row items-center p-4;
+    /* Archive Product Card Layouts */
+    .shop-archive-products.list-view .product-card {
+        @apply flex-col sm:flex-row items-center justify-between gap-6 p-5 w-full;
     }
-
-    /* Grid view */
-    ul.products.view-grid .dmd-archive-card {
-        @apply flex-col p-4;
+    .shop-archive-products.list-view .product-card-image-box {
+        @apply w-full sm:w-48 h-44 shrink-0 aspect-square mb-0;
     }
-
-    /* Grid view layout adjustments */
-    ul.products.view-grid .dmd-archive-main-content {
-        @apply flex-col items-start gap-0;
+    .shop-archive-products.list-view .product-card-content {
+        @apply flex-1 text-left;
     }
-    ul.products.view-grid .dmd-archive-main-content .w-28.h-28 {
-        @apply w-full h-auto aspect-square mb-3;
-    }
-    ul.products.view-grid .dmd-archive-actions {
-        @apply w-full mt-auto pt-3;
+    .shop-archive-products.list-view .product-card-actions {
+        @apply shrink-0 w-full sm:w-44 flex flex-col gap-2.5 mt-0;
     }
 
     ul.products.columns-2 {
