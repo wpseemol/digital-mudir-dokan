@@ -26,28 +26,30 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 	<div class="grid gap-8 lg:grid-cols-[260px_minmax(0,1fr)]">
 
 		<!-- Filters -->
-		<aside class="dmd-shop-sidebar" aria-label="<?php esc_attr_e( 'Shop filters', 'digital-mudir-dokan' ); ?>">
-			<?php if ( is_active_sidebar( 'shop-sidebar' ) ) : ?>
-				<?php dynamic_sidebar( 'shop-sidebar' ); ?>
-			<?php else : ?>
-				<section class="mb-5 rounded-lg border border-line bg-white p-5">
-					<h2 class="mb-3 text-base font-semibold"><?php esc_html_e( 'Product categories', 'digital-mudir-dokan' ); ?></h2>
-					<?php
-					wp_list_categories(
-						array(
-							'taxonomy'   => 'product_cat',
-							'title_li'   => '',
-							'hide_empty' => true,
-							'walker'     => null,
-						)
-					);
-					?>
-				</section>
-			<?php endif; ?>
-		</aside>
+		<?php if ( is_product_category() ) : ?>
+			<aside class="dmd-shop-sidebar" aria-label="<?php esc_attr_e( 'Shop filters', 'digital-mudir-dokan' ); ?>">
+				<?php if ( is_active_sidebar( 'shop-sidebar' ) ) : ?>
+					<?php dynamic_sidebar( 'shop-sidebar' ); ?>
+				<?php else : ?>
+					<section class="mb-5 rounded-lg border border-line bg-white p-5">
+						<h2 class="mb-3 text-base font-semibold"><?php esc_html_e( 'Product categories', 'digital-mudir-dokan' ); ?></h2>
+						<?php
+						wp_list_categories(
+							array(
+								'taxonomy'   => 'product_cat',
+								'title_li'   => '',
+								'hide_empty' => true,
+								'walker'     => null,
+							)
+						);
+						?>
+					</section>
+				<?php endif; ?>
+			</aside>
+		<?php endif; ?>
 
 		<!-- Results -->
-		<div class="dmd-shop-results">
+		<div class="dmd-shop-results <?php echo !is_product_category() ? 'lg:col-span-2' : ''; ?>">
 			<?php
 			/**
 			 * Notices and anything a plugin attaches before the content.
@@ -121,7 +123,7 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 				do_action( 'woocommerce_before_shop_loop' );
 
 				if ( wc_get_loop_prop( 'total' ) ) : ?>
-                    <ul class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    <ul class="products columns-3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6">
                         <?php
                         while ( have_posts() ) {
                             the_post();

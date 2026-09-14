@@ -37,7 +37,7 @@ $categories = get_terms( array(
 ?>
 <section id="<?php echo esc_attr($dmd_args['id']); ?>-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <div class="flex flex-wrap justify-between items-center mb-8 gap-4">
-        <h2 class="text-2xl md:text-3xl font-bold tracking-wider text-gray-900 text-center mb-8 uppercase w-full">
+        <h2 class="text-2xl md:text-3xl font-bold tracking-wider text-gray-900 text-center mb-4 uppercase w-full">
             <?php echo esc_html( $dmd_args['title'] ); ?>
         </h2>
 
@@ -64,23 +64,25 @@ $categories = get_terms( array(
         }
         $dmd_products = wc_get_products( $query_args );
 
-        foreach ( $dmd_products as $product ) : 
-            if ( ! $product->is_visible() ) {
+        foreach ( $dmd_products as $product_obj ) : 
+            if ( ! $product_obj->is_visible() ) {
                 continue;
             }
 
-            setup_postdata( $product->get_id() );
+            $GLOBALS['product'] = $product_obj;
+            setup_postdata( $product_obj->get_id() );
             
             wc_get_template_part( 'content', 'product' ); 
         endforeach; 
         wp_reset_postdata();
+        unset($GLOBALS['product']);
         ?>
     </ul>
 
     <?php if ($dmd_args['show_link']) : ?>
         <div class="text-center mt-10">
             <a class="text-emerald-700 font-semibold flex items-center justify-center gap-1" href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>">
-                সব দেখুন (VIEW ALL) ->
+                সব দেখুন (VIEW ALL) <?php echo dmd_icon( 'chevron-r', 16 ); ?>
             </a>
         </div>
     <?php endif; ?>
