@@ -251,7 +251,7 @@
 	 * View Switcher (Grid/List)
 	 * ------------------------------------------------------------------ */
 	function initViewSwitcher() {
-		var container = document.querySelector('.shop-archive-products');
+		var container = document.getElementById('dmd-archive-products');
 		var toggles = document.querySelectorAll('[data-view-toggle]');
 
 		if (!container || toggles.length === 0) {
@@ -259,7 +259,7 @@
 		}
 
 		function setView(view) {
-			localStorage.setItem('dmd_shop_view', view);
+			localStorage.setItem('dmd_archive_view', view);
 			
 			if (view === 'list') {
 				container.classList.remove('grid-view');
@@ -274,7 +274,7 @@
 			});
 		}
 
-		var savedView = localStorage.getItem('dmd_shop_view') || 'grid';
+		var savedView = localStorage.getItem('dmd_archive_view') || 'grid';
 		setView(savedView);
 
 		toggles.forEach(function (btn) {
