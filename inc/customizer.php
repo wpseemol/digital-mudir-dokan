@@ -357,51 +357,45 @@ function dmd_customize_register( $wp_customize ) {
 		)
 	);
 
-	$sections = array(
-		'dmd_home_top_title'   => array( __( 'Top selling — heading', 'digital-mudir-dokan' ), __( 'Top selling products', 'digital-mudir-dokan' ), 'text' ),
-		'dmd_home_top_count'   => array( __( 'Top selling — how many products', 'digital-mudir-dokan' ), 4, 'number' ),
-		'dmd_home_all_title'   => array( __( 'All products — heading', 'digital-mudir-dokan' ), __( 'All products', 'digital-mudir-dokan' ), 'text' ),
-		'dmd_home_all_count'   => array( __( 'All products — how many products', 'digital-mudir-dokan' ), 12, 'number' ),
-		'dmd_home_video_title' => array( __( 'Video wall — heading', 'digital-mudir-dokan' ), __( 'See what they say about us', 'digital-mudir-dokan' ), 'text' ),
-		'dmd_home_blog_title'  => array( __( 'Blog — heading', 'digital-mudir-dokan' ), __( 'From our blog', 'digital-mudir-dokan' ), 'text' ),
-	);
+	// Settings for Product Sections
+	$product_sections = [
+		'dmd_top_selling_title' => 'Top Selling / Featured Title',
+		'dmd_all_products_title' => 'All Products Title',
+	];
 
-	foreach ( $sections as $key => $conf ) {
-		list( $label, $default, $type ) = $conf;
-
-		$wp_customize->add_setting(
-			$key,
-			array(
-				'default'           => $default,
-				'sanitize_callback' => 'number' === $type ? 'absint' : 'sanitize_text_field',
-			)
-		);
-		$wp_customize->add_control(
-			$key,
-			array(
-				'label'   => $label,
-				'section' => 'dmd_homepage',
-				'type'    => $type,
-			)
-		);
+	foreach ($product_sections as $id => $label) {
+		$wp_customize->add_setting($id, array('default' => 'Our Products', 'sanitize_callback' => 'sanitize_text_field'));
+		$wp_customize->add_control($id, array('label' => __($label, 'digital-mudir-dokan'), 'section' => 'dmd_homepage', 'type' => 'text'));
 	}
 
-	$wp_customize->add_setting(
-		'dmd_home_videos',
+	$wp_customize->add_setting('dmd_show_category_tabs', array('default' => true, 'sanitize_callback' => 'dmd_sanitize_checkbox'));
+	$wp_customize->add_control('dmd_show_category_tabs', array('label' => __('Show Category Tabs', 'digital-mudir-dokan'), 'section' => 'dmd_homepage', 'type' => 'checkbox'));
+
+	$wp_customize->add_setting('dmd_show_view_all_link', array('default' => true, 'sanitize_callback' => 'dmd_sanitize_checkbox'));
+	$wp_customize->add_control('dmd_show_view_all_link', array('label' => __('Show View All link', 'digital-mudir-dokan'), 'section' => 'dmd_homepage', 'type' => 'checkbox'));
+
+	$wp_customize->add_setting('dmd_top_selling_count', array('default' => 4, 'sanitize_callback' => 'absint'));
+	$wp_customize->add_control('dmd_top_selling_count', array('label' => __('Top Selling Product Count Limit', 'digital-mudir-dokan'), 'section' => 'dmd_homepage', 'type' => 'number'));
+
+	$wp_customize->add_setting('dmd_product_count', array('default' => 12, 'sanitize_callback' => 'absint'));
+	$wp_customize->add_control('dmd_product_count', array('label' => __('Product Count Limit', 'digital-mudir-dokan'), 'section' => 'dmd_homepage', 'type' => 'number'));
+
+	$wp_customize->add_section(
+		'dmd_faq',
 		array(
-			'default'           => '',
-			'sanitize_callback' => 'sanitize_textarea_field',
+			'title' => __( 'FAQ Section', 'digital-mudir-dokan' ),
+			'panel' => 'dmd_panel',
 		)
 	);
-	$wp_customize->add_control(
-		'dmd_home_videos',
-		array(
-			'label'       => __( 'YouTube links', 'digital-mudir-dokan' ),
-			'description' => __( 'One link per line. Leave empty to hide the video wall.', 'digital-mudir-dokan' ),
-			'section'     => 'dmd_homepage',
-			'type'        => 'textarea',
-		)
-	);
+
+	for ( $i = 1; $i <= 5; $i++ ) {
+		$wp_customize->add_setting( "dmd_faq_{$i}_q", array( 'sanitize_callback' => 'sanitize_text_field' ) );
+		$wp_customize->add_control( "dmd_faq_{$i}_q", array( 'label' => "FAQ {$i} — Question", 'section' => 'dmd_faq', 'type' => 'text' ) );
+		
+		$wp_customize->add_setting( "dmd_faq_{$i}_a", array( 'sanitize_callback' => 'sanitize_textarea_field' ) );
+		$wp_customize->add_control( "dmd_faq_{$i}_a", array( 'label' => "FAQ {$i} — Answer", 'section' => 'dmd_faq', 'type' => 'textarea' ) );
+	}
+
 
 	/* ---------------------------------------------------------------
 	 * Shop details

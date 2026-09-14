@@ -144,36 +144,20 @@
         @apply text-center text-xl sm:text-2xl font-bold tracking-wide text-ink uppercase;
     }
 
-    /* ---------- Product card ---------- */
-    .dmd-card {
-        @apply relative flex h-full flex-col rounded-lg border border-line bg-white p-3 transition-shadow duration-200;
+    .product-card-item {
+        @apply flex flex-col justify-between bg-white rounded-2xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition h-full;
     }
-    .dmd-card:hover {
-        box-shadow: 0 6px 24px rgba(16, 24, 40, 0.08);
+    .product-card-item .woocommerce-loop-product__link {
+        @apply flex flex-col h-full;
+    }
+    .product-card-item .wp-post-image {
+        @apply w-full h-full object-cover object-center group-hover:scale-105 transition duration-300;
+    }
+    /* Discount Badge */
+    .product-card-item .onsale {
+        @apply absolute top-2 left-2 z-10 bg-emerald-700 text-white text-xs font-bold px-2.5 py-1 rounded-full !m-0;
     }
 
-    .dmd-card__media {
-        @apply relative block overflow-hidden rounded-md bg-surface;
-        aspect-ratio: 1 / 1;
-    }
-    .dmd-card__media img {
-        @apply h-full w-full object-cover;
-    }
-    .dmd-card__title {
-        @apply mt-3 text-[15px] font-medium leading-snug line-clamp-2;
-    }
-    .dmd-card__price {
-        @apply mt-1 text-[15px] font-semibold text-green;
-    }
-    .dmd-card__price del {
-        @apply text-muted font-normal text-xs mr-1.5 line-through decoration-muted;
-    }
-    .dmd-card__price ins {
-        @apply no-underline text-green;
-    }
-    .dmd-card__actions {
-        @apply mt-3 grid gap-2;
-    }
 
     /* ---------- Forms ---------- */
     .dmd-field {

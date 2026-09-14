@@ -21,11 +21,12 @@ if ( class_exists( 'WooCommerce' ) ) {
 		'template-parts/product-section',
 		null,
 		array(
-			'id'     => 'top-selling',
-			'title'  => get_theme_mod( 'dmd_home_top_title', __( 'Top selling products', 'digital-mudir-dokan' ) ),
-			'limit'  => (int) get_theme_mod( 'dmd_home_top_count', 4 ),
-			'source' => 'best_selling',
-			'tone'   => 'surface',
+			'id'        => 'top-selling',
+			'title'     => get_theme_mod( 'dmd_top_selling_title', __( 'Top selling products', 'digital-mudir-dokan' ) ),
+			'limit'     => (int) get_theme_mod( 'dmd_top_selling_count', 4 ),
+			'source'    => 'best_selling',
+			'show_tabs' => false,
+			'show_link' => false,
 		)
 	);
 
@@ -33,11 +34,12 @@ if ( class_exists( 'WooCommerce' ) ) {
 		'template-parts/product-section',
 		null,
 		array(
-			'id'     => 'all-products',
-			'title'  => get_theme_mod( 'dmd_home_all_title', __( 'All products', 'digital-mudir-dokan' ) ),
-			'limit'  => (int) get_theme_mod( 'dmd_home_all_count', 12 ),
-			'source' => 'recent',
-			'tone'   => 'white',
+			'id'        => 'all-products',
+			'title'     => get_theme_mod( 'dmd_all_products_title', __( 'All products', 'digital-mudir-dokan' ) ),
+			'limit'     => (int) get_theme_mod( 'dmd_product_count', 12 ),
+			'source'    => 'recent',
+			'show_tabs' => get_theme_mod( 'dmd_show_category_tabs', true ),
+			'show_link' => get_theme_mod( 'dmd_show_view_all_link', true ),
 		)
 	);
 }
