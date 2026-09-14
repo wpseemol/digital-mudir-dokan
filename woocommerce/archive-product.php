@@ -68,16 +68,19 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 
 				<div class="dmd-shop-toolbar mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
 
-					<div class="flex items-center gap-2 text-sm">
-						<span class="text-muted"><?php esc_html_e( 'Show:', 'digital-mudir-dokan' ); ?></span>
-						<?php foreach ( array( 9, 12, 18, 24 ) as $dmd_option ) : ?>
-							<a class="px-1 <?php echo $dmd_per_page === $dmd_option ? 'font-semibold text-green' : 'text-muted'; ?>"
-								href="<?php echo esc_url( add_query_arg( 'per_page', $dmd_option, $dmd_page_link ) ); ?>"
-								<?php echo $dmd_per_page === $dmd_option ? 'aria-current="true"' : ''; ?>>
-								<?php echo esc_html( $dmd_option ); ?>
-								<span class="screen-reader-text"><?php esc_html_e( 'products per page', 'digital-mudir-dokan' ); ?></span>
-							</a>
-						<?php endforeach; ?>
+					<div class="flex items-center gap-4 text-sm">
+						<div class="flex items-center gap-2">
+							<span class="text-muted"><?php esc_html_e( 'Show:', 'digital-mudir-dokan' ); ?></span>
+							<?php foreach ( array( 9, 12, 18, 24 ) as $dmd_option ) : ?>
+								<a class="px-1 <?php echo $dmd_per_page === $dmd_option ? 'font-semibold text-green' : 'text-muted'; ?>"
+									href="<?php echo esc_url( add_query_arg( 'per_page', $dmd_option, $dmd_page_link ) ); ?>"
+									<?php echo $dmd_per_page === $dmd_option ? 'aria-current="true"' : ''; ?>>
+									<?php echo esc_html( $dmd_option ); ?>
+									<span class="screen-reader-text"><?php esc_html_e( 'products per page', 'digital-mudir-dokan' ); ?></span>
+								</a>
+							<?php endforeach; ?>
+						</div>
+						<?php woocommerce_result_count(); ?>
 					</div>
 
 					<div class="flex items-center gap-4">
@@ -109,7 +112,6 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 								</svg>
 							</button>
 						</div>
-						<?php woocommerce_result_count(); ?>
 						<?php woocommerce_catalog_ordering(); ?>
 					</div>
 				</div>
@@ -123,7 +125,7 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 				do_action( 'woocommerce_before_shop_loop' );
 
 				if ( wc_get_loop_prop( 'total' ) ) : ?>
-                    <ul class="products shop-archive-products grid-view grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 list-none p-0 m-0">
+                    <ul class="products shop-archive-products grid-view grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-6 list-none p-0 m-0">
                         <?php
                         while ( have_posts() ) {
                             the_post();

@@ -210,18 +210,49 @@
     .woocommerce input.button,
     .woocommerce #respond input#submit,
     .single_add_to_cart_button,
-    .wc-block-components-button {
+    .wc-block-components-button,
+    .add_to_cart_button {
         @apply dmd-btn dmd-btn--primary !text-white;
     }
+    
+    .woocommerce a.button:hover,
+    .woocommerce button.button:hover,
+    .woocommerce input.button:hover,
+    .woocommerce #respond input#submit:hover,
+    .single_add_to_cart_button:hover,
+    .wc-block-components-button:hover,
+    .add_to_cart_button:hover,
+    .woocommerce a.button:focus,
+    .woocommerce button.button:focus,
+    .woocommerce input.button:focus,
+    .woocommerce #respond input#submit:focus,
+    .single_add_to_cart_button:focus,
+    .wc-block-components-button:focus,
+    .add_to_cart_button:focus,
+    .woocommerce a.button:active,
+    .woocommerce button.button:active,
+    .woocommerce input.button:active,
+    .woocommerce #respond input#submit:active,
+    .single_add_to_cart_button:active,
+    .wc-block-components-button:active,
+    .add_to_cart_button:active {
+        @apply !text-white !bg-emerald-900;
+    }
+
     .woocommerce a.button.alt,
     .woocommerce button.button.alt {
         @apply text-white font-semibold text-base md:text-lg flex items-center justify-center gap-2 py-3 px-6 rounded-lg w-full bg-green hover:bg-green-dark;
     }
 
+    .woocommerce a.button.alt:hover,
+    .woocommerce button.button.alt:hover {
+        @apply !text-white !bg-emerald-900;
+    }
+
     .woocommerce a.button.disabled,
     .woocommerce button.button:disabled,
     .woocommerce button.button.disabled {
-        @apply cursor-not-allowed opacity-50;
+        @apply cursor-not-allowed opacity-50 !text-white;
     }
     .single_add_to_cart_button {
         @apply dmd-btn--block;
@@ -361,7 +392,7 @@
         @apply m-0;
     }
     .woocommerce-ordering select {
-        @apply dmd-field w-auto min-w-[190px] py-2;
+        @apply bg-white border border-gray-300 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600;
     }
 
     /* Category widget / list */
