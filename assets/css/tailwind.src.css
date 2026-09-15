@@ -319,60 +319,46 @@
     /* ------------------------------------------------------------------
      Scoped Archive/Category Catalog Styles
      ------------------------------------------------------------------ */
-    .dmd-archive-catalog {
-        @apply m-0 grid list-none gap-4 p-0 transition-all duration-300 ease-in-out;
+    #dmd-archive-products {
+        @apply transition-all duration-300;
     }
 
-    .dmd-archive-catalog > li {
-        @apply transition-all duration-300 ease-in-out;
+    #dmd-archive-products.list-view {
+        @apply grid-cols-1 gap-4;
+    }
+    
+    #dmd-archive-products.grid-view {
+        @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6;
     }
 
-    /* List view */
-    .dmd-archive-catalog.list-view {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 1.25rem !important;
-        width: 100% !important;
-        grid-template-columns: none !important;
+    /* Grid/List Card Visibility */
+    .dmd-card-list {
+        @apply hidden;
+    }
+    .list-view .dmd-card-list {
+        @apply flex;
+    }
+    .list-view .dmd-card-grid {
+        @apply hidden;
+    }
+    .grid-view .dmd-card-grid {
+        @apply flex;
     }
 
-    .dmd-archive-catalog.list-view .product-card-item {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        width: 100% !important;
-        padding: 1.25rem !important;
-        background: #ffffff !important;
-        border: 1px solid #e5e7eb !important;
-        border-radius: 1rem !important;
-        gap: 1.5rem !important;
+    /* Pagination Styling */
+    .woocommerce-pagination ul {
+        @apply inline-flex gap-2 justify-center my-8 list-none p-0;
+    }
+    .woocommerce-pagination ul li {
+        @apply list-none;
+    }
+    .woocommerce-pagination .page-numbers {
+        @apply bg-white border border-gray-200 text-gray-700 rounded-lg px-4 py-2 hover:bg-emerald-50 transition;
+    }
+    .woocommerce-pagination .page-numbers.current {
+        @apply bg-emerald-700 text-white font-bold rounded-lg px-4 py-2;
     }
 
-    /* Constrain List View Thumbnail */
-    .dmd-archive-catalog.list-view .product-card-item > div:first-child a {
-        width: 130px !important;
-        height: 130px !important;
-        flex-shrink: 0 !important;
-        margin-bottom: 0 !important;
-    }
-
-    /* List View Content Info */
-    .dmd-archive-catalog.list-view .product-card-item > div:first-child {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        gap: 1.5rem !important;
-        flex: 1 1 auto !important;
-    }
-
-    /* List View Actions Column */
-    .dmd-archive-catalog.list-view .product-card-item .space-y-2 {
-        width: 160px !important;
-        flex-shrink: 0 !important;
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-    }
 
     /* 
     ul.products.columns-2 {

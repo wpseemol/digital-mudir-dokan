@@ -95,6 +95,22 @@ function dmd_loop_columns() {
 add_filter( 'loop_shop_columns', 'dmd_loop_columns', 20 );
 
 /**
+ * Products per page on archives.
+ *
+ * @return int
+ */
+function dmd_loop_per_page( $cols ) {
+	if ( is_shop() ) {
+		return (int) get_theme_mod( 'dmd_shop_products_per_page', 12 );
+	}
+	if ( is_product_category() || is_product_tag() ) {
+		return (int) get_theme_mod( 'dmd_category_products_per_page', 12 );
+	}
+	return 12;
+}
+add_filter( 'loop_shop_per_page', 'dmd_loop_per_page', 20 );
+
+/**
  * Icon arrows on shop pagination.
  *
  * @param array $args Pagination args.
@@ -523,4 +539,20 @@ function dmd_ajax_live_search() {
 	wp_send_json_success( $output );
 }
 add_action( 'wp_ajax_dmd_live_search', 'dmd_ajax_live_search' );
-add_action( 'wp_ajax_nopriv_dmd_live_search', 'dmd_ajax_live_search' );
+/**
+ * Set products per page based on customizer settings.
+ */
+function dmd_pre_get_posts_query( $query ) {
+    if ( is_admin() || ! $query->is_main_query() ) {
+        return;
+    }
+
+    if ( is_shop() ) {
+        $products_per_page = get_theme_mod( 'dmd_shop_products_per_page', 12 );
+        $query->set( 'posts_per_page', $products_per_page );
+    } elseif ( is_product_category() ) {
+        $products_per_page = get_theme_mod( 'dmd_category_products_per_page', 12 );
+        $query->set( 'posts_per_page', $products_per_page );
+    }
+}
+add_action( 'pre_get_posts', 'dmd_pre_get_posts_query' );

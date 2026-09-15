@@ -75,6 +75,9 @@ module.exports = {
     'swiper-button-prev-custom',
     'swiper-button-next-custom',
     'swiper-pagination-custom',
+    'onsale',
+    'woocommerce-loop-product__link',
+    'wp-post-image',
     { pattern: /^(grid-cols|col-span)-(1|2|3|4|5|6|12)$/, variants: ['sm', 'md', 'lg', 'xl'] },
   ],
   theme: {
