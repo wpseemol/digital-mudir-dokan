@@ -10,7 +10,6 @@ defined( 'ABSPATH' ) || exit;
 
 get_header( 'shop' );
 
-$dmd_per_page  = dmd_products_per_page();
 $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 ?>
 <div class="bg-surface py-6">
@@ -69,17 +68,6 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 				<div class="dmd-shop-toolbar mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
 
 					<div class="flex items-center gap-4 text-sm">
-						<div class="flex items-center gap-2">
-							<span class="text-muted"><?php esc_html_e( 'Show:', 'digital-mudir-dokan' ); ?></span>
-							<?php foreach ( array( 9, 12, 18, 24 ) as $dmd_option ) : ?>
-								<a class="px-1 <?php echo $dmd_per_page === $dmd_option ? 'font-semibold text-green' : 'text-muted'; ?>"
-									href="<?php echo esc_url( add_query_arg( 'per_page', $dmd_option, $dmd_page_link ) ); ?>"
-									<?php echo $dmd_per_page === $dmd_option ? 'aria-current="true"' : ''; ?>>
-									<?php echo esc_html( $dmd_option ); ?>
-									<span class="screen-reader-text"><?php esc_html_e( 'products per page', 'digital-mudir-dokan' ); ?></span>
-								</a>
-							<?php endforeach; ?>
-						</div>
 						<?php woocommerce_result_count(); ?>
 					</div>
 

@@ -95,25 +95,6 @@ function dmd_loop_columns() {
 add_filter( 'loop_shop_columns', 'dmd_loop_columns', 20 );
 
 /**
- * Default products per page.
- *
- * @return int
- */
-function dmd_products_per_page() {
-	if ( is_shop() ) {
-		$limit = get_theme_mod( 'dmd_shop_products_per_page', 12 );
-	} elseif ( is_product_category() || is_product_tag() ) {
-		$limit = get_theme_mod( 'dmd_category_products_per_page', 12 );
-	} else {
-		$limit = 12;
-	}
-
-	// Remove limitation if limit is very high (e.g. 999) or handle logic as requested.
-	return ( $limit >= 999 ) ? -1 : $limit;
-}
-add_filter( 'loop_shop_per_page', 'dmd_products_per_page', 20 );
-
-/**
  * Icon arrows on shop pagination.
  *
  * @param array $args Pagination args.

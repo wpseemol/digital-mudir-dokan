@@ -77,29 +77,13 @@ function dmd_customize_register( $wp_customize ) {
 		'dmd_shop_products_per_page',
 		array( 'default' => 12, 'sanitize_callback' => 'absint' )
 	);
-	$wp_customize->add_control(
-		'dmd_shop_products_per_page',
-		array(
-			'label'       => __( 'Shop Page Products Per Page', 'digital-mudir-dokan' ),
-			'section'     => 'dmd_catalog_settings',
-			'type'        => 'number',
-			'input_attrs' => array( 'min' => 4, 'max' => 999, 'step' => 4 ),
-		)
-	);
+	
 
 	$wp_customize->add_setting(
 		'dmd_category_products_per_page',
 		array( 'default' => 12, 'sanitize_callback' => 'absint' )
 	);
-	$wp_customize->add_control(
-		'dmd_category_products_per_page',
-		array(
-			'label'       => __( 'Category Archive Products Per Page', 'digital-mudir-dokan' ),
-			'section'     => 'dmd_catalog_settings',
-			'type'        => 'number',
-			'input_attrs' => array( 'min' => 4, 'max' => 999, 'step' => 4 ),
-		)
-	);
+	
 
 	/* ---------------------------------------------------------------
 	 * Shop settings

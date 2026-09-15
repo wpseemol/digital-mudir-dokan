@@ -12,25 +12,9 @@ define( 'DMD_DIR', get_template_directory() );
 define( 'DMD_URI', get_template_directory_uri() );
 
 /**
- * Pre_get_posts filter to adjust products per page.
- */
-function dmd_custom_products_per_page( $query ) {
-    if ( ! is_admin() && $query->is_main_query() ) {
-        if ( is_shop() ) {
-            $limit = get_theme_mod( 'dmd_shop_products_per_page', 12 );
-            $query->set( 'posts_per_page', intval($limit ) );
-        } elseif ( is_product_category() || is_product_tag() ) {
-            $limit = get_theme_mod( 'dmd_category_products_per_page', 12 );
-            $query->set( 'posts_per_page', intval($limit ) );
-        }
-    }
-}
-add_action( 'pre_get_posts', 'dmd_custom_products_per_page' );
-
-/**
  * Theme setup.
  */
-function dmd_setup() {
+function dmd_theme_setup() {
 	load_theme_textdomain( 'digital-mudir-dokan', DMD_DIR . '/languages' );
 
 	add_theme_support( 'automatic-feed-links' );
@@ -114,7 +98,7 @@ function dmd_setup() {
 		)
 	);
 }
-add_action( 'after_setup_theme', 'dmd_setup' );
+add_action( 'after_setup_theme', 'dmd_theme_setup' );
 
 /**
  * Content width.
