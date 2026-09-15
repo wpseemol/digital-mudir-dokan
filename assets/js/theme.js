@@ -401,6 +401,7 @@
 	 * Boot
 	 * ------------------------------------------------------------------ */
 	function boot() {
+		initMobileMenu();
 		initHeroSlider();
 		initProductTabs();
 		initFAQ();

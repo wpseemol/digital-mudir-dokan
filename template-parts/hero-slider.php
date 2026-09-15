@@ -27,7 +27,7 @@ $fallback_url   = get_theme_mod( 'dmd_hero_fallback_url' );
 // If no slides, try to render fallback. If no fallback, render default static hero.
 if ( 0 === $dmd_slide_count ) {
     if ( $fallback_image || $fallback_title ) : ?>
-        <section class="relative w-full h-[400px] md:h-[480px] lg:h-[680px] <?php echo esc_attr( 'full' === $dmd_width_mode ? '' : 'my-8' ); ?>">
+        <section class="relative w-full overflow-hidden h-[300px] md:h-[480px] lg:h-[680px] <?php echo esc_attr( 'full' === $dmd_width_mode ? '' : 'my-4' ); ?>">
             <div class="<?php echo esc_attr( $dmd_container_class ); ?> h-full">
                 <div class="relative w-full h-full rounded-2xl overflow-hidden">
                     <?php if ( $fallback_image ) : ?>
@@ -51,7 +51,7 @@ if ( 0 === $dmd_slide_count ) {
             </div>
         </section>
     <?php else : ?>
-        <section class="relative w-full h-[400px] md:h-[480px] lg:h-[680px] bg-gradient-to-br from-green-600 to-emerald-800 flex items-center justify-center text-white px-6">
+        <section class="relative w-full overflow-hidden h-[300px] md:h-[480px] lg:h-[680px] bg-gradient-to-br from-green-600 to-emerald-800 flex items-center justify-center text-white px-6">
             <div class="max-w-xl text-center space-y-4">
                 <h1 style="color: <?php echo esc_attr( $hero_title_color ); ?>;" class="text-3xl md:text-5xl font-bold leading-tight">
                     <?php esc_html_e( 'সেরা ও খাঁটি পণ্যের ডিজিটাল মুদির দোকান', 'digital-mudir-dokan' ); ?>
@@ -73,7 +73,7 @@ if ( 0 === $dmd_slide_count ) {
 // Single Slide Handling
 if ( 1 === $dmd_slide_count ) :
     $dmd_slide = $dmd_slides[0]; ?>
-    <section class="relative w-full h-[400px] md:h-[480px] lg:h-[680px] <?php echo esc_attr( 'full' === $dmd_width_mode ? '' : 'my-8' ); ?>">
+    <section class="relative w-full overflow-hidden h-[300px] md:h-[480px] lg:h-[680px] <?php echo esc_attr( 'full' === $dmd_width_mode ? '' : 'my-4' ); ?>">
         <div class="relative w-screen left-1/2 -translate-x-1/2 h-full overflow-hidden rounded-2xl">
             <?php if ( $dmd_slide['image'] ) : ?>
                 <img src="<?php echo esc_url( $dmd_slide['image'] ); ?>" alt="<?php echo esc_attr( $dmd_slide['title'] ); ?>" class="absolute inset-0 w-full h-full object-cover" />
@@ -101,14 +101,14 @@ if ( 1 === $dmd_slide_count ) :
 <?php return; endif; ?>
 
 <!-- Swiper for Multiple Slides -->
-<section class="relative w-full overflow-hidden bg-gray-50 <?php echo esc_attr( 'full' === $dmd_width_mode ? '' : 'my-8' ); ?>">
+<section class="relative w-full overflow-hidden bg-gray-50 <?php echo esc_attr( 'full' === $dmd_width_mode ? '' : 'my-4' ); ?>">
     <div class="swiper hero-swiper w-full rounded-2xl overflow-hidden"
             data-autoplay="<?php echo esc_attr( get_theme_mod( 'dmd_hero_autoplay', true ) ? 'true' : 'false' ); ?>"
             data-delay="<?php echo esc_attr( get_theme_mod( 'dmd_slider_delay', 4000 ) ); ?>"
             data-speed="<?php echo esc_attr( get_theme_mod( 'dmd_slider_speed', 800 ) ); ?>">
         <div class="swiper-wrapper">
             <?php foreach ( $dmd_slides as $dmd_slide ) : ?>
-            <div class="swiper-slide relative w-full h-[400px] md:h-[480px] lg:h-[680px]">
+            <div class="swiper-slide relative w-full h-[300px] md:h-[480px] lg:h-[680px]">
                 <?php if ( $dmd_slide['image'] ) : ?>
                 <img src="<?php echo esc_url( $dmd_slide['image'] ); ?>"
                     alt="<?php echo esc_attr( $dmd_slide['title'] ? $dmd_slide['title'] : get_bloginfo( 'name' ) ); ?>"

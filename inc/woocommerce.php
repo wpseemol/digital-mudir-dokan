@@ -84,6 +84,12 @@ add_action( 'init', 'dmd_wc_hooks' );
  * @return int
  */
 function dmd_loop_columns() {
+	if ( is_shop() ) {
+		return (int) get_theme_mod( 'dmd_shop_grid_columns', 4 );
+	}
+	if ( is_product_category() || is_product_tag() ) {
+		return (int) get_theme_mod( 'dmd_category_grid_columns', 4 );
+	}
 	return 4;
 }
 add_filter( 'loop_shop_columns', 'dmd_loop_columns', 20 );
@@ -94,15 +100,16 @@ add_filter( 'loop_shop_columns', 'dmd_loop_columns', 20 );
  * @return int
  */
 function dmd_products_per_page() {
-	$allowed = array( 9, 12, 18, 24 );
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display preference.
-	$chosen = isset( $_GET['per_page'] ) ? absint( wp_unslash( $_GET['per_page'] ) ) : 0;
-
-	if ( in_array( $chosen, $allowed, true ) ) {
-		return $chosen;
+	if ( is_shop() ) {
+		$limit = get_theme_mod( 'dmd_shop_products_per_page', 12 );
+	} elseif ( is_product_category() || is_product_tag() ) {
+		$limit = get_theme_mod( 'dmd_category_products_per_page', 12 );
+	} else {
+		$limit = 12;
 	}
 
-	return 12;
+	// Remove limitation if limit is very high (e.g. 999) or handle logic as requested.
+	return ( $limit >= 999 ) ? -1 : $limit;
 }
 add_filter( 'loop_shop_per_page', 'dmd_products_per_page', 20 );
 

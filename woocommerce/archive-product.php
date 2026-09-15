@@ -124,16 +124,22 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 				 */
 				do_action( 'woocommerce_before_shop_loop' );
 
-				$grid_cols_choice = get_theme_mod( 'dmd_archive_grid_columns', '4' );
-				$grid_cols_class  = ($grid_cols_choice === '3' ) ? 'lg:grid-cols-3' : 'lg:grid-cols-4';
+				$grid_cols_class = 'lg:grid-cols-4';
+				if ( is_shop() ) {
+					$grid_cols_choice = get_theme_mod( 'dmd_shop_grid_columns', '4' );
+					$grid_cols_class  = ( $grid_cols_choice === '3' ) ? 'lg:grid-cols-3' : 'lg:grid-cols-4';
+				} elseif ( is_product_category() || is_product_tag() ) {
+					$grid_cols_choice = get_theme_mod( 'dmd_category_grid_columns', '4' );
+					$grid_cols_class  = ( $grid_cols_choice === '3' ) ? 'lg:grid-cols-3' : 'lg:grid-cols-4';
+				}
 
 				if ( wc_get_loop_prop( 'total' ) ) : ?>
 				<ul id="dmd-archive-products" class="products dmd-archive-catalog grid-view grid grid-cols-2 md:grid-cols-3 <?php echo esc_attr( $grid_cols_class ); ?> gap-4 md:gap-6 list-none p-0 m-0">
 				<?php
 				while ( have_posts() ) {
-				the_post();
-				do_action( 'woocommerce_shop_loop' );
-				wc_get_template_part( 'content', 'product' );
+					the_post();
+					do_action( 'woocommerce_shop_loop' );
+					wc_get_template_part( 'content', 'product' );
 				}
 				?>
 				</ul>
