@@ -33,14 +33,21 @@ if ( ! $dmd_ids ) {
 
 $dmd_title = get_theme_mod( 'dmd_home_video_title', __( 'See what they say about us', 'digital-mudir-dokan' ) );
 ?>
-<section class="dmd-videos bg-white py-12" aria-labelledby="dmd-video-title">
+<section class="dmd-videos dmd-section" aria-labelledby="dmd-video-title">
 	<div class="dmd-container">
-		<h2 id="dmd-video-title" class="dmd-section-title mb-8"><?php echo esc_html( $dmd_title ); ?></h2>
+		<?php
+		dmd_section_heading(
+			array(
+				'title' => $dmd_title,
+				'id'    => 'dmd-video-title',
+			)
+		);
+		?>
 
-		<ul class="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 lg:grid-cols-4">
+		<ul class="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
 			<?php foreach ( $dmd_ids as $dmd_index => $dmd_id ) : ?>
 				<li class="list-none">
-					<div class="dmd-video dmd-ratio-16x9 relative overflow-hidden rounded-lg bg-surface" data-dmd-video="<?php echo esc_attr( $dmd_id ); ?>">
+					<div class="dmd-video dmd-ratio-16x9 relative overflow-hidden rounded-xl bg-surface" data-dmd-video="<?php echo esc_attr( $dmd_id ); ?>">
 						<img class="h-full w-full object-cover"
 							src="https://i.ytimg.com/vi/<?php echo esc_attr( $dmd_id ); ?>/hqdefault.jpg"
 							alt=""

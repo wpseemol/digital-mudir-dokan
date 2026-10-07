@@ -10,7 +10,7 @@
 
 	wp.customize('blogname', function (value) {
 		value.bind(function (to) {
-			$('.dmd-branding a, .dmd-branding p').text(to);
+			$('.dmd-branding > a:not(.custom-logo-link)').text(to);
 		});
 	});
 
@@ -22,12 +22,12 @@
 
 	wp.customize('dmd_topbar_text', function (value) {
 		value.bind(function (to) {
-			$('.dmd-topbar span').first().text(to);
+			$('.dmd-topbar-text').text(to);
 		});
 	});
 	wp.customize('dmd_logo_width', function (value) {
 		value.bind(function (to) {
-			$('.dmd-branding img').css('width', to + 'px');
+			$('.dmd-branding img.custom-logo').css({ width: to + 'px', maxWidth: 'min(' + to + 'px, 46vw)' });
 		});
 	});
 })(jQuery);

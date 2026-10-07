@@ -1,13 +1,16 @@
 <?php
 /**
- * A titled grid of products with optional tabbed category filtering used on the front page.
+ * A titled grid of products with optional category tabs, used on the front page.
  *
  * @param array $args {
- *     @type string $title   Section heading.
- *     @type int    $limit   How many products to show.
- *     @type string $source  'recent' or 'best_selling'.
- *     @type bool   $show_tabs Enable/Disable tabbed filtering.
- *     @type bool   $show_link Enable/Disable 'View All' link.
+ *     @type string $id        Section id prefix.
+ *     @type string $title     Section heading.
+ *     @type string $eyebrow   Small line above the heading.
+ *     @type int    $limit     How many products to show.
+ *     @type string $source    'recent' or 'best_selling'.
+ *     @type bool   $show_tabs Category tabs that filter the grid.
+ *     @type bool   $show_link "View all" link.
+ *     @type string $class     Extra section classes (background).
  * }
  *
  * @package Digital_Mudir_Dokan
@@ -18,81 +21,114 @@ defined( 'ABSPATH' ) || exit;
 $dmd_args = wp_parse_args(
 	$args,
 	array(
-		'title'     => get_theme_mod('dmd_all_products_title', 'Our Products'),
-		'limit'     => get_theme_mod('dmd_product_count', 12),
+		'id'        => 'products',
+		'title'     => __( 'Our products', 'digital-mudir-dokan' ),
+		'eyebrow'   => '',
+		'limit'     => 12,
 		'source'    => 'recent',
 		'show_tabs' => true,
 		'show_link' => true,
-        'id'        => 'products'
+		'class'     => '',
 	)
 );
 
-// Fetch top-level categories, excluding 'Uncategorized'
-$categories = get_terms( array(
-    'taxonomy'   => 'product_cat',
-    'hide_empty' => true,
-    'parent'     => 0,
-    'exclude'    => get_term_by('slug', 'uncategorized', 'product_cat') ? [get_term_by('slug', 'uncategorized', 'product_cat')->term_id] : [],
-) );
+$dmd_query_args = array(
+	'post_type'           => 'product',
+	'post_status'         => 'publish',
+	'posts_per_page'      => max( 1, (int) $dmd_args['limit'] ),
+	'ignore_sticky_posts' => true,
+	'no_found_rows'       => true,
+	'tax_query'           => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		array(
+			'taxonomy' => 'product_visibility',
+			'field'    => 'name',
+			'terms'    => array( 'exclude-from-catalog' ),
+			'operator' => 'NOT IN',
+		),
+	),
+);
+
+if ( 'best_selling' === $dmd_args['source'] ) {
+	$dmd_query_args['meta_key'] = 'total_sales'; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+	$dmd_query_args['orderby']  = array(
+		'meta_value_num' => 'DESC',
+		'date'           => 'DESC',
+	);
+}
+
+$dmd_products = new WP_Query( $dmd_query_args );
+
+if ( ! $dmd_products->have_posts() ) {
+	return;
+}
+
+// Only offer tabs for categories that actually appear in this grid.
+$dmd_tabs = array();
+if ( $dmd_args['show_tabs'] ) {
+	$dmd_present = array();
+	foreach ( $dmd_products->posts as $dmd_post ) {
+		$dmd_p = wc_get_product( $dmd_post );
+		if ( $dmd_p ) {
+			$dmd_present = array_merge( $dmd_present, explode( ' ', dmd_get_product_cat_slugs( $dmd_p ) ) );
+		}
+	}
+	foreach ( dmd_get_top_categories() as $dmd_cat ) {
+		if ( in_array( $dmd_cat->slug, $dmd_present, true ) ) {
+			$dmd_tabs[] = $dmd_cat;
+		}
+	}
+	if ( count( $dmd_tabs ) < 2 ) {
+		$dmd_tabs = array();
+	}
+}
+
+$dmd_heading_id = $dmd_args['id'] . '-heading';
+$dmd_shop_url   = wc_get_page_permalink( 'shop' );
+if ( 'best_selling' === $dmd_args['source'] ) {
+	$dmd_shop_url = add_query_arg( 'orderby', 'popularity', $dmd_shop_url );
+}
 ?>
-<section id="<?php echo esc_attr($dmd_args['id']); ?>-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <div class="flex flex-wrap justify-between items-center mb-8 gap-4">
-        <h2 class="text-2xl md:text-3xl font-bold tracking-wider text-gray-900 text-center mb-4 uppercase w-full">
-            <?php echo esc_html( $dmd_args['title'] ); ?>
-        </h2>
+<section id="<?php echo esc_attr( $dmd_args['id'] ); ?>-section" class="dmd-section <?php echo esc_attr( $dmd_args['class'] ); ?>" aria-labelledby="<?php echo esc_attr( $dmd_heading_id ); ?>" <?php echo $dmd_tabs ? 'data-dmd-tabs' : ''; ?>>
+	<div class="dmd-container">
+		<?php
+		dmd_section_heading(
+			array(
+				'title'    => $dmd_args['title'],
+				'eyebrow'  => $dmd_args['eyebrow'],
+				'id'       => $dmd_heading_id,
+				'link_url' => $dmd_args['show_link'] ? $dmd_shop_url : '',
+			)
+		);
+		?>
 
-        <?php if ($dmd_args['show_tabs'] && !empty($categories)) : ?>
-            <div class="flex flex-wrap gap-2 w-full justify-center mb-8">
-                <button class="product-tab-btn px-5 py-2 text-sm font-semibold border border-gray-300 rounded-md transition-all bg-[#1B6A3B] text-white border-[#1B6A3B]" data-category="all">
-                    সকল পণ্য (All)
-                </button>
-                <?php foreach ( $categories as $category ) : ?>
-                    <button class="product-tab-btn px-5 py-2 text-sm font-semibold border border-gray-300 rounded-md transition-all bg-white text-gray-700" data-category="<?php echo esc_attr( $category->slug ); ?>">
-                        <?php echo esc_html( $category->name ); ?>
-                    </button>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-    </div>
+		<?php if ( $dmd_tabs ) : ?>
+			<div class="dmd-scroll-x -mx-4 mb-6 gap-2 px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0" role="toolbar" aria-label="<?php esc_attr_e( 'Filter by category', 'digital-mudir-dokan' ); ?>">
+				<button type="button" class="dmd-chip is-active" data-dmd-tab-filter="all" aria-pressed="true"><?php esc_html_e( 'সকল পণ্য', 'digital-mudir-dokan' ); ?></button>
+				<?php foreach ( $dmd_tabs as $dmd_tab ) : ?>
+					<button type="button" class="dmd-chip" data-dmd-tab-filter="<?php echo esc_attr( $dmd_tab->slug ); ?>" aria-pressed="false"><?php echo esc_html( $dmd_tab->name ); ?></button>
+				<?php endforeach; ?>
+			</div>
+		<?php endif; ?>
 
-    <ul class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 product-grid-fade">
-        <?php 
-        $query_args = [ 
-            'post_type' => 'product',
-            'posts_per_page' => (int)$dmd_args['limit'], 
-            'post_status' => 'publish' 
-        ];
-        if ($dmd_args['source'] === 'best_selling') {
-            $query_args['orderby'] = 'meta_value_num';
-            $query_args['meta_key'] = 'total_sales';
-        }
-        
-        $products_query = new WP_Query( $query_args );
+		<ul class="products m-0 grid list-none grid-cols-2 gap-3 p-0 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+			<?php
+			while ( $dmd_products->have_posts() ) :
+				$dmd_products->the_post();
+				$GLOBALS['product'] = wc_get_product( get_the_ID() ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+				wc_get_template_part( 'content', 'product-homepage' );
+			endwhile;
+			wp_reset_postdata();
+			?>
+		</ul>
 
-        if ( $products_query->have_posts() ) :
-            while ( $products_query->have_posts() ) : $products_query->the_post();
-                global $product;
-                $product = wc_get_product( get_the_ID() );
-                if ( ! $product || ! $product->is_visible() ) continue;
-                
-                wc_get_template_part( 'content', 'product' ); 
-            endwhile;
-            wp_reset_postdata();
-        endif;
-        ?>
-    </ul>
+		<?php if ( $dmd_tabs ) : ?>
+			<p class="mt-6 text-center text-sm text-muted" data-dmd-tabs-empty hidden><?php esc_html_e( 'No products in this category yet.', 'digital-mudir-dokan' ); ?></p>
+		<?php endif; ?>
 
-    <?php if ($dmd_args['show_link']) : ?>
-        <div class="text-center mt-10">
-            <a class="text-emerald-700 font-semibold flex items-center justify-center gap-1" href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>">
-                সব দেখুন (VIEW ALL) <?php echo dmd_icon( 'chevron-r', 16 ); ?>
-            </a>
-        </div>
-    <?php endif; ?>
+		<?php if ( $dmd_args['show_link'] ) : ?>
+			<div class="mt-8 text-center sm:hidden">
+				<a class="dmd-btn dmd-btn--outline" href="<?php echo esc_url( $dmd_shop_url ); ?>"><?php esc_html_e( 'View all', 'digital-mudir-dokan' ); ?></a>
+			</div>
+		<?php endif; ?>
+	</div>
 </section>
-
-<script>
-jQuery(document).ready(function($) {
-    $('.product-card-item').animate({opacity: 1}, 500);
-});
-</script>

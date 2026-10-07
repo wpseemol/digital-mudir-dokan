@@ -1,105 +1,94 @@
 <?php
 /**
- * Category archive sidebar: price filter + product categories.
+ * Shop sidebar: categories + price filter (+ any "Shop sidebar" widgets).
+ *
+ * Sticky column from lg up; an off-canvas drawer below that, opened by the
+ * "Filters" button in the archive toolbar.
  *
  * @package Digital_Mudir_Dokan
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$min_price = isset( $_GET['min_price'] ) ? wc_clean( wp_unslash( $_GET['min_price'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$max_price = isset( $_GET['max_price'] ) ? wc_clean( wp_unslash( $_GET['max_price'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+// phpcs:disable WordPress.Security.NonceVerification.Recommended
+$dmd_min_price = isset( $_GET['min_price'] ) ? wc_clean( wp_unslash( $_GET['min_price'] ) ) : '';
+$dmd_max_price = isset( $_GET['max_price'] ) ? wc_clean( wp_unslash( $_GET['max_price'] ) ) : '';
+// phpcs:enable
 
-$form_action = '';
-if ( is_product_category() || is_product_tag() || is_product_taxonomy() ) {
-	$term = get_queried_object();
-	if ( $term instanceof WP_Term ) {
-		$form_action = get_term_link( $term );
-		if ( is_wp_error( $form_action ) ) {
-			$form_action = '';
-		}
+$dmd_current = is_product_category() ? get_queried_object() : null;
+$dmd_current = $dmd_current instanceof WP_Term ? $dmd_current : null;
+
+$dmd_form_action = wc_get_page_permalink( 'shop' );
+if ( is_product_taxonomy() ) {
+	$dmd_link = get_term_link( get_queried_object() );
+	if ( ! is_wp_error( $dmd_link ) ) {
+		$dmd_form_action = $dmd_link;
 	}
-} elseif ( function_exists( 'wc_get_page_id' ) ) {
-	$form_action = get_permalink( wc_get_page_id( 'shop' ) );
 }
 
-$currency = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '';
-?>
-<aside class="dmd-shop-sidebar space-y-5" aria-label="<?php esc_attr_e( 'Shop filters', 'digital-mudir-dokan' ); ?>">
+// The current category and its parents stay expanded.
+$dmd_open_ids = array();
+if ( $dmd_current ) {
+	$dmd_open_ids   = get_ancestors( $dmd_current->term_id, 'product_cat', 'taxonomy' );
+	$dmd_open_ids[] = $dmd_current->term_id;
+}
 
-	<section class="dmd-filter-card rounded-lg border border-line bg-white p-5">
-		<h2 class="mb-3 text-base font-semibold"><?php esc_html_e( 'Filter by price', 'digital-mudir-dokan' ); ?></h2>
-		<form class="dmd-price-filter" method="get" action="<?php echo esc_url( $form_action ); ?>">
+$dmd_currency = get_woocommerce_currency_symbol();
+?>
+<aside id="dmd-shop-sidebar" class="dmd-shop-sidebar space-y-5" aria-label="<?php esc_attr_e( 'Shop filters', 'digital-mudir-dokan' ); ?>">
+
+	<div class="flex items-center justify-between border-b border-line pb-3 lg:hidden">
+		<p class="m-0 text-base font-semibold"><?php esc_html_e( 'Filters', 'digital-mudir-dokan' ); ?></p>
+		<button type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface" data-dmd-filter-close>
+			<?php dmd_the_icon( 'close', 18 ); ?>
+			<span class="screen-reader-text"><?php esc_html_e( 'Close filters', 'digital-mudir-dokan' ); ?></span>
+		</button>
+	</div>
+
+	<section class="dmd-widget">
+		<h2 class="dmd-widget-title"><?php esc_html_e( 'Product Categories', 'digital-mudir-dokan' ); ?></h2>
+		<a class="mb-1 flex items-center justify-between rounded-md px-2 py-1.5 text-sm <?php echo esc_attr( is_shop() ? 'bg-green-soft font-semibold text-green' : 'text-ink hover:bg-green-soft hover:text-green' ); ?>" href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>">
+			<?php esc_html_e( 'All products', 'digital-mudir-dokan' ); ?>
+		</a>
+		<?php dmd_sidebar_category_tree( 0, $dmd_current ? $dmd_current->term_id : 0, $dmd_open_ids ); ?>
+	</section>
+
+	<section class="dmd-widget">
+		<h2 class="dmd-widget-title"><?php esc_html_e( 'Filter by price', 'digital-mudir-dokan' ); ?></h2>
+		<form class="dmd-price-filter" method="get" action="<?php echo esc_url( $dmd_form_action ); ?>">
 			<?php
 			// Keep catalog order / search args when applying a price filter.
-			if ( ! empty( $_GET ) && is_array( $_GET ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				foreach ( wp_unslash( $_GET ) as $key => $value ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-					if ( in_array( $key, array( 'min_price', 'max_price', 'paged', 'page' ), true ) || is_array( $value ) ) {
-						continue;
-					}
-					printf(
-						'<input type="hidden" name="%1$s" value="%2$s" />',
-						esc_attr( sanitize_key( $key ) ),
-						esc_attr( wc_clean( $value ) )
-					);
+			foreach ( wp_unslash( $_GET ) as $dmd_key => $dmd_value ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				if ( in_array( $dmd_key, array( 'min_price', 'max_price', 'paged', 'page' ), true ) || is_array( $dmd_value ) ) {
+					continue;
 				}
+				printf(
+					'<input type="hidden" name="%1$s" value="%2$s" />',
+					esc_attr( sanitize_key( $dmd_key ) ),
+					esc_attr( wc_clean( $dmd_value ) )
+				);
 			}
 			?>
 			<div class="grid grid-cols-2 gap-2">
 				<label class="block">
-					<span class="mb-1 block text-xs text-muted"><?php esc_html_e( 'Min', 'digital-mudir-dokan' ); ?><?php echo $currency ? ' (' . esc_html( $currency ) . ')' : ''; ?></span>
-					<input
-						type="number"
-						name="min_price"
-						inputmode="decimal"
-						min="0"
-						step="any"
-						value="<?php echo esc_attr( $min_price ); ?>"
-						placeholder="0"
-						class="dmd-price-filter__input w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600"
-					/>
+					<span class="mb-1 block text-xs text-muted"><?php esc_html_e( 'Min', 'digital-mudir-dokan' ); ?> (<?php echo esc_html( html_entity_decode( $dmd_currency ) ); ?>)</span>
+					<input type="number" name="min_price" inputmode="decimal" min="0" step="any" value="<?php echo esc_attr( $dmd_min_price ); ?>" placeholder="0" class="dmd-field !py-2" />
 				</label>
 				<label class="block">
-					<span class="mb-1 block text-xs text-muted"><?php esc_html_e( 'Max', 'digital-mudir-dokan' ); ?><?php echo $currency ? ' (' . esc_html( $currency ) . ')' : ''; ?></span>
-					<input
-						type="number"
-						name="max_price"
-						inputmode="decimal"
-						min="0"
-						step="any"
-						value="<?php echo esc_attr( $max_price ); ?>"
-						placeholder="<?php esc_attr_e( 'Any', 'digital-mudir-dokan' ); ?>"
-						class="dmd-price-filter__input w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600"
-					/>
+					<span class="mb-1 block text-xs text-muted"><?php esc_html_e( 'Max', 'digital-mudir-dokan' ); ?> (<?php echo esc_html( html_entity_decode( $dmd_currency ) ); ?>)</span>
+					<input type="number" name="max_price" inputmode="decimal" min="0" step="any" value="<?php echo esc_attr( $dmd_max_price ); ?>" placeholder="<?php esc_attr_e( 'Any', 'digital-mudir-dokan' ); ?>" class="dmd-field !py-2" />
 				</label>
 			</div>
-			<button type="submit" class="mt-3 w-full rounded-lg bg-emerald-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-900">
-				<?php esc_html_e( 'Apply', 'digital-mudir-dokan' ); ?>
-			</button>
-			<?php if ( '' !== $min_price || '' !== $max_price ) : ?>
-				<a href="<?php echo esc_url( $form_action ); ?>" class="mt-2 block text-center text-xs font-medium text-emerald-800 hover:underline">
+			<button type="submit" class="dmd-btn dmd-btn--primary dmd-btn--block mt-3"><?php esc_html_e( 'Apply', 'digital-mudir-dokan' ); ?></button>
+			<?php if ( '' !== $dmd_min_price || '' !== $dmd_max_price ) : ?>
+				<a href="<?php echo esc_url( remove_query_arg( array( 'min_price', 'max_price', 'paged' ) ) ); ?>" class="mt-2 block text-center text-xs font-medium text-green hover:underline">
 					<?php esc_html_e( 'Clear price filter', 'digital-mudir-dokan' ); ?>
 				</a>
 			<?php endif; ?>
 		</form>
 	</section>
 
-	<section class="dmd-filter-card rounded-lg border border-line bg-white p-5">
-		<h2 class="mb-3 text-base font-semibold"><?php esc_html_e( 'Product Categories', 'digital-mudir-dokan' ); ?></h2>
-		<ul class="dmd-product-categories product-categories m-0 list-none space-y-1.5 p-0 text-sm">
-			<?php
-			wp_list_categories(
-				array(
-					'taxonomy'     => 'product_cat',
-					'title_li'     => '',
-					'show_count'   => true,
-					'hide_empty'   => false,
-					'hierarchical' => true,
-					'current_category' => is_product_category() ? get_queried_object_id() : 0,
-				)
-			);
-			?>
-		</ul>
-	</section>
-
+	<?php if ( is_active_sidebar( 'shop-sidebar' ) ) : ?>
+		<?php dynamic_sidebar( 'shop-sidebar' ); ?>
+	<?php endif; ?>
 </aside>

@@ -1,15 +1,17 @@
 <?php
 /**
  * Product card used in loops.
- * This file redirects to the correct template based on context.
+ *
+ * Archives print the grid and list layouts and let the view switcher pick
+ * one; everywhere else (homepage, related products) only the grid card.
  *
  * @package Digital_Mudir_Dokan
  */
 
 defined( 'ABSPATH' ) || exit;
 
-if ( is_front_page() ) {
-    wc_get_template_part( 'content', 'product-homepage' );
+if ( is_shop() || is_product_taxonomy() || is_search() ) {
+	wc_get_template_part( 'content', 'product-archive' );
 } else {
-    wc_get_template_part( 'content', 'product-archive' );
+	wc_get_template_part( 'content', 'product-homepage' );
 }

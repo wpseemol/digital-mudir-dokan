@@ -19,31 +19,30 @@
 
 		if (!toggles.length || !nav) return;
 
+		var closedClass = nav.dataset.closedClass || 'translate-x-full';
+
 		// Create backdrop
 		var backdrop = document.createElement('div');
-		backdrop.className = 'fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 opacity-0 hidden';
+		backdrop.className = 'fixed inset-0 z-50 bg-black/50 transition-opacity duration-300 opacity-0 hidden';
 		body.appendChild(backdrop);
 
 		function toggleMenu(open) {
-			toggles.forEach(toggle => toggle.setAttribute('aria-expanded', open ? 'true' : 'false'));
-			
-			if (open) {
-				nav.classList.remove('translate-x-full');
-				nav.classList.add('translate-x-0');
-			} else {
-				nav.classList.remove('translate-x-0');
-				nav.classList.add('translate-x-full');
-			}
+			toggles.forEach(function (toggle) {
+				toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+			});
+
+			nav.classList.toggle(closedClass, !open);
+			nav.classList.toggle('translate-x-0', open);
 			
 			backdrop.classList.toggle('hidden', !open);
-			setTimeout(() => {
+			setTimeout(function () {
 				backdrop.classList.toggle('opacity-0', !open);
 			}, 10);
-			
+
 			body.classList.toggle('overflow-hidden', open);
 		}
 
-		toggles.forEach(toggle => {
+		toggles.forEach(function (toggle) {
 			toggle.addEventListener('click', function () {
 				var isOpen = toggle.getAttribute('aria-expanded') === 'true';
 				toggleMenu(!isOpen);
@@ -69,34 +68,125 @@
 	}
 
 	/* ------------------------------------------------------------------
-	 * Disclosure toggles (search panel)
+	 * Header — "All categories" dropdown and stuck shadow
 	 * ------------------------------------------------------------------ */
-	function initToggle(button, panel) {
-		if (!button || !panel) {
+	function initCategoryNav() {
+		var wrap = document.querySelector('.dmd-catnav');
+		if (!wrap) {
 			return;
 		}
 
+		var button = wrap.querySelector('.dmd-catnav-toggle');
+		var closeTimer;
+
+		function setOpen(open) {
+			wrap.setAttribute('data-open', open ? 'true' : 'false');
+			button.setAttribute('aria-expanded', open ? 'true' : 'false');
+		}
+
 		button.addEventListener('click', function () {
-			var open = button.getAttribute('aria-expanded') === 'true';
+			setOpen(wrap.getAttribute('data-open') !== 'true');
+		});
 
-			button.setAttribute('aria-expanded', open ? 'false' : 'true');
-			panel.hidden = open;
-			panel.classList.toggle('hidden', open);
+		wrap.addEventListener('mouseenter', function () {
+			window.clearTimeout(closeTimer);
+			setOpen(true);
+		});
 
-			if (!open) {
-				var field = panel.querySelector('input, a, button');
-				if (field) {
-					field.focus();
-				}
+		wrap.addEventListener('mouseleave', function () {
+			closeTimer = window.setTimeout(function () {
+				setOpen(false);
+			}, 150);
+		});
+
+		document.addEventListener('click', function (event) {
+			if (!wrap.contains(event.target)) {
+				setOpen(false);
 			}
 		});
 
 		document.addEventListener('keydown', function (event) {
-			if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
-				button.setAttribute('aria-expanded', 'false');
-				panel.hidden = true;
-				panel.classList.add('hidden');
+			if (event.key === 'Escape' && wrap.getAttribute('data-open') === 'true') {
+				setOpen(false);
 				button.focus();
+			}
+		});
+	}
+
+	function initStickyHeader() {
+		var header = document.getElementById('dmd-header');
+		if (!header) {
+			return;
+		}
+
+		var ticking = false;
+
+		function update() {
+			header.classList.toggle('is-stuck', window.scrollY > 8);
+			ticking = false;
+		}
+
+		window.addEventListener('scroll', function () {
+			if (!ticking) {
+				ticking = true;
+				window.requestAnimationFrame(update);
+			}
+		}, { passive: true });
+
+		update();
+	}
+
+	/* ------------------------------------------------------------------
+	 * Shop filter drawer (sidebar is off-canvas below lg)
+	 * ------------------------------------------------------------------ */
+	function initFilterDrawer() {
+		var sidebar = document.getElementById('dmd-shop-sidebar');
+		var openers = document.querySelectorAll('[data-dmd-filter-open]');
+
+		if (!sidebar || !openers.length) {
+			return;
+		}
+
+		var closers = sidebar.querySelectorAll('[data-dmd-filter-close]');
+		var backdrop = document.createElement('div');
+		backdrop.className = 'fixed inset-0 z-50 hidden bg-black/50 lg:hidden';
+		document.body.appendChild(backdrop);
+
+		function setOpen(open) {
+			sidebar.classList.toggle('is-open', open);
+			backdrop.classList.toggle('hidden', !open);
+			document.body.classList.toggle('overflow-hidden', open);
+			openers.forEach(function (btn) {
+				btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+			});
+
+			if (open) {
+				var field = sidebar.querySelector('input, a, button');
+				if (field) {
+					field.focus();
+				}
+			}
+		}
+
+		openers.forEach(function (btn) {
+			btn.addEventListener('click', function () {
+				setOpen(true);
+			});
+		});
+
+		closers.forEach(function (btn) {
+			btn.addEventListener('click', function () {
+				setOpen(false);
+			});
+		});
+
+		backdrop.addEventListener('click', function () {
+			setOpen(false);
+		});
+
+		document.addEventListener('keydown', function (event) {
+			if (event.key === 'Escape' && sidebar.classList.contains('is-open')) {
+				setOpen(false);
 			}
 		});
 	}
@@ -325,6 +415,17 @@
 			return;
 		}
 
+		// Never tuck the category the visitor is browsing behind "show more".
+		var currentIndex = -1;
+		items.forEach(function (item, index) {
+			if (item.classList.contains('current-cat') || item.querySelector('.current-cat')) {
+				currentIndex = index;
+			}
+		});
+		if (currentIndex >= limit) {
+			return;
+		}
+
 		// Hide excess items
 		items.forEach(function (item, index) {
 			if (index >= limit) {
@@ -334,7 +435,7 @@
 
 		// Create toggle button
 		var button = document.createElement('button');
-		button.className = 'mt-3 w-full rounded-lg border border-line bg-white px-3 py-2 text-xs font-medium text-emerald-800 transition hover:bg-emerald-50';
+		button.className = 'mt-3 w-full rounded-lg border border-line bg-white px-3 py-2 text-xs font-medium text-green transition hover:bg-green-soft';
 		button.innerHTML = 'আরও দেখুন +';
 		button.type = 'button';
 
@@ -424,34 +525,34 @@
 		}
 
 		var slides = slider.querySelectorAll('.swiper-slide');
-		if (slides.length <= 1) {
-			slider.querySelector('.swiper-button-prev-custom').style.display = 'none';
-			slider.querySelector('.swiper-button-next-custom').style.display = 'none';
+		if (slides.length <= 1 || typeof window.Swiper === 'undefined') {
 			return;
 		}
 
-		const isAutoplay = slider.dataset.autoplay !== 'false';
-		const delayTime = parseInt(slider.dataset.delay, 10) || 4000;
-		const speedTime = parseInt(slider.dataset.speed, 10) || 800;
+		var isAutoplay = slider.dataset.autoplay !== 'false' && !prefersReducedMotion;
+		var delayTime = parseInt(slider.dataset.delay, 10) || 4000;
+		var speedTime = prefersReducedMotion ? 0 : (parseInt(slider.dataset.speed, 10) || 800);
 
-		new Swiper(slider, {
+		new window.Swiper(slider, {
 			loop: true,
 			speed: speedTime,
+			grabCursor: true,
+			a11y: { enabled: true },
 			autoplay: isAutoplay ? {
 				delay: delayTime,
 				disableOnInteraction: false,
-				pauseOnMouseEnter: true,
+				pauseOnMouseEnter: true
 			} : false,
 			navigation: {
-				prevEl: '.swiper-button-prev-custom',
-				nextEl: '.swiper-button-next-custom',
+				prevEl: slider.querySelector('.swiper-button-prev-custom'),
+				nextEl: slider.querySelector('.swiper-button-next-custom')
 			},
 			pagination: {
-				el: '.swiper-pagination-custom',
+				el: slider.querySelector('.swiper-pagination-custom'),
 				clickable: true,
-				bulletClass: 'w-3 h-3 rounded-full bg-white/60 inline-block cursor-pointer transition-all',
-				bulletActiveClass: '!w-8 !bg-emerald-600',
-			},
+				bulletClass: 'dmd-hero-bullet',
+				bulletActiveClass: 'is-active'
+			}
 		});
 	}
 
@@ -459,47 +560,53 @@
 	 * Homepage Product Tab Filter
 	 * ------------------------------------------------------------------ */
 	function initProductTabs() {
-		jQuery(document).ready(function($) {
-			// Scope to the All Products section container specifically
-			var $allProductsSection = $('#all-products-section');
-			if ($allProductsSection.length === 0) return;
+		document.querySelectorAll('[data-dmd-tabs]').forEach(function (section) {
+			var tabs = section.querySelectorAll('[data-dmd-tab-filter]');
+			var items = section.querySelectorAll('[data-dmd-cats]');
+			var empty = section.querySelector('[data-dmd-tabs-empty]');
 
-			$allProductsSection.find('.product-tab-btn').on('click', function(e) {
-				e.preventDefault();
-				$allProductsSection.find('.product-tab-btn').removeClass('bg-[#1B6A3B] text-white border-[#1B6A3B]').addClass('bg-white text-gray-700 border-gray-300');
-				$(this).addClass('bg-[#1B6A3B] text-white border-[#1B6A3B]').removeClass('bg-white text-gray-700 border-gray-300');
+			if (!tabs.length || !items.length) {
+				return;
+			}
 
-				const selectedCat = $(this).data('category');
-				if (selectedCat === 'all') {
-					$allProductsSection.find('.product-card-item').fadeIn(200);
-				} else {
-					$allProductsSection.find('.product-card-item').hide();
-					$allProductsSection.find(`.product-card-item[data-category*="${selectedCat}"]`).fadeIn(200);
-				}
+			tabs.forEach(function (tab) {
+				tab.addEventListener('click', function () {
+					var slug = tab.getAttribute('data-dmd-tab-filter');
+					var shown = 0;
+
+					tabs.forEach(function (other) {
+						var active = other === tab;
+						other.classList.toggle('is-active', active);
+						other.setAttribute('aria-pressed', active ? 'true' : 'false');
+					});
+
+					items.forEach(function (item) {
+						var cats = (' ' + item.getAttribute('data-dmd-cats') + ' ');
+						var match = slug === 'all' || cats.indexOf(' ' + slug + ' ') !== -1;
+						item.hidden = !match;
+						if (match) {
+							shown++;
+						}
+					});
+
+					if (empty) {
+						empty.hidden = shown > 0;
+					}
+				});
 			});
 		});
 	}
 
 	/* ------------------------------------------------------------------
-	 * FAQ Accordion
+	 * Loop add-to-cart feedback
 	 * ------------------------------------------------------------------ */
-	function initFAQ() {
-		document.querySelectorAll('.faq-item').forEach(item => {
-			item.addEventListener('click', () => {
-				const answer = item.querySelector('.faq-answer');
-				const icon = item.querySelector('.faq-icon');
-				
-				// Close all other FAQs
-				document.querySelectorAll('.faq-answer').forEach(el => {
-					if (el !== answer) el.classList.add('hidden');
-				});
-				document.querySelectorAll('.faq-icon').forEach(el => {
-					if (el !== icon) el.textContent = '+';
-				});
+	function initAddedToCartToast() {
+		if (typeof jQuery === 'undefined') {
+			return;
+		}
 
-				answer.classList.toggle('hidden');
-				icon.textContent = answer.classList.contains('hidden') ? '+' : '-';
-			});
+		jQuery(document.body).on('added_to_cart', function () {
+			showToast((window.dmd_theme_object && window.dmd_theme_object.addedToCart) || 'Added to cart');
 		});
 	}
 
@@ -822,15 +929,12 @@
 	 * ------------------------------------------------------------------ */
 	function boot() {
 		initMobileMenu();
+		initCategoryNav();
+		initStickyHeader();
+		initFilterDrawer();
 		initHeroSlider();
 		initProductTabs();
-		initFAQ();
-		// ...
-
-		initToggle(
-			document.querySelector('.dmd-search-toggle'),
-			document.getElementById('dmd-search-panel')
-		);
+		initAddedToCartToast();
 
 		initQuantity(document);
 		initVideos();

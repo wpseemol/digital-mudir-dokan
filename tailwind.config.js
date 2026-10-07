@@ -5,6 +5,7 @@ module.exports = {
     './inc/**/*.php',
     './template-parts/**/*.php',
     './woocommerce/**/*.php',
+    './page-templates/**/*.php',
     './assets/js/**/*.js',
   ],
   // WooCommerce, WordPress core and select2 print these class names at runtime,
@@ -12,6 +13,20 @@ module.exports = {
   // safelist their rules are tree-shaken out of the build.
   // Regenerate with: npm run audit:safelist
   safelist: [
+    // Toggled on loop add-to-cart buttons by WooCommerce's AJAX script.
+    'added',
+    'added_to_cart',
+    'loading',
+    // Body / menu / paginate_links classes printed by WordPress core.
+    'admin-bar',
+    'current-product_cat-ancestor',
+    'dots',
+    // Block widgets placed in the shop sidebar.
+    'wp-block-group',
+    'wp-block-heading',
+    'wc-block-product-categories-list',
+    'wc-block-product-categories-list-item',
+    'wc-block-product-categories-list-item-count',
     'aligncenter',
     'alignfull',
     'alignleft',
@@ -107,10 +122,12 @@ module.exports = {
         display: ['"Poppins"', '"Hind Siliguri"', 'sans-serif'],
       },
       maxWidth: {
-        container: '1200px',
+        container: '1280px',
       },
       boxShadow: {
         card: '0 6px 24px rgba(16, 24, 40, 0.08)',
+        soft: '0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 8px rgba(16, 24, 40, 0.06)',
+        lift: '0 14px 32px -10px rgba(17, 61, 33, 0.22)',
       },
     },
   },

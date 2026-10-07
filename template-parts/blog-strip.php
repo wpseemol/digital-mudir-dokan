@@ -21,11 +21,18 @@ if ( ! $dmd_posts->have_posts() ) {
 	return;
 }
 ?>
-<section class="dmd-blog-strip bg-surface py-12" aria-labelledby="dmd-blog-title">
+<section class="dmd-blog-strip dmd-section bg-surface" aria-labelledby="dmd-blog-title">
 	<div class="dmd-container">
-		<h2 id="dmd-blog-title" class="dmd-section-title mb-8">
-			<?php echo esc_html( get_theme_mod( 'dmd_home_blog_title', __( 'From our blog', 'digital-mudir-dokan' ) ) ); ?>
-		</h2>
+		<?php
+		$dmd_posts_page = (int) get_option( 'page_for_posts' );
+		dmd_section_heading(
+			array(
+				'title'    => get_theme_mod( 'dmd_home_blog_title', __( 'From our blog', 'digital-mudir-dokan' ) ),
+				'id'       => 'dmd-blog-title',
+				'link_url' => $dmd_posts_page ? get_permalink( $dmd_posts_page ) : '',
+			)
+		);
+		?>
 
 		<ul class="m-0 grid list-none grid-cols-1 gap-5 p-0 md:grid-cols-3">
 			<?php
@@ -33,7 +40,7 @@ if ( ! $dmd_posts->have_posts() ) {
 				$dmd_posts->the_post();
 				?>
 				<li class="list-none">
-					<article id="post-<?php the_ID(); ?>" <?php post_class( 'flex h-full flex-col overflow-hidden rounded-lg border border-line bg-white' ); ?>>
+					<article id="post-<?php the_ID(); ?>" <?php post_class( 'group flex h-full flex-col overflow-hidden rounded-xl border border-line bg-white transition hover:-translate-y-0.5 hover:shadow-lift' ); ?>>
 
 						<?php if ( has_post_thumbnail() ) : ?>
 							<a class="relative block" href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true">
@@ -55,7 +62,7 @@ if ( ! $dmd_posts->have_posts() ) {
 							</a>
 						<?php endif; ?>
 
-						<div class="flex flex-1 flex-col p-5 text-center">
+						<div class="flex flex-1 flex-col p-5">
 							<h3 class="dmd-post-title text-lg leading-snug">
 								<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 							</h3>

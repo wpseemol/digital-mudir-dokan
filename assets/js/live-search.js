@@ -1,5 +1,5 @@
 jQuery(document).ready(function ($) {
-    var searchInput = $('.dmd-search-form input[name="s"]');
+    var searchInput = $('.dmd-header-search .dmd-search-form input[name="s"]');
     var resultsContainer = $('#dmd-live-search-results');
     var timer;
 

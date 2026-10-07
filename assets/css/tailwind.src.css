@@ -16,7 +16,7 @@
         --dmd-line: #e6e9ec;
         --dmd-sale: #113d21;
         --dmd-radius: 8px;
-        --dmd-container: 1200px;
+        --dmd-container: 1280px;
     }
 
     html {
@@ -90,7 +90,7 @@
 @layer components {
     /* Site logo */
     img.custom-logo {
-        @apply h-auto max-h-14 mx-auto object-contain;
+        @apply h-auto max-h-14 object-contain;
     }
 
     .dmd-container {
@@ -139,25 +139,137 @@
         @apply bg-white text-ink px-2.5 h-6 border border-line uppercase tracking-wide;
     }
 
-    /* ---------- Section headings ---------- */
+    /* ---------- Section layout ---------- */
+    .dmd-section {
+        @apply py-10 sm:py-14;
+    }
     .dmd-section-title {
         @apply text-center text-xl sm:text-2xl font-bold tracking-wide text-ink uppercase;
     }
+    .dmd-section-head {
+        @apply mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 sm:mb-8;
+    }
+    .dmd-eyebrow {
+        @apply mb-1.5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-green-dark;
+    }
+    .dmd-eyebrow::before {
+        @apply inline-block h-0.5 w-5 rounded-full bg-green-dark;
+        content: "";
+    }
+    .dmd-heading {
+        @apply m-0 font-display text-xl font-bold leading-tight text-ink sm:text-2xl lg:text-[28px];
+    }
+    .dmd-link-arrow {
+        @apply inline-flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-green hover:text-green-dark;
+    }
 
-    .product-card-item {
-        @apply flex flex-col justify-between bg-white rounded-2xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition h-full;
+    /* ---------- Chips + horizontal scrollers ---------- */
+    .dmd-chip {
+        @apply inline-flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full border border-line
+           bg-white px-4 py-2 text-sm font-medium leading-none text-ink transition-colors hover:border-green hover:text-green;
     }
-    .product-card-item .woocommerce-loop-product__link {
-        @apply flex flex-col h-full;
+    .dmd-chip.is-active,
+    .dmd-chip[aria-current="page"] {
+        @apply border-green bg-green text-white hover:text-white;
     }
-    .product-card-item .wp-post-image {
-        @apply w-full h-full object-cover object-center group-hover:scale-105 transition duration-300;
+    .dmd-scroll-x {
+        @apply flex overflow-x-auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
     }
-    /* Discount Badge */
-    .product-card-item .onsale {
-        @apply absolute top-2 left-2 z-10 bg-emerald-700 text-white text-xs font-bold px-2.5 py-1 rounded-full !m-0;
+    .dmd-scroll-x::-webkit-scrollbar {
+        display: none;
     }
 
+    /* ---------- Header ---------- */
+    .dmd-header {
+        @apply sticky top-0 z-40 bg-white transition-shadow duration-200;
+    }
+    .admin-bar .dmd-header {
+        top: 46px;
+    }
+    @media (min-width: 783px) {
+        .admin-bar .dmd-header {
+            top: 32px;
+        }
+    }
+    @media (max-width: 600px) {
+        .admin-bar .dmd-header {
+            top: 0;
+        }
+    }
+    .dmd-header.is-stuck {
+        @apply shadow-soft;
+    }
+    .dmd-catnav[data-open="true"] .dmd-catnav-panel,
+    .dmd-catnav:focus-within .dmd-catnav-panel {
+        @apply visible translate-y-0 opacity-100;
+    }
+    .dmd-primary-menu > li {
+        @apply shrink-0;
+    }
+    .dmd-primary-menu > li > a {
+        @apply relative inline-flex items-center whitespace-nowrap px-3 py-3 text-sm font-medium text-ink hover:text-green;
+    }
+    .dmd-primary-menu > li.current-menu-item > a,
+    .dmd-primary-menu > li.current-product_cat-ancestor > a {
+        @apply text-green;
+    }
+    .dmd-primary-menu > li.current-menu-item > a::after {
+        @apply absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-green;
+        content: "";
+    }
+
+    /* ---------- Search ---------- */
+    .dmd-search-form {
+        @apply relative flex w-full items-center;
+    }
+    .dmd-search-form input[type="search"] {
+        @apply h-11 w-full rounded-lg border border-line bg-surface pl-4 pr-14 text-sm text-ink
+           placeholder:text-muted transition-colors focus:border-green focus:bg-white focus:ring-0;
+    }
+    .dmd-search-form input[type="search"]::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+    }
+    .dmd-search-form button[type="submit"] {
+        @apply absolute right-1 top-1 bottom-1 inline-flex w-11 items-center justify-center rounded-md bg-green text-white
+           transition-colors hover:bg-green-dark;
+    }
+
+    /* ---------- Hero ---------- */
+    .dmd-hero-bullet {
+        @apply inline-block h-2 w-2 cursor-pointer rounded-full bg-white/60 transition-all duration-300;
+    }
+    .dmd-hero-bullet.is-active {
+        @apply w-6 bg-white;
+    }
+    .dmd-hero-nav {
+        @apply absolute top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full
+           bg-white/90 text-ink shadow-card transition hover:scale-105 md:inline-flex;
+    }
+
+    /* ---------- Product card ---------- */
+    .dmd-card .price {
+        @apply m-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-base font-bold leading-tight text-green;
+    }
+    .dmd-card .price del {
+        @apply order-2 text-xs font-normal text-muted;
+    }
+    .dmd-card .price ins {
+        @apply no-underline;
+    }
+    .dmd-card .star-rating {
+        @apply text-xs text-amber-500;
+    }
+    .dmd-card a.added_to_cart {
+        @apply hidden;
+    }
+    .dmd-card .dmd-atc.loading {
+        @apply pointer-events-none opacity-60;
+    }
+    .dmd-card .dmd-atc.added {
+        @apply border-green bg-green text-white;
+    }
     /* ---------- Forms ---------- */
     .dmd-field {
         @apply w-full rounded-md border border-line bg-white px-3.5 py-2.5 text-sm text-ink
@@ -204,38 +316,40 @@
     }
 
     /* Buttons WooCommerce prints without theme classes. */
-    .woocommerce a.button,
+    /* `.dmd-atc` marks the theme's own product-card buttons, which carry
+       WooCommerce's classes for the AJAX script but are styled in the card. */
+    .woocommerce a.button:not(.dmd-atc),
     .woocommerce button.button,
     .woocommerce input.button,
     .woocommerce #respond input#submit,
     .single_add_to_cart_button,
     .wc-block-components-button,
-    .add_to_cart_button {
+    .add_to_cart_button:not(.dmd-atc) {
         @apply dmd-btn dmd-btn--primary !text-white;
     }
 
-    .woocommerce a.button:hover,
+    .woocommerce a.button:not(.dmd-atc):hover,
     .woocommerce button.button:hover,
     .woocommerce input.button:hover,
     .woocommerce #respond input#submit:hover,
     .single_add_to_cart_button:hover,
     .wc-block-components-button:hover,
-    .add_to_cart_button:hover,
-    .woocommerce a.button:focus,
+    .add_to_cart_button:not(.dmd-atc):hover,
+    .woocommerce a.button:not(.dmd-atc):focus,
     .woocommerce button.button:focus,
     .woocommerce input.button:focus,
     .woocommerce #respond input#submit:focus,
     .single_add_to_cart_button:focus,
     .wc-block-components-button:focus,
-    .add_to_cart_button:focus,
-    .woocommerce a.button:active,
+    .add_to_cart_button:not(.dmd-atc):focus,
+    .woocommerce a.button:not(.dmd-atc):active,
     .woocommerce button.button:active,
     .woocommerce input.button:active,
     .woocommerce #respond input#submit:active,
     .single_add_to_cart_button:active,
     .wc-block-components-button:active,
-    .add_to_cart_button:active {
-        @apply !text-white !bg-emerald-900;
+    .add_to_cart_button:not(.dmd-atc):active {
+        @apply !text-white !bg-green-dark;
     }
 
     .woocommerce a.button.alt,
@@ -245,7 +359,7 @@
 
     .woocommerce a.button.alt:hover,
     .woocommerce button.button.alt:hover {
-        @apply !text-white !bg-emerald-900;
+        @apply !text-white !bg-green-dark;
     }
 
     .woocommerce a.button.disabled,
@@ -310,9 +424,80 @@
         margin: 0;
     }
 
-    /* Sidebar sticky */
+    /* ---------- Shop sidebar (off-canvas below lg) ---------- */
     .dmd-shop-sidebar {
-        @apply lg:sticky lg:top-24;
+        @apply fixed inset-y-0 left-0 z-[60] w-80 max-w-[86vw] -translate-x-full overflow-y-auto bg-white p-5
+           shadow-2xl transition-transform duration-300
+           lg:sticky lg:top-36 lg:z-auto lg:w-auto lg:max-w-none lg:translate-x-0 lg:self-start lg:overflow-visible
+           lg:bg-transparent lg:p-0 lg:shadow-none;
+    }
+    .dmd-shop-sidebar.is-open {
+        @apply translate-x-0;
+    }
+    .dmd-widget {
+        @apply rounded-xl border border-line bg-white p-5;
+    }
+    .dmd-widget-title,
+    .dmd-widget > .wp-block-heading,
+    .dmd-widget > .wp-block-group > .wp-block-heading {
+        @apply mb-4 flex items-center justify-between border-b border-line pb-3 text-[15px] font-semibold text-ink;
+    }
+    /* Block widget areas save a Heading block as its own widget: fuse it with the block after it. */
+    .dmd-widget:has(> .wp-block-heading:only-child) {
+        @apply rounded-b-none border-b-0 pb-0;
+    }
+    .dmd-widget:has(> .wp-block-heading:only-child) > .wp-block-heading {
+        @apply mb-0;
+    }
+    .dmd-widget:has(> .wp-block-heading:only-child) + .dmd-widget {
+        @apply !mt-0 rounded-t-none border-t-0 pt-4;
+    }
+    .dmd-widget .wc-block-product-categories-list {
+        @apply m-0 list-none space-y-2 p-0 text-sm;
+    }
+    .dmd-widget .wc-block-product-categories-list-item {
+        @apply list-none;
+    }
+    .dmd-widget .wc-block-product-categories-list-item > a {
+        @apply text-ink hover:text-green;
+    }
+    .dmd-widget .wc-block-product-categories-list-item-count {
+        @apply text-xs text-muted;
+    }
+    .dmd-product-categories {
+        @apply m-0 list-none space-y-0.5 p-0 text-sm;
+    }
+    .dmd-product-categories ul.children {
+        @apply ml-3 mt-0.5 list-none space-y-0.5 border-l border-line pl-3;
+    }
+    .dmd-product-categories li a {
+        @apply flex items-center justify-between rounded-md px-2 py-1.5 text-ink hover:bg-green-soft hover:text-green;
+    }
+    .dmd-product-categories li.current-cat > a {
+        @apply bg-green-soft font-semibold text-green;
+    }
+
+    /* ---------- Footer (dark green) ---------- */
+    .dmd-footer-menu a,
+    .dmd-footer-widgets a {
+        @apply text-sm text-white/75 hover:text-white;
+    }
+    .dmd-footer-widgets ul {
+        @apply m-0 list-none space-y-2.5 p-0;
+    }
+
+    /* ---------- Catalog toolbar ---------- */
+    .dmd-view-toggle {
+        @apply inline-flex h-8 w-8 items-center justify-center rounded-md text-muted transition-colors hover:text-green;
+    }
+    .dmd-view-toggle[aria-pressed="true"] {
+        @apply bg-white text-green shadow-soft;
+    }
+    .woocommerce-ordering {
+        @apply m-0;
+    }
+    .woocommerce-ordering select {
+        @apply h-10 max-w-[11rem] rounded-lg border border-line bg-white py-0 pl-3 pr-8 text-sm text-ink focus:border-green focus:ring-0 sm:max-w-none;
     }
 
     /* ------------------------------------------------------------------
@@ -328,7 +513,7 @@
     }
 
     #dmd-archive-products.grid-view {
-        @apply grid gap-4 md:gap-6;
+        @apply grid gap-3 sm:gap-4 lg:gap-5;
     }
 
     /* Grid/List Card Visibility */
@@ -356,12 +541,15 @@
     }
     .woocommerce-pagination .page-numbers:is(a, span),
     .dmd-woo-pagination .page-numbers:is(a, span) {
-        @apply inline-flex h-10 min-w-10 items-center justify-center rounded-md border border-line px-3 text-sm transition-colors;
+        @apply inline-flex h-10 min-w-10 items-center justify-center rounded-lg border border-line bg-white px-3 text-sm font-medium transition-colors;
+    }
+    .woocommerce-pagination span.page-numbers.dots,
+    .dmd-woo-pagination span.page-numbers.dots {
+        @apply border-transparent bg-transparent;
     }
 
-    /* Ensure hover effects only apply to the specific link, and override global a:hover */
-    .woocommerce-pagination .page-numbers:is(a, span):hover,
-    .dmd-woo-pagination .page-numbers:is(a, span):hover {
+    .woocommerce-pagination a.page-numbers:hover,
+    .dmd-woo-pagination a.page-numbers:hover {
         @apply !border-green !bg-green !text-white;
     }
 
@@ -516,7 +704,7 @@
 
     .single-product .variations_form .variations select {
         @apply w-full max-w-xs rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800
-           shadow-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600;
+           shadow-sm outline-none transition focus:border-green focus:ring-2 focus:ring-green/30;
     }
 
     /* The variation script reveals this by toggling inline visibility, so the
@@ -534,7 +722,7 @@
     .single-product .woocommerce-variation-price,
     .single-product .woocommerce-variation-price .price,
     .single-product .woocommerce-variation-price p {
-        @apply m-0 text-xl font-bold text-emerald-800;
+        @apply m-0 text-xl font-bold text-green;
     }
 
     .single-product .woocommerce-variation-availability {
@@ -546,7 +734,7 @@
     }
 
     .single-product .woocommerce-variation-availability .stock.in-stock {
-        @apply text-emerald-700;
+        @apply text-green-dark;
     }
 
     .single-product .woocommerce-variation-availability .stock.out-of-stock {
@@ -563,7 +751,7 @@
     }
 
     .single-product .single_add_to_cart_button {
-        @apply !bg-emerald-800 !text-white hover:!bg-emerald-900;
+        @apply !bg-green !text-white hover:!bg-green-dark;
     }
 
     /* ---------- Variable product chips ---------- */
@@ -580,11 +768,11 @@
 
     .dmd-variation-chip {
         @apply inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white
-           px-3 py-1.5 text-sm text-ink transition hover:border-emerald-700 active:bg-emerald-700 active:text-white;
+           px-3 py-1.5 text-sm text-ink transition hover:border-green active:bg-green active:text-white;
     }
 
     .dmd-variation-chip.is-active {
-        @apply border-emerald-700 bg-emerald-700 text-white;
+        @apply border-green bg-green text-white;
     }
 
     .dmd-variation-chip.is-unavailable {
@@ -595,11 +783,11 @@
 
     .dmd-tab {
         @apply inline-flex cursor-pointer items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold
-           text-muted transition hover:text-emerald-700;
+           text-muted transition hover:text-green;
     }
 
     .dmd-tab.is-active {
-        @apply bg-white text-emerald-800 shadow-sm;
+        @apply bg-white text-green shadow-sm;
     }
 
     .dmd-tab-panel {

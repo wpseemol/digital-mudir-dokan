@@ -27,7 +27,7 @@ $heading = esc_html( apply_filters( 'woocommerce_product_description_heading', _
 
     <div class="dmd-description-fade absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" data-dmd-description-fade></div>
 
-    <button type="button" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-emerald-600 text-emerald-700 font-medium text-sm hover:bg-emerald-50 transition mt-4" data-dmd-description-toggle>
+    <button type="button" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-green text-green font-medium text-sm hover:bg-green-soft transition mt-4" data-dmd-description-toggle>
         <span data-dmd-toggle-text><?php esc_html_e( 'বিস্তারিত দেখুন +', 'digital-mudir-dokan' ); ?></span>
     </button>
 </div>

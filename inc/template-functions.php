@@ -106,6 +106,14 @@ function dmd_icon( $name, $size = 20, $class = '' ) {
 		'zoom'       => '<circle cx="11" cy="11" r="7"/><path d="M11 8v6M8 11h6M20 20l-3.2-3.2"/>',
 		'plus'       => '<path d="M12 5v14M5 12h14"/>',
 		'minus'      => '<path d="M5 12h14"/>',
+		'grid'       => '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+		'list'       => '<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>',
+		'filter'     => '<path d="M4 6h16M7 12h10M10 18h4"/>',
+		'wallet'     => '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 15h2"/>',
+		'headset'    => '<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>',
+		'leaf'       => '<path d="M5 19c0-8 5-13 15-14-1 10-6 15-14 15"/><path d="m5 19 8-8"/>',
+		'whatsapp'   => '<path d="m4 20 1.3-4A8 8 0 1 1 8 18.7Z"/><path d="M9.5 9.5c.3 1.8 2.2 3.7 4 4l1-1 1.5.8-.4 1.4c-3 .3-6.6-3.3-6.3-6.3l1.4-.4.8 1.5Z"/>',
+		'grocery'    => '<path d="M5 8h14l-1.2 11a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
 	);
 
 	if ( ! isset( $paths[ $name ] ) ) {
@@ -255,8 +263,8 @@ function dmd_svg_allowed_html() {
 		'rect'   => array_merge( $attrs, array( 'x' => true, 'y' => true, 'rx' => true, 'ry' => true ) ),
 		'line'   => array_merge( $attrs, array( 'x1' => true, 'x2' => true, 'y1' => true, 'y2' => true ) ),
 		'polygon' => array_merge( $attrs, array( 'points' => true ) ),
-		'span'   => array( 'class' => true ),
-		'a'      => array( 'class' => true, 'href' => true, 'title' => true ),
+		'span'   => array( 'class' => true, 'aria-current' => true ),
+		'a'      => array( 'class' => true, 'href' => true, 'title' => true, 'aria-current' => true ),
 		'ul'     => array( 'class' => true ),
 		'li'     => array( 'class' => true ),
 		'nav'    => array( 'class' => true, 'aria-label' => true ),

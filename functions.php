@@ -109,6 +109,17 @@ function dmd_content_width() {
 add_action( 'after_setup_theme', 'dmd_content_width', 0 );
 
 /**
+ * Cache-busting version for a theme file: its modification time.
+ *
+ * @param string $path Path relative to the theme root.
+ * @return string
+ */
+function dmd_asset_version( $path ) {
+	$file = DMD_DIR . '/' . ltrim( $path, '/' );
+	return file_exists( $file ) ? (string) filemtime( $file ) : DMD_VERSION;
+}
+
+/**
  * Front-end assets.
  */
 function dmd_assets() {
@@ -124,12 +135,12 @@ function dmd_assets() {
 	wp_enqueue_style( 'swiper-css', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css', array(), '11.0.0' );
 	wp_enqueue_script( 'swiper-js', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js', array(), '11.0.0', true );
 
-	wp_enqueue_style( 'dmd-theme', DMD_URI . '/assets/css/theme.css', array(), time() );
-	wp_enqueue_style( 'dmd-overrides', DMD_URI . '/assets/css/woocommerce-overrides.css', array( 'dmd-theme' ), time() );
-	wp_enqueue_style( 'dmd-style', get_stylesheet_uri(), array( 'dmd-theme' ), time() );
+	wp_enqueue_style( 'dmd-theme', DMD_URI . '/assets/css/theme.css', array(), dmd_asset_version( 'assets/css/theme.css' ) );
+	wp_enqueue_style( 'dmd-overrides', DMD_URI . '/assets/css/woocommerce-overrides.css', array( 'dmd-theme' ), dmd_asset_version( 'assets/css/woocommerce-overrides.css' ) );
+	wp_enqueue_style( 'dmd-style', get_stylesheet_uri(), array( 'dmd-theme' ), dmd_asset_version( 'style.css' ) );
 
-	wp_enqueue_script( 'dmd-theme', DMD_URI . '/assets/js/theme.js', array( 'swiper-js', 'jquery' ), DMD_VERSION, true );
-	wp_enqueue_script( 'dmd-live-search', DMD_URI . '/assets/js/live-search.js', array( 'jquery' ), DMD_VERSION, true );
+	wp_enqueue_script( 'dmd-theme', DMD_URI . '/assets/js/theme.js', array( 'swiper-js', 'jquery' ), dmd_asset_version( 'assets/js/theme.js' ), true );
+	wp_enqueue_script( 'dmd-live-search', DMD_URI . '/assets/js/live-search.js', array( 'jquery' ), dmd_asset_version( 'assets/js/live-search.js' ), true );
 
 	wp_localize_script(
 		'dmd-theme',
@@ -137,6 +148,7 @@ function dmd_assets() {
 		array(
 			'selectVariation' => __( 'অনুগ্রহ করে একটি ভেরিয়েন্ট নির্বাচন করুন', 'digital-mudir-dokan' ),
 			'chooseVariation' => __( 'দয়া করে প্রথমে একটি ভেরিয়েন্ট বা সাইজ নির্বাচন করুন, তারপর অর্ডার সম্পন্ন করুন।', 'digital-mudir-dokan' ),
+			'addedToCart'     => __( 'পণ্যটি কার্টে যোগ হয়েছে', 'digital-mudir-dokan' ),
 		)
 	);
 
@@ -194,9 +206,9 @@ function dmd_widgets() {
 			'name'          => __( 'Shop sidebar', 'digital-mudir-dokan' ),
 			'id'            => 'shop-sidebar',
 			'description'   => __( 'Shows on shop and product archive pages.', 'digital-mudir-dokan' ),
-			'before_widget' => '<section id="%1$s" class="dmd-widget %2$s mb-5 rounded-lg border border-line bg-white p-5">',
+			'before_widget' => '<section id="%1$s" class="dmd-widget %2$s">',
 			'after_widget'  => '</section>',
-			'before_title'  => '<h2 class="dmd-widget__title mb-3 text-base font-semibold">',
+			'before_title'  => '<h2 class="dmd-widget-title">',
 			'after_title'   => '</h2>',
 		)
 	);
@@ -207,9 +219,10 @@ function dmd_widgets() {
 				/* translators: %d: footer column number. */
 				'name'          => sprintf( __( 'Footer column %d', 'digital-mudir-dokan' ), $i ),
 				'id'            => 'footer-' . $i,
-				'before_widget' => '<section id="%1$s" class="dmd-widget %2$s mb-6">',
+				'description'   => __( 'Replaces the default Categories / Quick links columns when used.', 'digital-mudir-dokan' ),
+				'before_widget' => '<section id="%1$s" class="dmd-footer-widget %2$s mb-6">',
 				'after_widget'  => '</section>',
-				'before_title'  => '<h2 class="mb-3 text-sm font-semibold uppercase tracking-wide">',
+				'before_title'  => '<h2 class="mb-4 text-base font-semibold text-white">',
 				'after_title'   => '</h2>',
 			)
 		);
@@ -227,7 +240,7 @@ add_action( 'widgets_init', 'dmd_widgets' );
  * @return string
  */
 function dmd_auth_input_class() {
-	return 'w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm transition';
+	return 'w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green/30 focus:border-green outline-none text-sm transition';
 }
 
 /**

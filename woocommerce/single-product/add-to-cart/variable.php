@@ -56,7 +56,7 @@ do_action( 'woocommerce_before_add_to_cart_form' );
 							'options'   => $dmd_options,
 							'attribute' => $dmd_attribute_name,
 							'product'   => $product,
-							'class'     => 'w-full max-w-xs px-4 py-2.5 rounded-xl border border-gray-300 text-gray-800 bg-white focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none text-sm transition shadow-sm',
+							'class'     => 'w-full max-w-xs px-4 py-2.5 rounded-xl border border-gray-300 text-gray-800 bg-white focus:ring-2 focus:ring-green/30 focus:border-green outline-none text-sm transition shadow-sm',
 						)
 					);
 					?>

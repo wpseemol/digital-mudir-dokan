@@ -147,27 +147,6 @@ function dmd_customize_register( $wp_customize ) {
 	);
 
 	$wp_customize->add_setting(
-		'dmd_logo_alignment',
-		array(
-			'default'           => 'center',
-			'sanitize_callback' => 'sanitize_text_field',
-		)
-	);
-	$wp_customize->add_control(
-		'dmd_logo_alignment',
-		array(
-			'label'   => __( 'Logo alignment', 'digital-mudir-dokan' ),
-			'section' => 'dmd_header',
-			'type'    => 'radio',
-			'choices' => array(
-				'left'   => __( 'Left', 'digital-mudir-dokan' ),
-				'center' => __( 'Center', 'digital-mudir-dokan' ),
-				'right'  => __( 'Right', 'digital-mudir-dokan' ),
-			),
-		)
-	);
-
-	$wp_customize->add_setting(
 		'dmd_logo_width',
 		array(
 			'default'           => 180,
@@ -236,12 +215,25 @@ function dmd_customize_register( $wp_customize ) {
 	/* ---------------------------------------------------------------
 	 * Hero slider
 	 * --------------------------------------------------------------- */
+	$hero_specs = dmd_hero_image_specs();
+	$hero_mode  = dmd_get_hero_mode();
+	$hero_crop  = $hero_specs[ $hero_mode ];
+
 	$wp_customize->add_section(
 		'dmd_hero',
 		array(
 			'title'       => __( 'Hero slider / Banner', 'digital-mudir-dokan' ),
 			'panel'       => 'dmd_panel',
-			'description' => __( 'Add up to five slides. A slide appears once it has an image or a headline.', 'digital-mudir-dokan' ),
+			'description' => sprintf(
+				/* translators: 1: boxed width, 2: boxed height, 3: full width, 4: full height, 5: mobile width, 6: mobile height. */
+				__( 'Add up to five slides. A slide appears once it has an image or a headline. Banner images use a fixed 13:5 ratio — Boxed: %1$d × %2$d px, Full width: %3$d × %4$d px. The optional mobile image uses 4:3 (%5$d × %6$d px). After choosing an image you will be asked to crop it to the right ratio; images with the wrong ratio or too small are rejected when you publish.', 'digital-mudir-dokan' ),
+				$hero_specs['container']['width'],
+				$hero_specs['container']['height'],
+				$hero_specs['full']['width'],
+				$hero_specs['full']['height'],
+				$hero_specs['mobile']['width'],
+				$hero_specs['mobile']['height']
+			),
 		)
 	);
 
@@ -249,18 +241,21 @@ function dmd_customize_register( $wp_customize ) {
 		'dmd_slider_width',
 		array(
 			'default'           => 'container',
-			'sanitize_callback' => 'sanitize_text_field',
+			'sanitize_callback' => 'dmd_sanitize_hero_mode',
 		)
 	);
 	$wp_customize->add_control(
 		'dmd_slider_width',
 		array(
-			'label'   => __( 'Container Width Mode', 'digital-mudir-dokan' ),
-			'section' => 'dmd_hero',
-			'type'    => 'select',
-			'choices' => array(
-				'container' => __( 'Boxed / Centered', 'digital-mudir-dokan' ),
-				'full'      => __( 'Full width', 'digital-mudir-dokan' ),
+			'label'       => __( 'Container Width Mode', 'digital-mudir-dokan' ),
+			'description' => __( 'Publish and reload the Customizer after switching, so the crop tool uses the size for the new mode.', 'digital-mudir-dokan' ),
+			'section'     => 'dmd_hero',
+			'type'        => 'select',
+			'choices'     => array(
+				/* translators: 1: width, 2: height in px. */
+				'container' => sprintf( __( 'Boxed / Centered — images %1$d × %2$d px', 'digital-mudir-dokan' ), $hero_specs['container']['width'], $hero_specs['container']['height'] ),
+				/* translators: 1: width, 2: height in px. */
+				'full'      => sprintf( __( 'Full width — images %1$d × %2$d px', 'digital-mudir-dokan' ), $hero_specs['full']['width'], $hero_specs['full']['height'] ),
 			),
 		)
 	);
@@ -338,13 +333,44 @@ function dmd_customize_register( $wp_customize ) {
 	$wp_customize->add_setting( 'dmd_hero_subtitle_color', array( 'default' => '#ffffff', 'sanitize_callback' => 'sanitize_hex_color' ) );
 	$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'dmd_hero_subtitle_color', array( 'label' => __( 'Hero supporting line text color', 'digital-mudir-dokan' ), 'section' => 'dmd_hero' ) ) );
 
+	$hero_image_description = sprintf(
+		/* translators: 1: boxed width, 2: boxed height, 3: boxed min width, 4: full width, 5: full height, 6: full min width, 7: current mode name. */
+		__( 'Ratio 13:5. Boxed: %1$d × %2$d px (min. %3$d px wide). Full width: %4$d × %5$d px (min. %6$d px wide). Crop size follows the current mode: %7$s.', 'digital-mudir-dokan' ),
+		$hero_specs['container']['width'],
+		$hero_specs['container']['height'],
+		$hero_specs['container']['min_width'],
+		$hero_specs['full']['width'],
+		$hero_specs['full']['height'],
+		$hero_specs['full']['min_width'],
+		'full' === $hero_mode ? __( 'Full width', 'digital-mudir-dokan' ) : __( 'Boxed', 'digital-mudir-dokan' )
+	);
+	$hero_mobile_description = sprintf(
+		/* translators: 1: width, 2: height, 3: min width. */
+		__( 'Optional, shown on phones. Ratio 4:3 — %1$d × %2$d px (min. %3$d px wide). Leave empty to use the main image.', 'digital-mudir-dokan' ),
+		$hero_specs['mobile']['width'],
+		$hero_specs['mobile']['height'],
+		$hero_specs['mobile']['min_width']
+	);
+
 	// Fallback banner
-	$wp_customize->add_setting( 'dmd_hero_fallback_image', array( 'sanitize_callback' => 'esc_url_raw' ) );
+	$wp_customize->add_setting(
+		'dmd_hero_fallback_image',
+		array(
+			'sanitize_callback' => 'dmd_sanitize_image_value',
+			'validate_callback' => 'dmd_validate_hero_image',
+		)
+	);
 	$wp_customize->add_control(
-		new WP_Customize_Image_Control(
+		new WP_Customize_Cropped_Image_Control(
 			$wp_customize,
 			'dmd_hero_fallback_image',
-			array( 'label' => __( 'Fallback Banner Image', 'digital-mudir-dokan' ), 'section' => 'dmd_hero' )
+			array(
+				'label'       => __( 'Fallback Banner Image', 'digital-mudir-dokan' ),
+				'description' => $hero_image_description,
+				'section'     => 'dmd_hero',
+				'width'       => $hero_crop['width'],
+				'height'      => $hero_crop['height'],
+			)
 		)
 	);
 	$wp_customize->add_setting( 'dmd_hero_fallback_title', array( 'sanitize_callback' => 'sanitize_text_field' ) );
@@ -355,16 +381,54 @@ function dmd_customize_register( $wp_customize ) {
 	for ( $i = 1; $i <= 5; $i++ ) {
 		$wp_customize->add_setting(
 			"dmd_slide_{$i}_image",
-			array( 'sanitize_callback' => 'esc_url_raw' )
+			array(
+				'sanitize_callback' => 'dmd_sanitize_image_value',
+				'validate_callback' => 'dmd_validate_hero_image',
+			)
 		);
 		$wp_customize->add_control(
-			new WP_Customize_Image_Control(
+			new WP_Customize_Cropped_Image_Control(
 				$wp_customize,
 				"dmd_slide_{$i}_image",
 				array(
-					/* translators: %d: slide number. */
-					'label'   => sprintf( __( 'Slide %d — image (Recommended: 1600x620px)', 'digital-mudir-dokan' ), $i ),
-					'section' => 'dmd_hero',
+					'label'       => sprintf(
+						/* translators: 1: slide number, 2: width, 3: height in px. */
+						__( 'Slide %1$d — image (%2$d × %3$d px)', 'digital-mudir-dokan' ),
+						$i,
+						$hero_crop['width'],
+						$hero_crop['height']
+					),
+					'description' => $hero_image_description,
+					'section'     => 'dmd_hero',
+					'width'       => $hero_crop['width'],
+					'height'      => $hero_crop['height'],
+				)
+			)
+		);
+
+		$wp_customize->add_setting(
+			"dmd_slide_{$i}_image_mobile",
+			array(
+				'sanitize_callback' => 'dmd_sanitize_image_value',
+				'validate_callback' => 'dmd_validate_hero_mobile_image',
+			)
+		);
+		$wp_customize->add_control(
+			new WP_Customize_Cropped_Image_Control(
+				$wp_customize,
+				"dmd_slide_{$i}_image_mobile",
+				array(
+					'label'       => sprintf(
+						/* translators: 1: slide number, 2: width, 3: height in px. */
+						__( 'Slide %1$d — mobile image (%2$d × %3$d px)', 'digital-mudir-dokan' ),
+						$i,
+						$hero_specs['mobile']['width'],
+						$hero_specs['mobile']['height']
+					),
+					'description' => $hero_mobile_description,
+					'section'     => 'dmd_hero',
+					'width'       => $hero_specs['mobile']['width'],
+					'height'      => $hero_specs['mobile']['height'],
 				)
 			)
 		);
@@ -437,16 +501,47 @@ function dmd_customize_register( $wp_customize ) {
 		)
 	);
 
-	// Settings for Product Sections
-	$product_sections = [
-		'dmd_top_selling_title' => 'Top Selling / Featured Title',
-		'dmd_all_products_title' => 'All Products Title',
-	];
+	$wp_customize->add_setting( 'dmd_show_home_categories', array( 'default' => true, 'sanitize_callback' => 'dmd_sanitize_checkbox' ) );
+	$wp_customize->add_control( 'dmd_show_home_categories', array( 'label' => __( 'Show "Shop by category" strip', 'digital-mudir-dokan' ), 'section' => 'dmd_homepage', 'type' => 'checkbox' ) );
 
-	foreach ($product_sections as $id => $label) {
-		$wp_customize->add_setting($id, array('default' => 'Our Products', 'sanitize_callback' => 'sanitize_text_field'));
-		$wp_customize->add_control($id, array('label' => __($label, 'digital-mudir-dokan'), 'section' => 'dmd_homepage', 'type' => 'text'));
+	$wp_customize->add_setting( 'dmd_home_categories_title', array( 'default' => __( 'Shop by category', 'digital-mudir-dokan' ), 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'dmd_home_categories_title', array( 'label' => __( 'Category strip title', 'digital-mudir-dokan' ), 'section' => 'dmd_homepage', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'dmd_home_categories_count', array( 'default' => 12, 'sanitize_callback' => 'absint' ) );
+	$wp_customize->add_control(
+		'dmd_home_categories_count',
+		array(
+			'label'       => __( 'Number of categories in the strip', 'digital-mudir-dokan' ),
+			'section'     => 'dmd_homepage',
+			'type'        => 'number',
+			'input_attrs' => array(
+				'min' => 4,
+				'max' => 24,
+			),
+		)
+	);
+
+	$wp_customize->add_setting( 'dmd_show_trust_row', array( 'default' => true, 'sanitize_callback' => 'dmd_sanitize_checkbox' ) );
+	$wp_customize->add_control( 'dmd_show_trust_row', array( 'label' => __( 'Show service highlights (delivery, payment, support)', 'digital-mudir-dokan' ), 'section' => 'dmd_homepage', 'type' => 'checkbox' ) );
+
+	$product_sections = array(
+		'dmd_top_selling_title'  => array( __( 'Top Selling / Featured Title', 'digital-mudir-dokan' ), __( 'Top selling products', 'digital-mudir-dokan' ) ),
+		'dmd_all_products_title' => array( __( 'All Products Title', 'digital-mudir-dokan' ), __( 'Our products', 'digital-mudir-dokan' ) ),
+	);
+
+	foreach ( $product_sections as $id => $conf ) {
+		$wp_customize->add_setting( $id, array( 'default' => $conf[1], 'sanitize_callback' => 'sanitize_text_field' ) );
+		$wp_customize->add_control( $id, array( 'label' => $conf[0], 'section' => 'dmd_homepage', 'type' => 'text' ) );
 	}
+
+	$wp_customize->add_setting( 'dmd_show_cta_band', array( 'default' => true, 'sanitize_callback' => 'dmd_sanitize_checkbox' ) );
+	$wp_customize->add_control( 'dmd_show_cta_band', array( 'label' => __( 'Show "Order by phone / WhatsApp" band', 'digital-mudir-dokan' ), 'section' => 'dmd_homepage', 'type' => 'checkbox' ) );
+
+	$wp_customize->add_setting( 'dmd_cta_title', array( 'default' => __( 'ফোনে বা WhatsApp-এ সহজেই অর্ডার করুন', 'digital-mudir-dokan' ), 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'dmd_cta_title', array( 'label' => __( 'Order band — headline', 'digital-mudir-dokan' ), 'section' => 'dmd_homepage', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'dmd_cta_text', array( 'default' => __( 'আমাদের প্রতিনিধি আপনার অর্ডার নিশ্চিত করে দ্রুত ডেলিভারির ব্যবস্থা করবেন।', 'digital-mudir-dokan' ), 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'dmd_cta_text', array( 'label' => __( 'Order band — supporting line', 'digital-mudir-dokan' ), 'section' => 'dmd_homepage', 'type' => 'text' ) );
 
 	$wp_customize->add_setting('dmd_show_category_tabs', array('default' => true, 'sanitize_callback' => 'dmd_sanitize_checkbox'));
 	$wp_customize->add_control('dmd_show_category_tabs', array('label' => __('Show Category Tabs', 'digital-mudir-dokan'), 'section' => 'dmd_homepage', 'type' => 'checkbox'));
@@ -476,6 +571,65 @@ function dmd_customize_register( $wp_customize ) {
 		$wp_customize->add_control( "dmd_faq_{$i}_a", array( 'label' => "FAQ {$i} — Answer", 'section' => 'dmd_faq', 'type' => 'textarea' ) );
 	}
 
+
+	/* ---------------------------------------------------------------
+	 * Promo banners (homepage)
+	 * --------------------------------------------------------------- */
+	$promo_spec = $hero_specs['promo'];
+
+	$wp_customize->add_section(
+		'dmd_promos',
+		array(
+			'title'       => __( 'Promo banners', 'digital-mudir-dokan' ),
+			'panel'       => 'dmd_panel',
+			'description' => sprintf(
+				/* translators: 1: width, 2: height, 3: min width. */
+				__( 'Two side-by-side banners shown between the homepage product sections. Ratio 2:1 — %1$d × %2$d px (min. %3$d px wide). The section is hidden until a banner has an image.', 'digital-mudir-dokan' ),
+				$promo_spec['width'],
+				$promo_spec['height'],
+				$promo_spec['min_width']
+			),
+		)
+	);
+
+	for ( $i = 1; $i <= 2; $i++ ) {
+		$wp_customize->add_setting(
+			"dmd_promo_{$i}_image",
+			array(
+				'sanitize_callback' => 'dmd_sanitize_image_value',
+				'validate_callback' => 'dmd_validate_promo_image',
+			)
+		);
+		$wp_customize->add_control(
+			new WP_Customize_Cropped_Image_Control(
+				$wp_customize,
+				"dmd_promo_{$i}_image",
+				array(
+					'label'   => sprintf(
+						/* translators: 1: banner number, 2: width, 3: height in px. */
+						__( 'Banner %1$d — image (%2$d × %3$d px)', 'digital-mudir-dokan' ),
+						$i,
+						$promo_spec['width'],
+						$promo_spec['height']
+					),
+					'section' => 'dmd_promos',
+					'width'   => $promo_spec['width'],
+					'height'  => $promo_spec['height'],
+				)
+			)
+		);
+
+		$wp_customize->add_setting( "dmd_promo_{$i}_url", array( 'sanitize_callback' => 'esc_url_raw' ) );
+		$wp_customize->add_control(
+			"dmd_promo_{$i}_url",
+			array(
+				/* translators: %d: banner number. */
+				'label'   => sprintf( __( 'Banner %d — link', 'digital-mudir-dokan' ), $i ),
+				'section' => 'dmd_promos',
+				'type'    => 'url',
+			)
+		);
+	}
 
 	/* ---------------------------------------------------------------
 	 * Shop details
@@ -654,6 +808,156 @@ add_action( 'customize_register', 'dmd_customize_register' );
  */
 function dmd_sanitize_checkbox( $checked ) {
 	return ( isset( $checked ) && true === (bool) $checked );
+}
+
+/**
+ * Hero width mode sanitiser.
+ *
+ * @param string $mode Raw value.
+ * @return string
+ */
+function dmd_sanitize_hero_mode( $mode ) {
+	return 'full' === $mode ? 'full' : 'container';
+}
+
+/**
+ * Image setting sanitiser.
+ *
+ * Cropped image controls store an attachment ID; slides saved before the
+ * switch still hold a URL, so both are accepted.
+ *
+ * @param mixed $value Raw value.
+ * @return int|string
+ */
+function dmd_sanitize_image_value( $value ) {
+	if ( is_numeric( $value ) ) {
+		return absint( $value );
+	}
+	return esc_url_raw( (string) $value );
+}
+
+/**
+ * Check an image setting against a size spec.
+ *
+ * @param mixed $value Attachment ID or URL.
+ * @param array $spec  `width`, `height` and `min_width` in px.
+ * @return true|WP_Error
+ */
+function dmd_check_image_spec( $value, $spec ) {
+	if ( empty( $value ) ) {
+		return true;
+	}
+
+	$attachment_id = is_numeric( $value ) ? absint( $value ) : attachment_url_to_postid( $value );
+
+	// External URLs can't be measured; keep them rather than block the save.
+	if ( ! $attachment_id ) {
+		return true;
+	}
+
+	if ( ! wp_attachment_is_image( $attachment_id ) ) {
+		return new WP_Error( 'dmd_not_image', __( 'Please choose an image file (JPG, PNG or WebP).', 'digital-mudir-dokan' ) );
+	}
+
+	$meta   = wp_get_attachment_metadata( $attachment_id );
+	$width  = isset( $meta['width'] ) ? (int) $meta['width'] : 0;
+	$height = isset( $meta['height'] ) ? (int) $meta['height'] : 0;
+
+	if ( ! $width || ! $height ) {
+		return true;
+	}
+
+	$target_ratio = $spec['width'] / $spec['height'];
+	$ratio        = $width / $height;
+
+	if ( abs( $ratio - $target_ratio ) / $target_ratio > 0.03 ) {
+		return new WP_Error(
+			'dmd_image_ratio',
+			sprintf(
+				/* translators: 1: image width, 2: image height, 3: required width, 4: required height. */
+				__( 'This image is %1$d × %2$d px, which is the wrong shape. Use %3$d × %4$d px, or click "Change image" and crop it.', 'digital-mudir-dokan' ),
+				$width,
+				$height,
+				$spec['width'],
+				$spec['height']
+			)
+		);
+	}
+
+	if ( $width < $spec['min_width'] ) {
+		return new WP_Error(
+			'dmd_image_small',
+			sprintf(
+				/* translators: 1: image width, 2: minimum width, 3: recommended width, 4: recommended height. */
+				__( 'This image is only %1$d px wide and will look blurry. Upload at least %2$d px wide (recommended %3$d × %4$d px).', 'digital-mudir-dokan' ),
+				$width,
+				$spec['min_width'],
+				$spec['width'],
+				$spec['height']
+			)
+		);
+	}
+
+	return true;
+}
+
+/**
+ * Hero image validator — the minimum size follows the width mode being saved.
+ *
+ * @param WP_Error             $validity Validity object.
+ * @param mixed                $value    Attachment ID or URL.
+ * @param WP_Customize_Setting $setting  Setting instance.
+ * @return WP_Error
+ */
+function dmd_validate_hero_image( $validity, $value, $setting ) {
+	$mode         = dmd_get_hero_mode();
+	$mode_setting = $setting->manager->get_setting( 'dmd_slider_width' );
+
+	if ( $mode_setting ) {
+		$mode = dmd_sanitize_hero_mode( $mode_setting->post_value( $mode ) );
+	}
+
+	$specs  = dmd_hero_image_specs();
+	$result = dmd_check_image_spec( $value, $specs[ $mode ] );
+
+	if ( is_wp_error( $result ) ) {
+		$validity->add( $result->get_error_code(), $result->get_error_message() );
+	}
+	return $validity;
+}
+
+/**
+ * Hero mobile image validator.
+ *
+ * @param WP_Error $validity Validity object.
+ * @param mixed    $value    Attachment ID or URL.
+ * @return WP_Error
+ */
+function dmd_validate_hero_mobile_image( $validity, $value ) {
+	$specs  = dmd_hero_image_specs();
+	$result = dmd_check_image_spec( $value, $specs['mobile'] );
+
+	if ( is_wp_error( $result ) ) {
+		$validity->add( $result->get_error_code(), $result->get_error_message() );
+	}
+	return $validity;
+}
+
+/**
+ * Promo banner validator.
+ *
+ * @param WP_Error $validity Validity object.
+ * @param mixed    $value    Attachment ID or URL.
+ * @return WP_Error
+ */
+function dmd_validate_promo_image( $validity, $value ) {
+	$specs  = dmd_hero_image_specs();
+	$result = dmd_check_image_spec( $value, $specs['promo'] );
+
+	if ( is_wp_error( $result ) ) {
+		$validity->add( $result->get_error_code(), $result->get_error_message() );
+	}
+	return $validity;
 }
 
 /**

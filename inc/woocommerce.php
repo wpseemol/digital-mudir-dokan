@@ -82,6 +82,20 @@ function dmd_wc_hooks() {
 add_action( 'init', 'dmd_wc_hooks' );
 
 /**
+ * Archives always list products; categories are shown as chips and in the
+ * sidebar. A "Show categories" display setting would otherwise make
+ * WooCommerce hide sorting and treat the page as having no products.
+ *
+ * @param string $value Stored display mode.
+ * @return string
+ */
+function dmd_force_products_display( $value ) {
+	return 'subcategories' === $value ? '' : $value;
+}
+add_filter( 'option_woocommerce_shop_page_display', 'dmd_force_products_display' );
+add_filter( 'option_woocommerce_category_archive_display', 'dmd_force_products_display' );
+
+/**
  * Whether the current request is a product category/tag/attribute archive.
  *
  * @return bool
@@ -181,22 +195,106 @@ function dmd_woo_pagination() {
 		return;
 	}
 
-	echo '<div class="dmd-woo-pagination mt-10 flex justify-center">';
-	
-	// Testing native paginate_links as a fallback
-	echo paginate_links( array(
-		'base'      => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) ),
-		'format'    => '?paged=%#%',
-		'current'   => $current,
-		'total'     => $total,
-		'prev_text' => '&larr;',
-		'next_text' => '&rarr;',
-		'type'      => 'list',
-		'end_size'  => 2,
-		'mid_size'  => 2,
-	) );
-	
-	echo '</div>';
+	$links = paginate_links(
+		array(
+			'base'      => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) ),
+			'format'    => '?paged=%#%',
+			'current'   => $current,
+			'total'     => $total,
+			'prev_text' => dmd_icon( 'chevron-l', 16 ) . '<span class="screen-reader-text">' . esc_html__( 'Previous page', 'digital-mudir-dokan' ) . '</span>',
+			'next_text' => '<span class="screen-reader-text">' . esc_html__( 'Next page', 'digital-mudir-dokan' ) . '</span>' . dmd_icon( 'chevron-r', 16 ),
+			'type'      => 'list',
+			'end_size'  => 1,
+			'mid_size'  => 2,
+		)
+	);
+
+	if ( ! $links ) {
+		return;
+	}
+
+	echo '<nav class="dmd-woo-pagination" aria-label="' . esc_attr__( 'Products pagination', 'digital-mudir-dokan' ) . '">';
+	echo wp_kses( $links, dmd_svg_allowed_html() );
+	echo '</nav>';
+}
+
+/**
+ * Recursive category list for the shop sidebar.
+ *
+ * @param int   $parent     Parent term ID.
+ * @param int   $current_id Current category ID.
+ * @param int[] $open_ids   IDs whose children are shown.
+ */
+function dmd_sidebar_category_tree( $parent, $current_id, $open_ids ) {
+	$terms = get_terms(
+		array(
+			'taxonomy'   => 'product_cat',
+			'parent'     => $parent,
+			'hide_empty' => false,
+			'exclude'    => array( (int) get_option( 'default_product_cat' ) ),
+		)
+	);
+
+	if ( ! $terms || is_wp_error( $terms ) ) {
+		return;
+	}
+
+	echo 0 === $parent ? '<ul class="dmd-product-categories">' : '<ul class="children">';
+
+	foreach ( $terms as $term ) {
+		$is_current = $term->term_id === $current_id;
+		printf(
+			'<li class="%1$s"><a href="%2$s"%3$s><span class="truncate">%4$s</span><span class="ml-2 shrink-0 rounded-full bg-surface px-2 py-0.5 text-[11px] text-muted">%5$s</span></a>',
+			esc_attr( $is_current ? 'current-cat' : '' ),
+			esc_url( get_term_link( $term ) ),
+			$is_current ? ' aria-current="page"' : '',
+			esc_html( $term->name ),
+			esc_html( number_format_i18n( $term->count ) )
+		);
+
+		if ( in_array( $term->term_id, $open_ids, true ) ) {
+			dmd_sidebar_category_tree( $term->term_id, $current_id, $open_ids );
+		}
+
+		echo '</li>';
+	}
+
+	echo '</ul>';
+}
+
+/**
+ * "Showing 1–12 of 40 products" for the catalog toolbar.
+ *
+ * WooCommerce's own result count relies on loop props that the theme's
+ * archive template doesn't set, so this reads the main query directly.
+ */
+function dmd_result_count() {
+	global $wp_query;
+
+	$total = (int) $wp_query->found_posts;
+	if ( $total < 1 ) {
+		return;
+	}
+
+	$per_page = (int) $wp_query->get( 'posts_per_page' );
+	$current  = max( 1, (int) get_query_var( 'paged' ) );
+
+	echo '<p class="woocommerce-result-count m-0 text-sm text-muted">';
+	if ( $per_page < 1 || $total <= $per_page ) {
+		/* translators: %d: total results. */
+		printf( esc_html( _n( 'Showing the single product', 'Showing all %d products', $total, 'digital-mudir-dokan' ) ), (int) $total );
+	} else {
+		$first = ( $per_page * $current ) - $per_page + 1;
+		$last  = min( $total, $per_page * $current );
+		printf(
+			/* translators: 1: first result, 2: last result, 3: total results. */
+			esc_html__( 'Showing %1$d–%2$d of %3$d products', 'digital-mudir-dokan' ),
+			(int) $first,
+			(int) $last,
+			(int) $total
+		);
+	}
+	echo '</p>';
 }
 
 /**
@@ -298,6 +396,84 @@ function dmd_loop_add_to_cart_args( $args, $product ) {
 	return $args;
 }
 add_filter( 'woocommerce_loop_add_to_cart_args', 'dmd_loop_add_to_cart_args', 10, 2 );
+
+/**
+ * Add-to-cart link for the theme's product cards.
+ *
+ * Carries WooCommerce's classes and data attributes so the core AJAX script
+ * handles it, and still runs through `woocommerce_loop_add_to_cart_link`.
+ *
+ * @param WC_Product $product Product.
+ * @param string     $variant `icon` (square cart button) or `full`.
+ */
+function dmd_loop_add_to_cart_button( $product, $variant = 'full' ) {
+	$is_icon = 'icon' === $variant;
+
+	$classes = array(
+		'button',
+		'dmd-atc',
+		'product_type_' . $product->get_type(),
+		$product->is_purchasable() && $product->is_in_stock() ? 'add_to_cart_button' : '',
+		$product->supports( 'ajax_add_to_cart' ) && $product->is_purchasable() && $product->is_in_stock() ? 'ajax_add_to_cart' : '',
+		$is_icon
+			? 'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-green/20 bg-green-soft text-green transition-colors hover:border-green hover:bg-green hover:text-white'
+			: 'inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-green bg-white px-3 text-[13px] font-semibold text-green transition-colors hover:bg-green hover:text-white',
+	);
+
+	$label = $is_icon
+		? dmd_icon( 'cart', 18 ) . '<span class="screen-reader-text">' . esc_html( $product->add_to_cart_text() ) . '</span>'
+		: ( $product->is_purchasable() && $product->is_in_stock() ? dmd_icon( 'cart', 16 ) : '' ) . '<span>' . esc_html( $product->add_to_cart_text() ) . '</span>';
+
+	$html = sprintf(
+		'<a href="%1$s" data-quantity="1" class="%2$s" data-product_id="%3$d" data-product_sku="%4$s" aria-label="%5$s" title="%6$s" rel="nofollow">%7$s</a>',
+		esc_url( $product->add_to_cart_url() ),
+		esc_attr( implode( ' ', array_filter( $classes ) ) ),
+		(int) $product->get_id(),
+		esc_attr( $product->get_sku() ),
+		esc_attr( $product->add_to_cart_description() ),
+		esc_attr( $product->add_to_cart_text() ),
+		$label
+	);
+
+	$allowed         = dmd_svg_allowed_html();
+	$allowed['a']    = array(
+		'href'            => true,
+		'class'           => true,
+		'data-quantity'   => true,
+		'data-product_id' => true,
+		'data-product_sku' => true,
+		'aria-label'      => true,
+		'title'           => true,
+		'rel'             => true,
+	);
+
+	echo wp_kses( apply_filters( 'woocommerce_loop_add_to_cart_link', $html, $product, array() ), $allowed );
+}
+
+/**
+ * Space-separated category slugs (including parents) for card filtering.
+ *
+ * @param WC_Product $product Product.
+ * @return string
+ */
+function dmd_get_product_cat_slugs( $product ) {
+	$slugs = array();
+	$terms = get_the_terms( $product->get_id(), 'product_cat' );
+
+	if ( $terms && ! is_wp_error( $terms ) ) {
+		foreach ( $terms as $term ) {
+			$slugs[] = $term->slug;
+			foreach ( get_ancestors( $term->term_id, 'product_cat', 'taxonomy' ) as $ancestor_id ) {
+				$ancestor = get_term( $ancestor_id, 'product_cat' );
+				if ( $ancestor instanceof WP_Term ) {
+					$slugs[] = $ancestor->slug;
+				}
+			}
+		}
+	}
+
+	return implode( ' ', array_unique( $slugs ) );
+}
 
 /**
  * Style the place-order button on checkout.
@@ -452,17 +628,20 @@ function dmd_cart_link() {
 
 	$count = WC()->cart->get_cart_contents_count();
 	?>
-	<a class="dmd-cart-link relative inline-flex items-center gap-2 text-sm"
+	<a class="dmd-cart-link group relative inline-flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-ink hover:bg-surface hover:text-ink"
 		href="<?php echo esc_url( wc_get_cart_url() ); ?>"
 		title="<?php esc_attr_e( 'View your shopping cart', 'digital-mudir-dokan' ); ?>">
-		<span class="relative inline-flex">
-			<?php dmd_the_icon( 'cart', 22 ); ?>
-			<span class="dmd-cart-count absolute -right-2 -top-2 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-green px-1 text-[10px] font-semibold text-white">
+		<span class="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-green text-white transition-colors group-hover:bg-green-dark">
+			<?php dmd_the_icon( 'cart', 20 ); ?>
+			<span class="dmd-cart-count absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-green-dark px-1 text-[10px] font-bold leading-none text-white">
 				<?php echo esc_html( $count ); ?>
 			</span>
 		</span>
-		<span class="dmd-cart-total hidden font-semibold sm:inline">
-			<?php echo wp_kses_post( WC()->cart->get_cart_subtotal() ); ?>
+		<span class="hidden flex-col leading-tight sm:flex">
+			<span class="text-[11px] text-muted"><?php esc_html_e( 'My cart', 'digital-mudir-dokan' ); ?></span>
+			<span class="dmd-cart-total text-sm font-semibold">
+				<?php echo wp_kses_post( WC()->cart->get_cart_subtotal() ); ?>
+			</span>
 		</span>
 		<span class="screen-reader-text">
 			<?php

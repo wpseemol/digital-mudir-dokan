@@ -30,7 +30,7 @@ if ( ! $dmd_register_enabled ) {
 
 $dmd_is_register = 'register' === $dmd_active_tab;
 $dmd_label_class = 'mb-1.5 block text-sm font-semibold text-gray-700';
-$dmd_submit_class = 'w-full py-3 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold transition text-center shadow-sm mt-3';
+$dmd_submit_class = 'w-full py-3 rounded-lg bg-green hover:bg-green-dark text-white font-semibold transition text-center shadow-sm mt-3';
 ?>
 <div class="mx-auto my-12 w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
 	<div id="customer_login" class="dmd-account-tabs">
@@ -101,10 +101,10 @@ $dmd_submit_class = 'w-full py-3 rounded-lg bg-emerald-700 hover:bg-emerald-800 
 
 				<p class="form-row mb-4 flex items-center justify-between">
 					<label class="flex items-center gap-2 text-sm text-gray-600">
-						<input class="h-4 w-4 rounded border-gray-300 text-emerald-700 focus:ring-emerald-500" name="rememberme" type="checkbox" id="rememberme" value="forever" />
+						<input class="h-4 w-4 rounded border-gray-300 text-green focus:ring-green/30" name="rememberme" type="checkbox" id="rememberme" value="forever" />
 						<span><?php esc_html_e( 'Remember me', 'digital-mudir-dokan' ); ?></span>
 					</label>
-					<a class="text-sm font-medium text-emerald-700 underline underline-offset-2 transition hover:text-emerald-800" href="<?php echo esc_url( wp_lostpassword_url() ); ?>">
+					<a class="text-sm font-medium text-green underline underline-offset-2 transition hover:text-green-dark" href="<?php echo esc_url( wp_lostpassword_url() ); ?>">
 						<?php esc_html_e( 'Lost your password?', 'digital-mudir-dokan' ); ?>
 					</a>
 				</p>
@@ -122,7 +122,7 @@ $dmd_submit_class = 'w-full py-3 rounded-lg bg-emerald-700 hover:bg-emerald-800 
 			<?php if ( $dmd_register_enabled ) : ?>
 				<p class="mb-0 mt-5 text-center text-sm text-gray-600">
 					<?php esc_html_e( 'একাউন্ট নেই?', 'digital-mudir-dokan' ); ?>
-					<button type="button" class="font-semibold text-emerald-700 underline underline-offset-2 transition hover:text-emerald-800" data-dmd-tab="register">
+					<button type="button" class="font-semibold text-green underline underline-offset-2 transition hover:text-green-dark" data-dmd-tab="register">
 						<?php esc_html_e( 'রেজিস্ট্রেশন করুন', 'digital-mudir-dokan' ); ?>
 					</button>
 				</p>
@@ -198,7 +198,7 @@ $dmd_submit_class = 'w-full py-3 rounded-lg bg-emerald-700 hover:bg-emerald-800 
 
 				<p class="mb-0 mt-5 text-center text-sm text-gray-600">
 					<?php esc_html_e( 'একাউন্ট আছে?', 'digital-mudir-dokan' ); ?>
-					<button type="button" class="font-semibold text-emerald-700 underline underline-offset-2 transition hover:text-emerald-800" data-dmd-tab="login">
+					<button type="button" class="font-semibold text-green underline underline-offset-2 transition hover:text-green-dark" data-dmd-tab="login">
 						<?php esc_html_e( 'লগইন করুন', 'digital-mudir-dokan' ); ?>
 					</button>
 				</p>
