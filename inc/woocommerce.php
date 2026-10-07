@@ -772,45 +772,112 @@ add_action( 'woocommerce_after_add_to_cart_form', 'dmd_single_order_now', 5 );
 function dmd_ajax_live_search() {
 	check_ajax_referer( 'dmd_search_nonce', 'nonce' );
 
-	$search_query = sanitize_text_field( wp_unslash( $_POST['query'] ) );
+	$search_query = isset( $_POST['query'] ) ? sanitize_text_field( wp_unslash( $_POST['query'] ) ) : '';
 
-	if ( empty( $search_query ) ) {
-		wp_send_json_error( __( 'Please enter a search term.', 'digital-mudir-dokan' ) );
+	if ( mb_strlen( $search_query ) < 2 ) {
+		wp_send_json_error( __( 'Type at least 2 characters.', 'digital-mudir-dokan' ) );
 	}
 
-	$args = array(
-		'post_type'      => 'product',
-		'post_status'    => 'publish',
-		'posts_per_page' => 5,
-		's'              => $search_query,
+	$query = new WP_Query(
+		array(
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => 8,
+			's'              => $search_query,
+			'tax_query'      => WC()->query->get_tax_query(), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- respects catalog visibility.
+		)
 	);
 
-	$query = new WP_Query( $args );
+	$categories = get_terms(
+		array(
+			'taxonomy'   => 'product_cat',
+			'name__like' => $search_query,
+			'hide_empty' => false,
+			'number'     => 6,
+		)
+	);
+	$categories = is_wp_error( $categories ) ? array() : $categories;
 
-	if ( ! $query->have_posts() ) {
-		wp_send_json_error( __( 'No products found.', 'digital-mudir-dokan' ) );
+	if ( ! $query->have_posts() && ! $categories ) {
+		/* translators: %s: search term. */
+		wp_send_json_error( sprintf( __( 'No products found for “%s”.', 'digital-mudir-dokan' ), $search_query ) );
 	}
+
+	$search_url = add_query_arg(
+		array(
+			's'         => $search_query,
+			'post_type' => 'product',
+		),
+		home_url( '/' )
+	);
 
 	ob_start();
-	while ( $query->have_posts() ) {
-		$query->the_post();
-		?>
-		<a href="<?php echo esc_url( get_permalink() ); ?>" class="dmd-search-result flex items-center gap-3 p-2 hover:bg-surface">
-			<?php if ( has_post_thumbnail() ) : ?>
-				<?php the_post_thumbnail( 'thumbnail', array( 'class' => 'h-10 w-10 object-cover rounded' ) ); ?>
-			<?php endif; ?>
-			<span class="text-sm font-medium"><?php the_title(); ?></span>
-		</a>
+	?>
+	<div class="flex flex-col gap-4 p-4 lg:flex-row lg:gap-6 lg:p-5">
+		<?php if ( $categories ) : ?>
+			<div class="shrink-0 lg:w-56">
+				<p class="mb-2 text-xs font-semibold uppercase tracking-wider text-muted"><?php esc_html_e( 'Categories', 'digital-mudir-dokan' ); ?></p>
+				<ul class="m-0 flex list-none flex-wrap gap-2 p-0 lg:flex-col lg:gap-1">
+					<?php foreach ( $categories as $category ) : ?>
+						<li class="list-none">
+							<a class="dmd-chip lg:w-full lg:justify-between lg:rounded-lg lg:border-0 lg:bg-surface" href="<?php echo esc_url( get_term_link( $category ) ); ?>">
+								<?php echo esc_html( $category->name ); ?>
+								<span class="text-xs text-muted"><?php echo esc_html( number_format_i18n( $category->count ) ); ?></span>
+							</a>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+		<?php endif; ?>
+
+		<?php if ( $query->have_posts() ) : ?>
+			<div class="min-w-0 flex-1">
+				<p class="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
+					<?php
+					printf(
+						/* translators: %s: number of matching products. */
+						esc_html( _n( '%s product', '%s products', $query->found_posts, 'digital-mudir-dokan' ) ),
+						esc_html( number_format_i18n( $query->found_posts ) )
+					);
+					?>
+				</p>
+				<ul class="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2 xl:grid-cols-4">
+					<?php
+					while ( $query->have_posts() ) :
+						$query->the_post();
+						$product = wc_get_product( get_the_ID() );
+						if ( ! $product ) {
+							continue;
+						}
+						?>
+						<li class="list-none">
+							<a class="dmd-search-result flex items-center gap-3 rounded-lg border border-transparent p-2 text-ink hover:border-line hover:bg-surface hover:text-ink" href="<?php echo esc_url( get_permalink() ); ?>">
+								<span class="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md bg-surface">
+									<?php echo wp_kses_post( $product->get_image( 'thumbnail', array( 'class' => 'h-full w-full object-contain mix-blend-multiply' ) ) ); ?>
+								</span>
+								<span class="min-w-0">
+									<span class="line-clamp-2 block text-sm font-medium leading-snug"><?php the_title(); ?></span>
+									<span class="dmd-search-price mt-0.5 block text-sm font-semibold text-green"><?php echo wp_kses_post( $product->get_price_html() ); ?></span>
+								</span>
+							</a>
+						</li>
+					<?php endwhile; ?>
+				</ul>
+			</div>
+		<?php endif; ?>
+	</div>
+
+	<a class="flex items-center justify-center gap-1 border-t border-line bg-surface/60 px-4 py-3 text-sm font-semibold text-green hover:bg-green-soft hover:text-green" href="<?php echo esc_url( $search_url ); ?>">
 		<?php
-	}
-	
-	// Add View all link
-	$search_url = add_query_arg( array( 's' => $search_query, 'post_type' => 'product' ), home_url( '/' ) );
-	echo '<a href="' . esc_url( $search_url ) . '" class="block p-2 mt-2 text-sm text-center text-green font-semibold hover:underline border-t border-line">' . esc_html__( 'View all results', 'digital-mudir-dokan' ) . '</a>';
-
+		/* translators: %s: search term. */
+		printf( esc_html__( 'View all results for “%s”', 'digital-mudir-dokan' ), esc_html( $search_query ) );
+		?>
+		<?php dmd_the_icon( 'chevron-r', 14 ); ?>
+	</a>
+	<?php
 	wp_reset_postdata();
-	$output = ob_get_clean();
 
-	wp_send_json_success( $output );
+	wp_send_json_success( ob_get_clean() );
 }
 add_action( 'wp_ajax_dmd_live_search', 'dmd_ajax_live_search' );
+add_action( 'wp_ajax_nopriv_dmd_live_search', 'dmd_ajax_live_search' );

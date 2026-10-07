@@ -54,7 +54,7 @@ $dmd_categories = $dmd_has_wc ? dmd_get_top_categories() : array();
 
 	<header id="dmd-header" class="dmd-header border-b border-line" role="banner">
 		<div class="dmd-container">
-			<div class="flex flex-wrap items-center gap-x-3 gap-y-3 py-3 sm:gap-x-5 lg:flex-nowrap lg:py-4">
+			<div class="relative flex flex-wrap items-center gap-x-3 gap-y-3 py-3 sm:gap-x-5 lg:flex-nowrap lg:py-4">
 
 				<button type="button"
 					class="dmd-menu-toggle order-1 -ml-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-ink hover:bg-surface lg:hidden"
@@ -73,10 +73,11 @@ $dmd_categories = $dmd_has_wc ? dmd_get_top_categories() : array();
 					<?php endif; ?>
 				</div>
 
-				<div class="dmd-header-search relative order-4 w-full lg:order-3 lg:mx-auto lg:max-w-2xl lg:flex-1">
+				<div class="dmd-header-search order-4 w-full lg:order-3 lg:mx-auto lg:max-w-2xl lg:flex-1">
 					<?php get_search_form(); ?>
-					<div id="dmd-live-search-results" class="absolute left-0 top-full z-50 mt-1.5 hidden max-h-96 w-full overflow-y-auto rounded-xl border border-line bg-white shadow-card"></div>
 				</div>
+
+				<div id="dmd-live-search-results" class="absolute inset-x-0 top-full z-50 -mt-1 hidden max-h-[75vh] overflow-y-auto rounded-xl border border-line bg-white shadow-lift" role="region" aria-live="polite" aria-label="<?php esc_attr_e( 'Search suggestions', 'digital-mudir-dokan' ); ?>"></div>
 
 				<div class="order-3 ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:order-4 lg:ml-0">
 					<?php if ( function_exists( 'wc_get_page_permalink' ) ) : ?>

@@ -444,6 +444,12 @@ function dmd_get_all_categories_url() {
 		return $url;
 	}
 
+	$chosen = function_exists( 'dmd_page_id' ) ? dmd_page_id( 'categories' ) : 0;
+	if ( $chosen ) {
+		$url = get_permalink( $chosen );
+		return $url;
+	}
+
 	$pages = get_posts(
 		array(
 			'post_type'      => 'page',

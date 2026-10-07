@@ -12,6 +12,7 @@ $dmd_social      = dmd_social_links();
 $dmd_has_widgets = is_active_sidebar( 'footer-1' ) || is_active_sidebar( 'footer-2' ) || is_active_sidebar( 'footer-3' );
 $dmd_has_wc      = function_exists( 'wc_get_page_permalink' );
 $dmd_footer_cats = $dmd_has_wc ? dmd_get_top_categories( 6 ) : array();
+$dmd_policy      = dmd_option( 'footer_policy_links' ) ? dmd_policy_links() : array();
 
 $dmd_quick_links = array();
 if ( $dmd_has_wc ) {
@@ -161,6 +162,15 @@ $dmd_link_class = 'text-sm text-white/75 transition-colors hover:text-white';
 						);
 						?>
 					</p>
+					<?php if ( $dmd_policy ) : ?>
+						<nav aria-label="<?php esc_attr_e( 'Policies', 'digital-mudir-dokan' ); ?>">
+							<ul class="m-0 flex list-none flex-wrap justify-center gap-x-4 gap-y-1 p-0 md:justify-start">
+								<?php foreach ( $dmd_policy as $dmd_label => $dmd_url ) : ?>
+									<li class="list-none"><a class="text-white/60 hover:text-white" href="<?php echo esc_url( $dmd_url ); ?>"><?php echo esc_html( $dmd_label ); ?></a></li>
+								<?php endforeach; ?>
+							</ul>
+						</nav>
+					<?php endif; ?>
 					<?php if ( get_theme_mod( 'dmd_trade_license' ) ) : ?>
 						<p class="m-0">
 							<?php

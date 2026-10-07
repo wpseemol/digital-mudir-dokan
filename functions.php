@@ -156,8 +156,9 @@ function dmd_assets() {
 		'dmd-live-search',
 		'dmd_ajax_object',
 		array(
-			'ajax_url' => admin_url( 'admin-ajax.php' ),
-			'nonce'    => wp_create_nonce( 'dmd_search_nonce' ),
+			'ajax_url'  => admin_url( 'admin-ajax.php' ),
+			'nonce'     => wp_create_nonce( 'dmd_search_nonce' ),
+			'searching' => __( 'খুঁজছি…', 'digital-mudir-dokan' ),
 		)
 	);
 
@@ -384,12 +385,19 @@ function dmd_save_registration_fields( $customer_id ) {
 }
 add_action( 'woocommerce_created_customer', 'dmd_save_registration_fields', 10, 1 );
 
+require DMD_DIR . '/inc/theme-options.php';
 require DMD_DIR . '/inc/template-functions.php';
 require DMD_DIR . '/inc/template-tags.php';
 require DMD_DIR . '/inc/class-dmd-nav-walker.php';
 require DMD_DIR . '/inc/customizer.php';
 require DMD_DIR . '/inc/seo-schema.php';
+require DMD_DIR . '/inc/theme-features.php';
+
+if ( is_admin() ) {
+	require DMD_DIR . '/inc/admin/dashboard.php';
+}
 
 if ( class_exists( 'WooCommerce' ) ) {
 	require DMD_DIR . '/inc/woocommerce.php';
+	require DMD_DIR . '/inc/woocommerce-features.php';
 }

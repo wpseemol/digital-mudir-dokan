@@ -80,7 +80,13 @@ $dmd_title     = get_the_title();
 
 				<!-- Stock -->
 				<p class="mt-4 m-0">
-					<?php if ( $product->is_in_stock() ) : ?>
+					<?php $dmd_low_qty = function_exists( 'dmd_low_stock_qty' ) ? dmd_low_stock_qty( $product ) : 0; ?>
+					<?php if ( $dmd_low_qty ) : ?>
+						<span class="inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-3 py-1.5 text-[13px] font-semibold text-amber-800 ring-1 ring-amber-200">
+							<?php dmd_the_icon( 'clock', 15 ); ?>
+							<?php echo esc_html( $product->get_availability()['availability'] ); ?>
+						</span>
+					<?php elseif ( $product->is_in_stock() ) : ?>
 						<span class="inline-flex items-center gap-1.5 rounded-md bg-green-soft px-3 py-1.5 text-[13px] font-medium text-green-dark">
 							<?php dmd_the_icon( 'check', 15 ); ?>
 							<?php

@@ -94,6 +94,42 @@
 	}
 
 	/* ------------------------------------------------------------------
+	 * Back-to-top button — shown after one screen of scrolling
+	 * ------------------------------------------------------------------ */
+	function initBackToTop() {
+		var button = document.querySelector('[data-dmd-back-to-top]');
+		if (!button) {
+			return;
+		}
+
+		var ticking = false;
+		var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		function update() {
+			var show = window.scrollY > window.innerHeight;
+			button.classList.toggle('opacity-0', !show);
+			button.classList.toggle('translate-y-4', !show);
+			button.classList.toggle('pointer-events-none', !show);
+			ticking = false;
+		}
+
+		window.addEventListener('scroll', function () {
+			if (!ticking) {
+				ticking = true;
+				window.requestAnimationFrame(update);
+			}
+		}, { passive: true });
+
+		button.addEventListener('click', function (e) {
+			e.preventDefault();
+			window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+			button.blur();
+		});
+
+		update();
+	}
+
+	/* ------------------------------------------------------------------
 	 * Shop filter drawer (sidebar is off-canvas below lg)
 	 * ------------------------------------------------------------------ */
 	function initFilterDrawer() {
@@ -105,8 +141,9 @@
 		}
 
 		var closers = sidebar.querySelectorAll('[data-dmd-filter-close]');
+		var alwaysDrawer = !!sidebar.closest('.dmd-shop-full');
 		var backdrop = document.createElement('div');
-		backdrop.className = 'fixed inset-0 z-50 hidden bg-black/50 lg:hidden';
+		backdrop.className = 'fixed inset-0 z-50 hidden bg-black/50' + (alwaysDrawer ? '' : ' lg:hidden');
 		document.body.appendChild(backdrop);
 
 		function setOpen(open) {
@@ -887,6 +924,7 @@
 	function boot() {
 		initMobileMenu();
 		initStickyHeader();
+		initBackToTop();
 		initFilterDrawer();
 		initHeroSlider();
 		initProductTabs();

@@ -17,6 +17,9 @@ $dmd_term  = is_product_taxonomy() ? get_queried_object() : null;
 $dmd_term  = $dmd_term instanceof WP_Term ? $dmd_term : null;
 $dmd_total = (int) $wp_query->found_posts;
 
+// Search results use the whole width; filters stay available in the off-canvas drawer.
+$dmd_full_width = is_search();
+
 $dmd_term_image = '';
 if ( $dmd_term && 'product_cat' === $dmd_term->taxonomy ) {
 	$dmd_thumb_id = (int) get_term_meta( $dmd_term->term_id, 'thumbnail_id', true );
@@ -89,7 +92,7 @@ $dmd_max = isset( $_GET['max_price'] ) ? wc_clean( wp_unslash( $_GET['max_price'
 </section>
 
 <div class="dmd-container py-6 sm:py-8">
-	<div class="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-8">
+	<div class="<?php echo esc_attr( $dmd_full_width ? 'dmd-shop-full grid gap-6' : 'grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-8' ); ?>">
 
 		<?php get_template_part( 'template-parts/shop', 'sidebar' ); ?>
 
@@ -106,7 +109,7 @@ $dmd_max = isset( $_GET['max_price'] ) ? wc_clean( wp_unslash( $_GET['max_price'
 
 			<div class="dmd-shop-toolbar mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-white px-3 py-2.5 sm:px-4">
 				<div class="flex min-w-0 items-center gap-3">
-					<button type="button" class="inline-flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-sm font-medium hover:border-green hover:text-green lg:hidden" data-dmd-filter-open aria-controls="dmd-shop-sidebar" aria-expanded="false">
+					<button type="button" class="<?php echo esc_attr( $dmd_full_width ? 'inline-flex' : 'inline-flex lg:hidden' ); ?> items-center gap-2 rounded-lg border border-line px-3 py-2 text-sm font-medium hover:border-green hover:text-green" data-dmd-filter-open aria-controls="dmd-shop-sidebar" aria-expanded="false">
 						<?php dmd_the_icon( 'filter', 16 ); ?>
 						<?php esc_html_e( 'Filters', 'digital-mudir-dokan' ); ?>
 					</button>
@@ -167,8 +170,8 @@ $dmd_max = isset( $_GET['max_price'] ) ? wc_clean( wp_unslash( $_GET['max_price'
 						'grid',
 						'grid-cols-2',
 						'md:grid-cols-3',
-						'lg:grid-cols-' . min( 4, $dmd_cols ),
-						'xl:grid-cols-' . $dmd_cols,
+						$dmd_full_width ? 'lg:grid-cols-4' : 'lg:grid-cols-' . min( 4, $dmd_cols ),
+						$dmd_full_width ? 'xl:grid-cols-5' : 'xl:grid-cols-' . $dmd_cols,
 						'columns-' . $dmd_cols,
 						'list-none',
 						'p-0',

@@ -37,7 +37,7 @@ $dmd_currency = get_woocommerce_currency_symbol();
 ?>
 <aside id="dmd-shop-sidebar" class="dmd-shop-sidebar space-y-5" aria-label="<?php esc_attr_e( 'Shop filters', 'digital-mudir-dokan' ); ?>">
 
-	<div class="flex items-center justify-between border-b border-line pb-3 lg:hidden">
+	<div class="<?php echo esc_attr( is_search() ? 'flex' : 'flex lg:hidden' ); ?> items-center justify-between border-b border-line pb-3">
 		<p class="m-0 text-base font-semibold"><?php esc_html_e( 'Filters', 'digital-mudir-dokan' ); ?></p>
 		<button type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface" data-dmd-filter-close>
 			<?php dmd_the_icon( 'close', 18 ); ?>

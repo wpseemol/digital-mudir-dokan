@@ -220,6 +220,12 @@
     }
 
     /* ---------- Search ---------- */
+    .dmd-search-price del {
+        @apply mr-1 text-xs font-normal text-muted;
+    }
+    .dmd-search-price ins {
+        @apply no-underline;
+    }
     .dmd-search-form {
         @apply relative flex w-full items-center;
     }
@@ -426,12 +432,19 @@
     /* ---------- Shop sidebar (off-canvas below lg) ---------- */
     .dmd-shop-sidebar {
         @apply fixed inset-y-0 left-0 z-[60] w-80 max-w-[86vw] -translate-x-full overflow-y-auto bg-white p-5
-           shadow-2xl transition-transform duration-300
+           transition-transform duration-300
            lg:sticky lg:top-36 lg:z-auto lg:w-auto lg:max-w-none lg:translate-x-0 lg:self-start lg:overflow-visible
-           lg:bg-transparent lg:p-0 lg:shadow-none;
+           lg:bg-transparent lg:p-0;
     }
     .dmd-shop-sidebar.is-open {
-        @apply translate-x-0;
+        @apply translate-x-0 shadow-2xl lg:shadow-none;
+    }
+    /* Full-width layouts (search) keep the sidebar as a drawer at every size. */
+    .dmd-shop-full > .dmd-shop-sidebar {
+        @apply lg:fixed lg:inset-y-0 lg:left-0 lg:z-[60] lg:w-80 lg:-translate-x-full lg:overflow-y-auto lg:bg-white lg:p-5;
+    }
+    .dmd-shop-full > .dmd-shop-sidebar.is-open {
+        @apply lg:translate-x-0 lg:shadow-2xl;
     }
     .dmd-widget {
         @apply rounded-xl border border-line bg-white p-5;
