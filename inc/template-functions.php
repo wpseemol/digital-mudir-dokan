@@ -210,8 +210,9 @@ function dmd_primary_menu_fallback() {
 	$terms = get_terms(
 		array(
 			'taxonomy'   => 'product_cat',
-			'hide_empty' => true,
-			'number'     => 9,
+			'hide_empty' => false,
+			'parent'     => 0,
+			'exclude'    => array( (int) get_option( 'default_product_cat' ) ),
 		)
 	);
 
@@ -219,10 +220,10 @@ function dmd_primary_menu_fallback() {
 		return;
 	}
 
-	echo '<ul class="dmd-menu m-0 flex flex-wrap items-center justify-center gap-x-7 p-0 list-none">';
+	echo '<ul class="dmd-menu dmd-primary-menu m-0 flex list-none flex-wrap items-center justify-center p-0">';
 	foreach ( $terms as $term ) {
 		printf(
-			'<li class="list-none"><a class="dmd-menu-link inline-flex items-center py-3 text-[15px] font-medium hover:text-green" href="%s">%s</a></li>',
+			'<li class="list-none"><a href="%s">%s</a></li>',
 			esc_url( get_term_link( $term ) ),
 			esc_html( $term->name )
 		);

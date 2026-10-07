@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 $dmd_posts = new WP_Query(
 	array(
 		'post_type'           => 'post',
-		'posts_per_page'      => 3,
+		'posts_per_page'      => max( 1, min( 12, (int) get_theme_mod( 'dmd_home_blog_count', 3 ) ) ),
 		'ignore_sticky_posts' => true,
 		'no_found_rows'       => true,
 	)

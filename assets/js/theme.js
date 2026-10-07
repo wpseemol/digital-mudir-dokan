@@ -68,51 +68,8 @@
 	}
 
 	/* ------------------------------------------------------------------
-	 * Header — "All categories" dropdown and stuck shadow
+	 * Header — shadow once the page scrolls under it
 	 * ------------------------------------------------------------------ */
-	function initCategoryNav() {
-		var wrap = document.querySelector('.dmd-catnav');
-		if (!wrap) {
-			return;
-		}
-
-		var button = wrap.querySelector('.dmd-catnav-toggle');
-		var closeTimer;
-
-		function setOpen(open) {
-			wrap.setAttribute('data-open', open ? 'true' : 'false');
-			button.setAttribute('aria-expanded', open ? 'true' : 'false');
-		}
-
-		button.addEventListener('click', function () {
-			setOpen(wrap.getAttribute('data-open') !== 'true');
-		});
-
-		wrap.addEventListener('mouseenter', function () {
-			window.clearTimeout(closeTimer);
-			setOpen(true);
-		});
-
-		wrap.addEventListener('mouseleave', function () {
-			closeTimer = window.setTimeout(function () {
-				setOpen(false);
-			}, 150);
-		});
-
-		document.addEventListener('click', function (event) {
-			if (!wrap.contains(event.target)) {
-				setOpen(false);
-			}
-		});
-
-		document.addEventListener('keydown', function (event) {
-			if (event.key === 'Escape' && wrap.getAttribute('data-open') === 'true') {
-				setOpen(false);
-				button.focus();
-			}
-		});
-	}
-
 	function initStickyHeader() {
 		var header = document.getElementById('dmd-header');
 		if (!header) {
@@ -929,7 +886,6 @@
 	 * ------------------------------------------------------------------ */
 	function boot() {
 		initMobileMenu();
-		initCategoryNav();
 		initStickyHeader();
 		initFilterDrawer();
 		initHeroSlider();

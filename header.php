@@ -7,11 +7,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$dmd_contact     = dmd_contact();
-$dmd_logo_width  = absint( get_theme_mod( 'dmd_logo_width', 180 ) );
-$dmd_has_wc      = function_exists( 'WC' );
-$dmd_categories  = $dmd_has_wc ? dmd_get_top_categories() : array();
-$dmd_all_cat_url = dmd_get_all_categories_url();
+$dmd_contact    = dmd_contact();
+$dmd_logo_width = absint( get_theme_mod( 'dmd_logo_width', 180 ) );
+$dmd_has_wc     = function_exists( 'WC' );
+$dmd_categories = $dmd_has_wc ? dmd_get_top_categories() : array();
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -115,47 +114,19 @@ $dmd_all_cat_url = dmd_get_all_categories_url();
 		</div>
 
 		<nav id="dmd-primary-nav" class="dmd-nav hidden border-t border-line bg-white lg:block" aria-label="<?php esc_attr_e( 'Primary', 'digital-mudir-dokan' ); ?>">
-			<div class="dmd-container flex items-center gap-4">
-				<?php if ( $dmd_categories ) : ?>
-					<div class="dmd-catnav relative shrink-0" data-open="false">
-						<button type="button" class="dmd-catnav-toggle inline-flex items-center gap-2 rounded-t-lg bg-green px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-green-dark" aria-expanded="false" aria-controls="dmd-catnav-panel">
-							<?php dmd_the_icon( 'menu', 18 ); ?>
-							<?php esc_html_e( 'All categories', 'digital-mudir-dokan' ); ?>
-							<?php dmd_the_icon( 'chevron-d', 14 ); ?>
-						</button>
-						<div id="dmd-catnav-panel" class="dmd-catnav-panel invisible absolute left-0 top-full z-50 w-[560px] translate-y-1 rounded-b-xl rounded-tr-xl border border-line bg-white p-3 opacity-0 shadow-card transition-all duration-200">
-							<ul class="m-0 grid max-h-[70vh] list-none grid-cols-2 gap-0.5 overflow-y-auto p-0">
-								<?php foreach ( $dmd_categories as $dmd_cat ) : ?>
-									<li>
-										<a class="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-ink hover:bg-green-soft hover:text-green" href="<?php echo esc_url( get_term_link( $dmd_cat ) ); ?>">
-											<span class="truncate"><?php echo esc_html( $dmd_cat->name ); ?></span>
-											<span class="shrink-0 text-xs text-muted"><?php echo esc_html( number_format_i18n( $dmd_cat->count ) ); ?></span>
-										</a>
-									</li>
-								<?php endforeach; ?>
-							</ul>
-							<a class="mt-2 flex items-center justify-center gap-1 rounded-lg bg-surface px-3 py-2.5 text-sm font-semibold text-green hover:bg-green-soft hover:text-green" href="<?php echo esc_url( $dmd_all_cat_url ); ?>">
-								<?php esc_html_e( 'Browse all categories', 'digital-mudir-dokan' ); ?>
-								<?php dmd_the_icon( 'chevron-r', 14 ); ?>
-							</a>
-						</div>
-					</div>
-				<?php endif; ?>
-
-				<div class="relative min-w-0 flex-1">
-					<?php
-					wp_nav_menu(
-						array(
-							'theme_location' => 'primary',
-							'container'      => false,
-							'menu_class'     => 'dmd-menu dmd-primary-menu dmd-scroll-x m-0 items-center p-0 list-none',
-							'depth'          => 1,
-							'walker'         => new DMD_Nav_Walker(),
-							'fallback_cb'    => 'dmd_primary_menu_fallback',
-						)
-					);
-					?>
-				</div>
+			<div class="dmd-container">
+				<?php
+				wp_nav_menu(
+					array(
+						'theme_location' => 'primary',
+						'container'      => false,
+						'menu_class'     => 'dmd-menu dmd-primary-menu m-0 flex list-none flex-wrap items-center justify-center p-0',
+						'depth'          => 1,
+						'walker'         => new DMD_Nav_Walker(),
+						'fallback_cb'    => 'dmd_primary_menu_fallback',
+					)
+				);
+				?>
 			</div>
 		</nav>
 	</header>

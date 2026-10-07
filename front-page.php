@@ -27,36 +27,40 @@ if ( get_theme_mod( 'dmd_show_trust_row', true ) ) {
 }
 
 if ( class_exists( 'WooCommerce' ) ) {
-	get_template_part(
-		'template-parts/product-section',
-		null,
-		array(
-			'id'        => 'top-selling',
-			'title'     => get_theme_mod( 'dmd_top_selling_title', __( 'Top selling products', 'digital-mudir-dokan' ) ),
-			'eyebrow'   => __( 'Customer favourites', 'digital-mudir-dokan' ),
-			'limit'     => (int) get_theme_mod( 'dmd_top_selling_count', 4 ),
-			'source'    => 'best_selling',
-			'show_tabs' => false,
-			'show_link' => true,
-			'class'     => 'mt-10 bg-surface/70 sm:mt-14',
-		)
-	);
+	if ( get_theme_mod( 'dmd_show_top_selling', true ) ) {
+		get_template_part(
+			'template-parts/product-section',
+			null,
+			array(
+				'id'        => 'top-selling',
+				'title'     => get_theme_mod( 'dmd_top_selling_title', __( 'Top selling products', 'digital-mudir-dokan' ) ),
+				'eyebrow'   => get_theme_mod( 'dmd_top_selling_eyebrow', __( 'Customer favourites', 'digital-mudir-dokan' ) ),
+				'limit'     => (int) get_theme_mod( 'dmd_top_selling_count', 4 ),
+				'source'    => 'best_selling',
+				'show_tabs' => false,
+				'show_link' => true,
+				'class'     => 'mt-10 bg-surface/70 sm:mt-14',
+			)
+		);
+	}
 
 	get_template_part( 'template-parts/promo-banners' );
 
-	get_template_part(
-		'template-parts/product-section',
-		null,
-		array(
-			'id'        => 'all-products',
-			'title'     => get_theme_mod( 'dmd_all_products_title', __( 'Our products', 'digital-mudir-dokan' ) ),
-			'eyebrow'   => __( 'Fresh arrivals', 'digital-mudir-dokan' ),
-			'limit'     => (int) get_theme_mod( 'dmd_product_count', 12 ),
-			'source'    => 'recent',
-			'show_tabs' => get_theme_mod( 'dmd_show_category_tabs', true ),
-			'show_link' => get_theme_mod( 'dmd_show_view_all_link', true ),
-		)
-	);
+	if ( get_theme_mod( 'dmd_show_all_products', true ) ) {
+		get_template_part(
+			'template-parts/product-section',
+			null,
+			array(
+				'id'        => 'all-products',
+				'title'     => get_theme_mod( 'dmd_all_products_title', __( 'Our products', 'digital-mudir-dokan' ) ),
+				'eyebrow'   => get_theme_mod( 'dmd_all_products_eyebrow', __( 'Fresh arrivals', 'digital-mudir-dokan' ) ),
+				'limit'     => (int) get_theme_mod( 'dmd_product_count', 12 ),
+				'source'    => 'recent',
+				'show_tabs' => get_theme_mod( 'dmd_show_category_tabs', true ),
+				'show_link' => get_theme_mod( 'dmd_show_view_all_link', true ),
+			)
+		);
+	}
 }
 
 if ( get_theme_mod( 'dmd_show_cta_band', true ) ) {
@@ -82,8 +86,14 @@ if ( is_page() && have_posts() ) {
 	endwhile;
 }
 
-get_template_part( 'template-parts/video-wall' );
-get_template_part( 'template-parts/blog-strip' );
-get_template_part( 'template-parts/faq-section' );
+if ( get_theme_mod( 'dmd_show_videos', true ) ) {
+	get_template_part( 'template-parts/video-wall' );
+}
+if ( get_theme_mod( 'dmd_show_blog', true ) ) {
+	get_template_part( 'template-parts/blog-strip' );
+}
+if ( get_theme_mod( 'dmd_show_faq', true ) ) {
+	get_template_part( 'template-parts/faq-section' );
+}
 
 get_footer();

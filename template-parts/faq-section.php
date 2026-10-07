@@ -40,13 +40,21 @@ for ( $dmd_i = 1; $dmd_i <= 5; $dmd_i++ ) {
 if ( ! $dmd_faqs ) {
 	return;
 }
+
+$dmd_faq_eyebrow = get_theme_mod( 'dmd_faq_eyebrow', __( 'সচরাচর জিজ্ঞাসিত প্রশ্নাবলী', 'digital-mudir-dokan' ) );
+$dmd_faq_title   = get_theme_mod( 'dmd_faq_title', __( 'সাধারণ প্রশ্ন ও উত্তর', 'digital-mudir-dokan' ) );
+$dmd_faq_text    = get_theme_mod( 'dmd_faq_text', __( 'আপনার প্রশ্নের উত্তর এখানে না পেলে আমাদের সাথে সরাসরি যোগাযোগ করুন।', 'digital-mudir-dokan' ) );
 ?>
 <section class="dmd-section" aria-labelledby="dmd-faq-heading">
 	<div class="dmd-container grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-14">
 		<div>
-			<p class="dmd-eyebrow"><?php esc_html_e( 'সচরাচর জিজ্ঞাসিত প্রশ্নাবলী', 'digital-mudir-dokan' ); ?></p>
-			<h2 id="dmd-faq-heading" class="dmd-heading"><?php esc_html_e( 'সাধারণ প্রশ্ন ও উত্তর', 'digital-mudir-dokan' ); ?></h2>
-			<p class="mt-3 text-sm text-muted sm:text-base"><?php esc_html_e( 'আপনার প্রশ্নের উত্তর এখানে না পেলে আমাদের সাথে সরাসরি যোগাযোগ করুন।', 'digital-mudir-dokan' ); ?></p>
+			<?php if ( $dmd_faq_eyebrow ) : ?>
+				<p class="dmd-eyebrow"><?php echo esc_html( $dmd_faq_eyebrow ); ?></p>
+			<?php endif; ?>
+			<h2 id="dmd-faq-heading" class="dmd-heading"><?php echo esc_html( $dmd_faq_title ); ?></h2>
+			<?php if ( $dmd_faq_text ) : ?>
+				<p class="mt-3 text-sm text-muted sm:text-base"><?php echo esc_html( $dmd_faq_text ); ?></p>
+			<?php endif; ?>
 		</div>
 
 		<div class="space-y-3">

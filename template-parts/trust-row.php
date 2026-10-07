@@ -8,28 +8,31 @@
 defined( 'ABSPATH' ) || exit;
 
 $dmd_contact  = dmd_contact();
-$dmd_promises = array(
-	array(
-		'icon'  => 'truck',
-		'title' => __( 'সারা দেশে হোম ডেলিভারি', 'digital-mudir-dokan' ),
-		'text'  => get_theme_mod( 'dmd_delivery_inside', __( 'ঢাকার ভেতরে: ১-২ দিন', 'digital-mudir-dokan' ) ),
-	),
-	array(
-		'icon'  => 'leaf',
-		'title' => __( '১০০% খাঁটি ও প্রাকৃতিক', 'digital-mudir-dokan' ),
-		'text'  => __( 'সরাসরি উৎপাদকের কাছ থেকে সংগ্রহ', 'digital-mudir-dokan' ),
-	),
-	array(
-		'icon'  => 'wallet',
-		'title' => __( 'ক্যাশ অন ডেলিভারি', 'digital-mudir-dokan' ),
-		'text'  => __( 'পণ্য হাতে পেয়ে মূল্য পরিশোধ', 'digital-mudir-dokan' ),
-	),
-	array(
-		'icon'  => 'headset',
-		'title' => __( 'গ্রাহক সহায়তা', 'digital-mudir-dokan' ),
-		'text'  => $dmd_contact['hotline'] ? sprintf( /* translators: %s: hotline number. */ __( 'হটলাইন: %s', 'digital-mudir-dokan' ), $dmd_contact['hotline'] ) : __( 'সকাল ৯টা – রাত ১০টা', 'digital-mudir-dokan' ),
-	),
-);
+$dmd_promises = array();
+
+foreach ( dmd_trust_defaults() as $dmd_i => $dmd_card ) {
+	$dmd_title = get_theme_mod( "dmd_trust_{$dmd_i}_title", $dmd_card['title'] );
+	$dmd_text  = get_theme_mod( "dmd_trust_{$dmd_i}_text", $dmd_card['text'] );
+
+	if ( 4 === $dmd_i && '' === trim( (string) $dmd_text ) && $dmd_contact['hotline'] ) {
+		/* translators: %s: hotline number. */
+		$dmd_text = sprintf( __( 'হটলাইন: %s', 'digital-mudir-dokan' ), $dmd_contact['hotline'] );
+	}
+
+	if ( '' === trim( (string) $dmd_title ) ) {
+		continue;
+	}
+
+	$dmd_promises[] = array(
+		'icon'  => $dmd_card['icon'],
+		'title' => $dmd_title,
+		'text'  => $dmd_text,
+	);
+}
+
+if ( ! $dmd_promises ) {
+	return;
+}
 ?>
 <section class="dmd-promises pt-2 sm:pt-4" aria-label="<?php esc_attr_e( 'Shopping with us', 'digital-mudir-dokan' ); ?>">
 	<div class="dmd-container">

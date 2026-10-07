@@ -201,15 +201,14 @@
     .dmd-header.is-stuck {
         @apply shadow-soft;
     }
-    .dmd-catnav[data-open="true"] .dmd-catnav-panel,
-    .dmd-catnav:focus-within .dmd-catnav-panel {
-        @apply visible translate-y-0 opacity-100;
+    .dmd-primary-menu {
+        @apply gap-x-1 py-1;
     }
     .dmd-primary-menu > li {
-        @apply shrink-0;
+        @apply list-none;
     }
     .dmd-primary-menu > li > a {
-        @apply relative inline-flex items-center whitespace-nowrap px-3 py-3 text-sm font-medium text-ink hover:text-green;
+        @apply relative inline-flex items-center whitespace-nowrap px-3 py-2 text-sm font-medium text-ink hover:text-green;
     }
     .dmd-primary-menu > li.current-menu-item > a,
     .dmd-primary-menu > li.current-product_cat-ancestor > a {
