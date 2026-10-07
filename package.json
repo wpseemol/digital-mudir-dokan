@@ -4,6 +4,7 @@
   "private": true,
   "description": "Build tooling for the Digital Mudir Dokan WordPress theme.",
   "scripts": {
+    "build": "npm run build:css",
     "build:css": "tailwindcss -i ./assets/css/tailwind.src.css -o ./assets/css/theme.css --minify",
     "watch:css": "tailwindcss -i ./assets/css/tailwind.src.css -o ./assets/css/theme.css --watch",
     "audit:safelist": "node ./tools/audit-safelist.js"

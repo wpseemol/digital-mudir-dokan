@@ -178,20 +178,130 @@
 	}
 
 	/* ------------------------------------------------------------------
-	 * Express order buttons carry the chosen quantity to checkout
+	 * Toast — a short-lived status message
 	 * ------------------------------------------------------------------ */
+	var DMD_TOAST_BASE = 'dmd-toast fixed bottom-6 right-6 z-50 max-w-xs bg-gray-900 text-white px-5 py-3 rounded-xl shadow-xl text-sm transition-all duration-300 transform translate-y-2 opacity-0';
+	var DMD_TOAST_SHOWN = 'translate-y-0 opacity-100';
+
+	function showToast(message) {
+		// Never stack two toasts in the same corner.
+		document.querySelectorAll('.dmd-toast').forEach(function (existing) {
+			existing.remove();
+		});
+
+		var toast = document.createElement('div');
+		toast.className = DMD_TOAST_BASE;
+		toast.setAttribute('role', 'status');
+		toast.textContent = message;
+		document.body.appendChild(toast);
+
+		window.requestAnimationFrame(function () {
+			toast.className = DMD_TOAST_BASE + ' ' + DMD_TOAST_SHOWN;
+		});
+
+		window.setTimeout(function () {
+			toast.className = DMD_TOAST_BASE;
+			window.setTimeout(function () {
+				toast.remove();
+			}, 300);
+		}, 3000);
+	}
+
+	/* ------------------------------------------------------------------
+	 * Express order buttons carry the chosen quantity and variation to checkout
+	 * ------------------------------------------------------------------ */
+	function variationMessage() {
+		return (window.dmd_theme_object && window.dmd_theme_object.selectVariation) || 'Please choose a variation.';
+	}
+
+	function chooseVariationMessage() {
+		return (window.dmd_theme_object && window.dmd_theme_object.chooseVariation)
+			|| 'দয়া করে প্রথমে একটি ভেরিয়েন্ট বা সাইজ নির্বাচন করুন, তারপর অর্ডার সম্পন্ন করুন।';
+	}
+
+	/**
+	 * Permalink of the product shown by a loop card.
+	 *
+	 * The theme's cards do not use WooCommerce's `.woocommerce-loop-product__link`
+	 * wrapper, so fall back to the title link and then to the first anchor.
+	 */
+	function cardPermalink(card) {
+		var anchor = card.querySelector('.woocommerce-loop-product__link[href], h2 a[href], h3 a[href]')
+			|| card.querySelector('a[href]');
+
+		return anchor ? anchor.getAttribute('href') : '';
+	}
+
 	function initOrderNow() {
-		document.querySelectorAll('[data-dmd-order-now]').forEach(function (link) {
-			link.addEventListener('click', function () {
+		document.querySelectorAll('[data-dmd-order-now], .dmd-direct-checkout-btn').forEach(function (link) {
+			link.addEventListener('click', function (event) {
+				// Loop cards (home, shop, category): there is no variation
+				// form on the page, so a variable product cannot be added
+				// straight from the card.
+				var card = link.closest('li.product');
+
+				if (card) {
+					if (!card.classList.contains('product-type-variable')) {
+						return; // Simple products keep their direct checkout link.
+					}
+
+					event.preventDefault();
+					showToast(chooseVariationMessage());
+
+					var permalink = cardPermalink(card);
+					if (permalink) {
+						window.setTimeout(function () {
+							window.location.href = permalink;
+						}, 1200);
+					}
+					return;
+				}
+
 				var form = link.closest('form.cart') || document.querySelector('form.cart');
 				if (!form) {
 					return;
 				}
 
-				var qty = form.querySelector('input.qty');
+				var isVariations = form.classList.contains('variations_form');
+				var variation = form.querySelector('input.variation_id');
+				var chosenVariation = variation ? parseInt(variation.value, 10) : 0;
+
+				// Instant checkout needs a variation before it can build a cart line.
+				if (isVariations && chosenVariation < 1) {
+					event.preventDefault();
+					showToast(variationMessage());
+
+					var firstChip = document.querySelector('.dmd-variation-chip:not(.is-unavailable)');
+					if (firstChip) {
+						firstChip.focus();
+					}
+					return;
+				}
+
+				var url = new URL(link.href, window.location.origin);
+				var changed = false;
+
+				var qty = form.querySelector('input.qty') || form.querySelector('input[name="quantity"]');
 				if (qty && parseInt(qty.value, 10) > 1) {
-					var url = new URL(link.href, window.location.origin);
 					url.searchParams.set('quantity', qty.value);
+					changed = true;
+				}
+
+				// Variable products: pass the chosen variation and attribute
+				// values through so the express handler can add them to the cart.
+				if (chosenVariation > 0) {
+					url.searchParams.set('variation_id', variation.value);
+					changed = true;
+				}
+
+				form.querySelectorAll('.variations select').forEach(function (select) {
+					if (select.name && select.value) {
+						url.searchParams.set(select.name, select.value);
+						changed = true;
+					}
+				});
+
+				if (changed) {
 					link.href = url.toString();
 				}
 			});
@@ -202,16 +312,12 @@
 	 * WooCommerce category toggle
 	 * ------------------------------------------------------------------ */
 	function initCategoryToggle() {
-		var widget = document.querySelector('.widget_product_categories');
-		if (!widget) {
-			return;
-		}
-
-		var list = widget.querySelector('ul');
+		var list = document.querySelector('.dmd-product-categories, .widget_product_categories > ul');
 		if (!list) {
 			return;
 		}
 
+		var widget = list.closest('.dmd-filter-card, .widget_product_categories, .dmd-widget') || list.parentElement;
 		var items = Array.prototype.slice.call(list.children);
 		var limit = 8;
 
@@ -228,7 +334,7 @@
 
 		// Create toggle button
 		var button = document.createElement('button');
-		button.className = 'dmd-btn dmd-btn--ghost dmd-btn--block mt-3 text-xs';
+		button.className = 'mt-3 w-full rounded-lg border border-line bg-white px-3 py-2 text-xs font-medium text-emerald-800 transition hover:bg-emerald-50';
 		button.innerHTML = 'আরও দেখুন +';
 		button.type = 'button';
 
@@ -398,6 +504,320 @@
 	}
 
 	/* ------------------------------------------------------------------
+	 * Variable products — pill chips mirroring the attribute selects
+	 *
+	 * WooCommerce drives the variation through `.variations select`, so the
+	 * chips stay a view of that element: clicking one sets the value and fires
+	 * `change`, and the chips are rebuilt whenever WooCommerce rewrites the
+	 * options. The select is only hidden once the chips exist, which keeps the
+	 * form usable without JavaScript.
+	 * ------------------------------------------------------------------ */
+	function buildVariationChips($form) {
+		$form.find('.variations select').each(function () {
+			var $select = $(this);
+			var $field = $select.closest('.dmd-variation-field');
+			var $chips = $field.find('[data-dmd-chips]');
+
+			if (!$chips.length) {
+				return;
+			}
+
+			var current = $select.val();
+			$chips.empty();
+
+			$select.find('option').each(function () {
+				var $option = $(this);
+				var value = $option.val();
+
+				if (!value) {
+					return;
+				}
+
+				var $chip = $('<button type="button" class="dmd-variation-chip"></button>');
+				var isActive = current === value;
+
+				$chip.text($option.text());
+				$chip.attr('data-dmd-chip-value', value);
+				$chip.attr('aria-pressed', isActive ? 'true' : 'false');
+
+				if (isActive) {
+					$chip.addClass('is-active');
+				}
+
+				if (this.disabled) {
+					$chip.addClass('is-unavailable').prop('disabled', true);
+				}
+
+				$chips.append($chip);
+			});
+
+			if (!$chips.children().length) {
+				return;
+			}
+
+			var label = $field.find('label').first().text().replace(/\*+\s*$/, '').trim();
+
+			$chips.attr({ role: 'group', 'aria-label': label || 'Variation' });
+			$chips.prop('hidden', false);
+			$select.addClass('dmd-variation-native');
+		});
+	}
+
+	function initVariationChips() {
+		if (typeof jQuery === 'undefined') {
+			return;
+		}
+
+		var $ = jQuery;
+		var $forms = $('.variations_form');
+
+		if (!$forms.length) {
+			return;
+		}
+
+		$forms.each(function () {
+			var $form = $(this);
+
+			if ($form.data('dmdChips')) {
+				return;
+			}
+			$form.data('dmdChips', true);
+
+			buildVariationChips($form);
+
+			$form.on('click', '.dmd-variation-chip', function () {
+				var $chip = $(this);
+
+				if ($chip.prop('disabled')) {
+					return;
+				}
+
+				var value = $chip.attr('data-dmd-chip-value');
+				var $field = $chip.closest('.dmd-variation-field');
+
+				$field.find('select').first().val(value).trigger('change');
+
+				// The rebuild replaced the node that was clicked, so move focus
+				// onto its replacement.
+				$field
+					.find('.dmd-variation-chip')
+					.filter(function () {
+						return $(this).attr('data-dmd-chip-value') === value;
+					})
+					.first()
+					.trigger('focus');
+			});
+
+			$form.on('change', '.variations select', function () {
+				buildVariationChips($form);
+			});
+
+			$form.on('woocommerce_update_variation_values reset_data', function () {
+				buildVariationChips($form);
+			});
+
+			// WooCommerce tries to focus the select here; the chips are visible.
+			$form.on('reset_focus', function () {
+				$form.find('.dmd-variation-chip:not(.is-unavailable)').first().trigger('focus');
+			});
+		});
+	}
+
+	/* ------------------------------------------------------------------
+	 * Variable products — preselect the first purchasable variation
+	 * ------------------------------------------------------------------ */
+	function pickFirstVariation($form) {
+		var raw = $form.attr('data-product_variations');
+		var variations = null;
+
+		if (raw) {
+			try {
+				variations = JSON.parse(raw);
+			} catch (e) {
+				variations = null;
+			}
+		}
+
+		if (!Array.isArray(variations) || !variations.length) {
+			return null;
+		}
+
+		var match = null;
+
+		variations.forEach(function (variation) {
+			if (!match && variation.is_in_stock && variation.is_purchasable) {
+				match = variation;
+			}
+		});
+
+		if (!match) {
+			variations.forEach(function (variation) {
+				if (!match && variation.is_in_stock) {
+					match = variation;
+				}
+			});
+		}
+
+		return match || variations[0];
+	}
+
+	function autoSelectVariation($form) {
+		if ($form.data('dmdAutoSelected')) {
+			return;
+		}
+
+		var $selects = $form.find('.variations select');
+
+		if (!$selects.length) {
+			return;
+		}
+
+		var alreadyChosen = false;
+		$selects.each(function () {
+			if ($(this).val()) {
+				alreadyChosen = true;
+			}
+		});
+
+		if (!alreadyChosen) {
+			var variation = pickFirstVariation($form);
+
+			// Prefer a combination WooCommerce already knows is purchasable; it
+			// cannot be invalid, unlike picking the first option of each select.
+			if (variation && variation.attributes) {
+				$selects.each(function () {
+					var $select = $(this);
+					var name = $select.data('attribute_name') || $select.attr('name');
+					var value = variation.attributes[name];
+
+					if (value) {
+						$select.val(value);
+					}
+				});
+			}
+
+			// Anything still empty takes its first selectable option. This is
+			// the only path when variations are fetched over AJAX.
+			$selects.each(function () {
+				var $select = $(this);
+
+				if ($select.val()) {
+					return;
+				}
+
+				var first = $select
+					.find('option')
+					.filter(function () {
+						return this.value !== '' && !this.disabled;
+					})
+					.first()
+					.val();
+
+				if (first) {
+					$select.val(first);
+				}
+			});
+
+			$selects.first().trigger('change');
+		}
+
+		$form.data('dmdAutoSelected', true);
+	}
+
+	function initVariationAutoSelect() {
+		if (typeof jQuery === 'undefined') {
+			return;
+		}
+
+		var $ = jQuery;
+
+		// WooCommerce fires this once the form is wired up.
+		$(document).on('wc_variation_form', '.variations_form', function () {
+			autoSelectVariation($(this));
+		});
+
+		// Cover a form WooCommerce has already initialised.
+		$('.variations_form').each(function () {
+			var $form = $(this);
+
+			if ($form.data('product_variations')) {
+				autoSelectVariation($form);
+			}
+		});
+	}
+
+	/* ------------------------------------------------------------------
+	 * My account — login / register tabs
+	 * ------------------------------------------------------------------ */
+	function initAccountTabs() {
+		var triggers = document.querySelectorAll('[data-dmd-tab]');
+
+		if (!triggers.length) {
+			return;
+		}
+
+		var panels = {
+			login: document.getElementById('dmd-panel-login'),
+			register: document.getElementById('dmd-panel-register')
+		};
+
+		var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"][data-dmd-tab]'));
+
+		function activate(name, moveFocus) {
+			if (!panels[name]) {
+				return;
+			}
+
+			Object.keys(panels).forEach(function (key) {
+				if (panels[key]) {
+					panels[key].classList.toggle('hidden', key !== name);
+				}
+			});
+
+			tabs.forEach(function (tab) {
+				var isActive = tab.dataset.dmdTab === name;
+				tab.classList.toggle('is-active', isActive);
+				tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+			});
+
+			if (moveFocus) {
+				var field = panels[name].querySelector('input');
+				if (field) {
+					field.focus();
+				}
+			}
+		}
+
+		triggers.forEach(function (trigger) {
+			trigger.addEventListener('click', function (event) {
+				event.preventDefault();
+				activate(trigger.dataset.dmdTab, trigger.getAttribute('role') !== 'tab');
+			});
+		});
+
+		// Arrow keys walk the tablist.
+		tabs.forEach(function (tab, index) {
+			tab.addEventListener('keydown', function (event) {
+				var offset = event.key === 'ArrowRight' ? 1 : (event.key === 'ArrowLeft' ? -1 : 0);
+
+				if (!offset) {
+					return;
+				}
+
+				event.preventDefault();
+
+				var next = tabs[(index + offset + tabs.length) % tabs.length];
+				next.focus();
+				activate(next.dataset.dmdTab, false);
+			});
+		});
+
+		if (window.location.hash === '#register' && panels.register) {
+			activate('register', false);
+		}
+	}
+
+	/* ------------------------------------------------------------------
 	 * Boot
 	 * ------------------------------------------------------------------ */
 	function boot() {
@@ -418,6 +838,9 @@
 		initCategoryToggle();
 		initViewSwitcher();
 		initDescriptionToggle();
+		initVariationChips();
+		initVariationAutoSelect();
+		initAccountTabs();
 	}
 
 	if (document.readyState === 'loading') {

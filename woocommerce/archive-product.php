@@ -10,7 +10,8 @@ defined( 'ABSPATH' ) || exit;
 
 get_header( 'shop' );
 
-$dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
+$catalog_cols     = function_exists( 'dmd_get_catalog_columns' ) ? dmd_get_catalog_columns() : 4;
+$show_shop_sidebar = is_product_taxonomy();
 ?>
 <div class="bg-surface py-6">
 	<div class="dmd-container flex flex-wrap items-center justify-between gap-3">
@@ -22,33 +23,14 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 </div>
 
 <div class="dmd-container py-8">
-	<div class="grid gap-8 lg:grid-cols-[260px_minmax(0,1fr)]">
+	<div class="grid gap-8 <?php echo $show_shop_sidebar ? 'lg:grid-cols-[260px_minmax(0,1fr)]' : ''; ?>">
 
-		<!-- Filters -->
-		<?php if ( is_product_category() ) : ?>
-			<aside class="dmd-shop-sidebar" aria-label="<?php esc_attr_e( 'Shop filters', 'digital-mudir-dokan' ); ?>">
-				<?php if ( is_active_sidebar( 'shop-sidebar' ) ) : ?>
-					<?php dynamic_sidebar( 'shop-sidebar' ); ?>
-				<?php else : ?>
-					<section class="mb-5 rounded-lg border border-line bg-white p-5">
-						<h2 class="mb-3 text-base font-semibold"><?php esc_html_e( 'Product categories', 'digital-mudir-dokan' ); ?></h2>
-						<?php
-						wp_list_categories(
-							array(
-								'taxonomy'   => 'product_cat',
-								'title_li'   => '',
-								'hide_empty' => true,
-								'walker'     => null,
-							)
-						);
-						?>
-					</section>
-				<?php endif; ?>
-			</aside>
+		<?php if ( $show_shop_sidebar ) : ?>
+			<?php get_template_part( 'template-parts/shop', 'sidebar' ); ?>
 		<?php endif; ?>
 
 		<!-- Results -->
-		<div class="dmd-shop-results <?php echo !is_product_category() ? 'lg:col-span-2' : ''; ?>">
+		<div class="dmd-shop-results">
 			<?php
 			/**
 			 * Notices and anything a plugin attaches before the content.
@@ -73,10 +55,10 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 
 					<div class="flex items-center gap-4">
 						<div class="flex items-center gap-1 border-r border-line pr-4">
-							<button type="button" 
-									class="dmd-view-toggle p-2 rounded-md transition-all duration-200 ease-in-out" 
-									data-view-toggle="grid" 
-									aria-label="<?php esc_attr_e( 'Grid view', 'digital-mudir-dokan' ); ?>" 
+							<button type="button"
+									class="dmd-view-toggle p-2 rounded-md transition-all duration-200 ease-in-out"
+									data-view-toggle="grid"
+									aria-label="<?php esc_attr_e( 'Grid view', 'digital-mudir-dokan' ); ?>"
 									aria-pressed="true">
 								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dmd-icon">
 									<rect x="3" y="3" width="7" height="7" rx="1"></rect>
@@ -85,10 +67,10 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 									<rect x="14" y="14" width="7" height="7" rx="1"></rect>
 								</svg>
 							</button>
-							<button type="button" 
-									class="dmd-view-toggle p-2 rounded-md transition-all duration-200 ease-in-out" 
-									data-view-toggle="list" 
-									aria-label="<?php esc_attr_e( 'List view', 'digital-mudir-dokan' ); ?>" 
+							<button type="button"
+									class="dmd-view-toggle p-2 rounded-md transition-all duration-200 ease-in-out"
+									data-view-toggle="list"
+									aria-label="<?php esc_attr_e( 'List view', 'digital-mudir-dokan' ); ?>"
 									aria-pressed="false">
 								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dmd-icon">
 									<line x1="8" y1="6" x2="21" y2="6"></line>
@@ -112,15 +94,24 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 				 */
 				do_action( 'woocommerce_before_shop_loop' );
 
-				// Check if category page or shop page, with fallback to 4 columns
-				$saved_cols = is_product_category() 
-					? get_theme_mod( 'dmd_category_grid_columns', get_theme_mod( 'dmd_archive_grid_columns', '4' ) )
-					: get_theme_mod( 'dmd_shop_grid_columns', get_theme_mod( 'dmd_archive_grid_columns', '4' ) );
-
-				$grid_col_class = ( strval($saved_cols ) === '3' ) ? 'lg:grid-cols-3' : 'lg:grid-cols-4';
-
-				if ( wc_get_loop_prop( 'total' ) ) : ?>
-				<ul id="dmd-archive-products" class="products dmd-archive-catalog grid-view grid grid-cols-2 md:grid-cols-3 <?php echo esc_attr( $grid_col_class ); ?> gap-4 md:gap-6 list-none p-0 m-0">
+				if ( wc_get_loop_prop( 'total' ) ) :
+					$grid_classes = array(
+						'products',
+						'dmd-archive-catalog',
+						'grid-view',
+						'grid',
+						'grid-cols-2',
+						'md:grid-cols-3',
+						'lg:grid-cols-' . $catalog_cols,
+						'columns-' . $catalog_cols,
+						'gap-4',
+						'md:gap-6',
+						'list-none',
+						'p-0',
+						'm-0',
+					);
+					?>
+				<ul id="dmd-archive-products" class="<?php echo esc_attr( implode( ' ', $grid_classes ) ); ?>" data-columns="<?php echo esc_attr( (string) $catalog_cols ); ?>">
 				<?php
 				while ( have_posts() ) {
 					the_post();
@@ -129,9 +120,11 @@ $dmd_page_link = remove_query_arg( array( 'per_page', 'paged' ) );
 				}
 				?>
 				</ul>
-				<?php endif;
+				<?php
+				endif;
 
 				do_action( 'woocommerce_after_shop_loop' );
+				dmd_woo_pagination();
 				?>
 
 			<?php else : ?>

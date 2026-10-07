@@ -78,6 +78,15 @@ module.exports = {
     'onsale',
     'woocommerce-loop-product__link',
     'wp-post-image',
+    // Injected by the variation script once a product combination matches.
+    'in-stock',
+    'woocommerce-variation-add-to-cart',
+    'woocommerce-variation-availability',
+    'woocommerce-variation-price',
+    // Added around the password field by WooCommerce's show/hide toggle script.
+    'display-password',
+    'password-input',
+    'show-password-input',
     { pattern: /^(grid-cols|col-span)-(1|2|3|4|5|6|12)$/, variants: ['sm', 'md', 'lg', 'xl'] },
   ],
   theme: {

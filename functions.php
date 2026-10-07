@@ -128,8 +128,18 @@ function dmd_assets() {
 	wp_enqueue_style( 'dmd-overrides', DMD_URI . '/assets/css/woocommerce-overrides.css', array( 'dmd-theme' ), time() );
 	wp_enqueue_style( 'dmd-style', get_stylesheet_uri(), array( 'dmd-theme' ), time() );
 
-	wp_enqueue_script( 'dmd-theme', DMD_URI . '/assets/js/theme.js', array( 'swiper-js' ), DMD_VERSION, true );
+	wp_enqueue_script( 'dmd-theme', DMD_URI . '/assets/js/theme.js', array( 'swiper-js', 'jquery' ), DMD_VERSION, true );
 	wp_enqueue_script( 'dmd-live-search', DMD_URI . '/assets/js/live-search.js', array( 'jquery' ), DMD_VERSION, true );
+
+	wp_localize_script(
+		'dmd-theme',
+		'dmd_theme_object',
+		array(
+			'selectVariation' => __( 'অনুগ্রহ করে একটি ভেরিয়েন্ট নির্বাচন করুন', 'digital-mudir-dokan' ),
+			'chooseVariation' => __( 'দয়া করে প্রথমে একটি ভেরিয়েন্ট বা সাইজ নির্বাচন করুন, তারপর অর্ডার সম্পন্ন করুন।', 'digital-mudir-dokan' ),
+		)
+	);
+
 	wp_localize_script(
 		'dmd-live-search',
 		'dmd_ajax_object',
@@ -206,6 +216,160 @@ function dmd_widgets() {
 	}
 }
 add_action( 'widgets_init', 'dmd_widgets' );
+
+/* ---------------------------------------------------------------------------
+ * My account — registration
+ * ------------------------------------------------------------------------- */
+
+/**
+ * Shared class list for the account login/register inputs.
+ *
+ * @return string
+ */
+function dmd_auth_input_class() {
+	return 'w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm transition';
+}
+
+/**
+ * Class list for the account password inputs.
+ *
+ * WooCommerce's script wraps `.woocommerce-Input[type="password"]` — inside a
+ * `.woocommerce` container — in `.password-input` and appends its show/hide
+ * toggle. The marker class therefore has to be present or no toggle appears.
+ * The My Account shortcode already renders that `.woocommerce` container, so
+ * only the input needs the extra class.
+ *
+ * @return string
+ */
+function dmd_auth_password_class() {
+	return dmd_auth_input_class() . ' woocommerce-Input woocommerce-Input--password';
+}
+
+/**
+ * Turn the My Account registration form on and make customers type a password.
+ *
+ * Each option is only written when it differs from the wanted value, so a normal
+ * request never hits the database. Return false from the
+ * `dmd_force_account_registration` filter to leave the choice to the shop owner.
+ */
+function dmd_enable_account_registration() {
+	if ( ! apply_filters( 'dmd_force_account_registration', true ) ) {
+		return;
+	}
+
+	if ( 'yes' !== get_option( 'woocommerce_enable_myaccount_registration' ) ) {
+		update_option( 'woocommerce_enable_myaccount_registration', 'yes' );
+	}
+
+	if ( 'no' !== get_option( 'woocommerce_registration_generate_password' ) ) {
+		update_option( 'woocommerce_registration_generate_password', 'no' );
+	}
+}
+add_action( 'after_setup_theme', 'dmd_enable_account_registration', 20 );
+
+/**
+ * Name and phone rows appended to the registration form.
+ *
+ * `woocommerce_register_form` prints after the core email and password rows, so
+ * they are validated through the registration hooks rather than re-ordered.
+ */
+function dmd_register_form_fields() {
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- values are echoed back for convenience only; the nonce is verified by WC_Form_Handler::process_registration().
+	$dmd_first_name = isset( $_POST['first_name'] ) && is_string( $_POST['first_name'] ) ? sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) : '';
+	$dmd_phone      = isset( $_POST['billing_phone'] ) && is_string( $_POST['billing_phone'] ) ? sanitize_text_field( wp_unslash( $_POST['billing_phone'] ) ) : '';
+	// phpcs:enable
+	?>
+	<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide mb-4">
+		<label for="reg_first_name" class="mb-1.5 block text-sm font-semibold text-gray-700">
+			<?php esc_html_e( 'Full name', 'digital-mudir-dokan' ); ?>&nbsp;<span class="required" aria-hidden="true">*</span>
+		</label>
+		<input type="text"
+			class="<?php echo esc_attr( dmd_auth_input_class() ); ?>"
+			name="first_name"
+			id="reg_first_name"
+			autocomplete="name"
+			required
+			value="<?php echo esc_attr( $dmd_first_name ); ?>" />
+	</p>
+
+	<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide mb-4">
+		<label for="reg_phone" class="mb-1.5 block text-sm font-semibold text-gray-700">
+			<?php esc_html_e( 'Phone number', 'digital-mudir-dokan' ); ?>&nbsp;<span class="required" aria-hidden="true">*</span>
+		</label>
+		<input type="tel"
+			class="<?php echo esc_attr( dmd_auth_input_class() ); ?>"
+			name="billing_phone"
+			id="reg_phone"
+			autocomplete="tel"
+			required
+			value="<?php echo esc_attr( $dmd_phone ); ?>" />
+	</p>
+	<?php
+}
+add_action( 'woocommerce_register_form', 'dmd_register_form_fields' );
+
+/**
+ * Reject empty name, phone, email or password before the account is created.
+ *
+ * WooCommerce already fails an invalid/empty email and a missing password before
+ * this hook runs; those checks are repeated so the rules hold even if the shop
+ * later flips `woocommerce_registration_generate_password` back on.
+ *
+ * @param string   $username Submitted username.
+ * @param string   $email    Submitted email address.
+ * @param WP_Error $errors   Error collector.
+ */
+function dmd_validate_registration( $username, $email, $errors ) {
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified by WC_Form_Handler::process_registration().
+	$first_name = isset( $_POST['first_name'] ) && is_string( $_POST['first_name'] ) ? sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) : '';
+	$phone      = isset( $_POST['billing_phone'] ) && is_string( $_POST['billing_phone'] ) ? sanitize_text_field( wp_unslash( $_POST['billing_phone'] ) ) : '';
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- passwords must never be sanitized.
+	$password = isset( $_POST['password'] ) && is_string( $_POST['password'] ) ? $_POST['password'] : '';
+	// phpcs:enable
+
+	if ( '' === trim( $first_name ) ) {
+		$errors->add( 'dmd_first_name_error', __( 'Please enter your name.', 'digital-mudir-dokan' ) );
+	}
+
+	if ( '' === trim( $phone ) ) {
+		$errors->add( 'dmd_phone_error', __( 'Please enter your phone number.', 'digital-mudir-dokan' ) );
+	} elseif ( ! preg_match( '/^[0-9+()\-\s]{6,20}$/', $phone ) ) {
+		$errors->add( 'dmd_phone_error', __( 'Please enter a valid phone number.', 'digital-mudir-dokan' ) );
+	}
+
+	if ( '' === $email || ! is_email( $email ) ) {
+		$errors->add( 'dmd_email_error', __( 'Please enter a valid email address.', 'digital-mudir-dokan' ) );
+	}
+
+	if ( '' === $password ) {
+		$errors->add( 'dmd_password_error', __( 'Please create a password for your account.', 'digital-mudir-dokan' ) );
+	}
+}
+add_action( 'woocommerce_register_post', 'dmd_validate_registration', 10, 3 );
+
+/**
+ * Copy the extra registration fields onto the new customer.
+ *
+ * The phone number is stored as `billing_phone` so checkout is pre-filled.
+ *
+ * @param int $customer_id New customer user ID.
+ */
+function dmd_save_registration_fields( $customer_id ) {
+	// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified by WC_Form_Handler::process_registration().
+	$first_name = isset( $_POST['first_name'] ) && is_string( $_POST['first_name'] ) ? sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) : '';
+	$phone      = isset( $_POST['billing_phone'] ) && is_string( $_POST['billing_phone'] ) ? sanitize_text_field( wp_unslash( $_POST['billing_phone'] ) ) : '';
+	// phpcs:enable
+
+	if ( '' !== $first_name ) {
+		update_user_meta( $customer_id, 'first_name', $first_name );
+		update_user_meta( $customer_id, 'billing_first_name', $first_name );
+	}
+
+	if ( '' !== $phone ) {
+		update_user_meta( $customer_id, 'billing_phone', $phone );
+	}
+}
+add_action( 'woocommerce_created_customer', 'dmd_save_registration_fields', 10, 1 );
 
 require DMD_DIR . '/inc/template-functions.php';
 require DMD_DIR . '/inc/template-tags.php';

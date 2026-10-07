@@ -51,6 +51,9 @@ function dmd_wc_hooks() {
 	remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
 	remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
 
+	// Pagination is printed explicitly in archive-product.php.
+	remove_action( 'woocommerce_after_shop_loop', 'woocommerce_pagination', 10 );
+
 	// Loop card is rebuilt in woocommerce/content-product.php.
 	remove_action( 'woocommerce_before_shop_loop_item', 'woocommerce_template_loop_product_link_open', 10 );
 	remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_product_link_close', 5 );
@@ -79,36 +82,75 @@ function dmd_wc_hooks() {
 add_action( 'init', 'dmd_wc_hooks' );
 
 /**
+ * Whether the current request is a product category/tag/attribute archive.
+ *
+ * @return bool
+ */
+function dmd_is_product_tax_archive() {
+	return function_exists( 'is_product_taxonomy' ) && is_product_taxonomy();
+}
+
+/**
+ * Grid column count from Customizer (3 or 4).
+ *
+ * @return int
+ */
+function dmd_get_catalog_columns() {
+	$key  = dmd_is_product_tax_archive() ? 'dmd_category_grid_columns' : 'dmd_shop_grid_columns';
+	$cols = (int) get_theme_mod( $key, 4 );
+
+	return in_array( $cols, array( 3, 4 ), true ) ? $cols : 4;
+}
+
+/**
+ * Products-per-page from Customizer for the current catalog context.
+ *
+ * @return int
+ */
+function dmd_get_catalog_per_page() {
+	$key = dmd_is_product_tax_archive() ? 'dmd_category_products_per_page' : 'dmd_shop_products_per_page';
+
+	return max( 1, (int) get_theme_mod( $key, 12 ) );
+}
+
+/**
  * Products per row on archives.
  *
  * @return int
  */
 function dmd_loop_columns() {
-	if ( is_shop() ) {
-		return (int) get_theme_mod( 'dmd_shop_grid_columns', 4 );
-	}
-	if ( is_product_category() || is_product_tag() ) {
-		return (int) get_theme_mod( 'dmd_category_grid_columns', 4 );
-	}
-	return 4;
+	return dmd_get_catalog_columns();
 }
 add_filter( 'loop_shop_columns', 'dmd_loop_columns', 20 );
 
 /**
  * Products per page on archives.
  *
+ * @param int $per_page Default per page.
  * @return int
  */
-function dmd_loop_per_page( $cols ) {
-	if ( is_shop() ) {
-		return (int) get_theme_mod( 'dmd_shop_products_per_page', 12 );
-	}
-	if ( is_product_category() || is_product_tag() ) {
-		return (int) get_theme_mod( 'dmd_category_products_per_page', 12 );
-	}
-	return 12;
+function dmd_loop_per_page( $per_page ) {
+	return dmd_get_catalog_per_page();
 }
 add_filter( 'loop_shop_per_page', 'dmd_loop_per_page', 20 );
+
+/**
+ * Force Customizer per-page on the main product query (shop + tax archives).
+ *
+ * @param WP_Query $q Product query.
+ */
+function dmd_product_query_per_page( $q ) {
+	$product_taxonomies = get_object_taxonomies( 'product', 'names' );
+
+	if ( ! empty( $product_taxonomies ) && $q->is_tax( $product_taxonomies ) ) {
+		$per_page = max( 1, (int) get_theme_mod( 'dmd_category_products_per_page', 12 ) );
+	} else {
+		$per_page = max( 1, (int) get_theme_mod( 'dmd_shop_products_per_page', 12 ) );
+	}
+
+	$q->set( 'posts_per_page', $per_page );
+}
+add_action( 'woocommerce_product_query', 'dmd_product_query_per_page' );
 
 /**
  * Icon arrows on shop pagination.
@@ -117,11 +159,45 @@ add_filter( 'loop_shop_per_page', 'dmd_loop_per_page', 20 );
  * @return array
  */
 function dmd_pagination_args( $args ) {
-	$args['prev_text'] = dmd_icon( 'chevron-l', 16 );
-	$args['next_text'] = dmd_icon( 'chevron-r', 16 );
+	$args['prev_text'] = '&larr;';
+	$args['next_text'] = '&rarr;';
+	$args['type']      = 'list';
+	$args['end_size']  = 2;
+	$args['mid_size']  = 2;
 	return $args;
 }
 add_filter( 'woocommerce_pagination_args', 'dmd_pagination_args' );
+
+/**
+ * Catalog pagination for shop and product taxonomies.
+ */
+function dmd_woo_pagination() {
+	global $wp_query;
+
+	$total = isset( $wp_query->max_num_pages ) ? (int) $wp_query->max_num_pages : 0;
+	$current = max( 1, get_query_var( 'paged' ) );
+
+	if ( $total <= 1 ) {
+		return;
+	}
+
+	echo '<div class="dmd-woo-pagination mt-10 flex justify-center">';
+	
+	// Testing native paginate_links as a fallback
+	echo paginate_links( array(
+		'base'      => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) ),
+		'format'    => '?paged=%#%',
+		'current'   => $current,
+		'total'     => $total,
+		'prev_text' => '&larr;',
+		'next_text' => '&rarr;',
+		'type'      => 'list',
+		'end_size'  => 2,
+		'mid_size'  => 2,
+	) );
+	
+	echo '</div>';
+}
 
 /**
  * Product thumbnail placeholder size.
@@ -282,7 +358,7 @@ function dmd_order_now_button( $product = null, $classes = '' ) {
 	);
 
 	printf(
-		'<a href="%1$s" class="dmd-btn dmd-btn--primary %2$s" data-dmd-order-now="%3$d" rel="nofollow">%4$s</a>',
+		'<a href="%1$s" class="dmd-btn dmd-btn--primary dmd-direct-checkout-btn %2$s" data-dmd-order-now="%3$d" rel="nofollow">%4$s</a>',
 		esc_url( $url ),
 		esc_attr( $classes ),
 		(int) $product->get_id(),
@@ -320,7 +396,27 @@ function dmd_handle_order_now() {
 		$quantity = max( 1, absint( wp_unslash( $_GET['quantity'] ) ) );
 	}
 
-	WC()->cart->add_to_cart( $product_id, $quantity );
+	// Variable products carry the chosen variation and its attribute values in
+	// the query string, mirroring WC_Form_Handler::add_to_cart_action().
+	$variation_id = 0;
+	$variations   = array();
+
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( isset( $_GET['variation_id'] ) ) {
+		$variation_id = absint( wp_unslash( $_GET['variation_id'] ) );
+	}
+
+	if ( $variation_id ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		foreach ( $_GET as $dmd_key => $dmd_value ) {
+			if ( 'attribute_' !== substr( $dmd_key, 0, 10 ) ) {
+				continue;
+			}
+			$variations[ sanitize_title( wp_unslash( $dmd_key ) ) ] = wc_clean( wp_unslash( $dmd_value ) );
+		}
+	}
+
+	WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variations );
 
 	wp_safe_redirect( wc_get_checkout_url() );
 	exit;
@@ -539,20 +635,3 @@ function dmd_ajax_live_search() {
 	wp_send_json_success( $output );
 }
 add_action( 'wp_ajax_dmd_live_search', 'dmd_ajax_live_search' );
-/**
- * Set products per page based on customizer settings.
- */
-function dmd_pre_get_posts_query( $query ) {
-    if ( is_admin() || ! $query->is_main_query() ) {
-        return;
-    }
-
-    if ( is_shop() ) {
-        $products_per_page = get_theme_mod( 'dmd_shop_products_per_page', 12 );
-        $query->set( 'posts_per_page', $products_per_page );
-    } elseif ( is_product_category() ) {
-        $products_per_page = get_theme_mod( 'dmd_category_products_per_page', 12 );
-        $query->set( 'posts_per_page', $products_per_page );
-    }
-}
-add_action( 'pre_get_posts', 'dmd_pre_get_posts_query' );

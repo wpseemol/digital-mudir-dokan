@@ -7,14 +7,14 @@
    ------------------------------------------------------------------ */
 @layer base {
     :root {
-        --dmd-green: #113D21;
+        --dmd-green: #113d21;
         --dmd-green-dark: #058a36;
         --dmd-green-soft: #e8f8ee;
         --dmd-ink: #1b1b1b;
         --dmd-muted: #6b7280;
         --dmd-surface: #f3f5f7;
         --dmd-line: #e6e9ec;
-        --dmd-sale: #113D21;
+        --dmd-sale: #113d21;
         --dmd-radius: 8px;
         --dmd-container: 1200px;
     }
@@ -158,7 +158,6 @@
         @apply absolute top-2 left-2 z-10 bg-emerald-700 text-white text-xs font-bold px-2.5 py-1 rounded-full !m-0;
     }
 
-
     /* ---------- Forms ---------- */
     .dmd-field {
         @apply w-full rounded-md border border-line bg-white px-3.5 py-2.5 text-sm text-ink
@@ -214,7 +213,7 @@
     .add_to_cart_button {
         @apply dmd-btn dmd-btn--primary !text-white;
     }
-    
+
     .woocommerce a.button:hover,
     .woocommerce button.button:hover,
     .woocommerce input.button:hover,
@@ -323,12 +322,13 @@
         @apply transition-all duration-300;
     }
 
+    /* Column counts come from Customizer via PHP (lg:grid-cols-3|4). */
     #dmd-archive-products.list-view {
-        @apply grid-cols-1 gap-4;
+        @apply !grid-cols-1 md:!grid-cols-1 lg:!grid-cols-1 gap-4;
     }
-    
+
     #dmd-archive-products.grid-view {
-        @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6;
+        @apply grid gap-4 md:gap-6;
     }
 
     /* Grid/List Card Visibility */
@@ -345,134 +345,29 @@
         @apply flex;
     }
 
-    /* Pagination Styling */
-    .woocommerce-pagination ul {
-        @apply inline-flex gap-2 justify-center my-8 list-none p-0;
-    }
-    .woocommerce-pagination ul li {
-        @apply list-none;
-    }
-    .woocommerce-pagination .page-numbers {
-        @apply bg-white border border-gray-200 text-gray-700 rounded-lg px-4 py-2 hover:bg-emerald-50 transition;
-    }
-    .woocommerce-pagination .page-numbers.current {
-        @apply bg-emerald-700 text-white font-bold rounded-lg px-4 py-2;
-    }
-
-
-    /* 
-    ul.products.columns-2 {
-        @apply sm:grid-cols-2;
-    }
-    ul.products.columns-3 {
-        @apply sm:grid-cols-2 lg:grid-cols-3;
-    }
-    ul.products.columns-4 {
-        @apply sm:grid-cols-2 lg:grid-cols-4;
-    }
-    ul.products.columns-5 {
-        @apply sm:grid-cols-3 lg:grid-cols-5;
-    }
-    */
-
-    .woocommerce-result-count {
-        @apply m-0 text-sm text-muted;
-    }
-    .woocommerce-ordering {
-        @apply m-0;
-    }
-    .woocommerce-ordering select {
-        @apply bg-white border border-gray-300 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600;
-    }
-
-    /* Category widget / list */
-    .dmd-shop-sidebar ul {
-        @apply m-0 list-none space-y-1.5 p-0 text-sm;
-    }
-    .dmd-shop-sidebar ul ul {
-        @apply mt-1.5 space-y-1.5 border-l border-line pl-3;
-    }
-    .dmd-shop-sidebar li {
-        @apply list-none;
-    }
-    .dmd-shop-sidebar li.current-cat > a {
-        @apply font-semibold text-green;
-    }
-    .dmd-shop-sidebar .count {
-        @apply text-muted;
-    }
-
-    /* Price */
-    .price {
-        @apply font-semibold text-green;
-    }
-    .price del {
-        @apply mr-1.5 font-normal text-muted line-through;
-    }
-    .price ins {
-        @apply no-underline;
-    }
-
-    /* Star rating.
-     WooCommerce draws these with its bundled "star" icon font, which lives in
-     the stylesheet we dequeue. These rules redraw the same widget with plain
-     text stars so ratings never fall back to stray letters. */
-    .star-rating {
-        @apply relative inline-block overflow-hidden whitespace-nowrap font-normal;
-        width: 5.4em;
-        height: 1.3em;
-        line-height: 1.3;
-        letter-spacing: 0.08em;
-        font-family: inherit;
-    }
-    .star-rating::before {
-        @apply absolute left-0 top-0 text-line;
-        content: "\2605\2605\2605\2605\2605";
-    }
-    .star-rating span {
-        @apply absolute left-0 top-0 overflow-hidden;
-        padding-top: 1.5em;
-    }
-    .star-rating span::before {
-        @apply absolute left-0 top-0;
-        content: "\2605\2605\2605\2605\2605";
-        color: #f5a623;
-    }
-    .woocommerce-product-rating {
-        @apply flex items-center gap-2 text-sm;
-    }
-    .woocommerce-review-link {
-        @apply text-muted;
-    }
-
-    /* Tabs */
-    .woocommerce-tabs ul.tabs {
-        @apply flex flex-wrap gap-1 border-b border-line p-0 m-0 list-none;
-    }
-    .woocommerce-tabs ul.tabs li {
-        @apply list-none;
-    }
-    .woocommerce-tabs ul.tabs li a {
-        @apply block rounded-t-md px-4 py-2.5 text-sm font-medium text-muted;
-    }
-    .woocommerce-tabs ul.tabs li.active a {
-        @apply bg-white text-green border-b-2 border-green;
-    }
-    .woocommerce-Tabs-panel {
-        @apply py-6;
-    }
-
     /* Pagination */
+    .woocommerce-pagination,
+    .dmd-woo-pagination {
+        @apply w-full flex justify-center mt-10;
+    }
     .woocommerce-pagination ul.page-numbers,
-    .dmd-pagination .nav-links {
+    .dmd-woo-pagination ul.page-numbers {
         @apply flex flex-wrap items-center justify-center gap-2 p-0 m-0 list-none;
     }
-    .page-numbers {
-        @apply inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-line px-3 text-sm;
+    .woocommerce-pagination .page-numbers:is(a, span),
+    .dmd-woo-pagination .page-numbers:is(a, span) {
+        @apply inline-flex h-10 min-w-10 items-center justify-center rounded-md border border-line px-3 text-sm transition-colors;
     }
-    .page-numbers.current,
-    .page-numbers:hover {
-        @apply border-green bg-green text-white;
+
+    /* Ensure hover effects only apply to the specific link, and override global a:hover */
+    .woocommerce-pagination .page-numbers:is(a, span):hover,
+    .dmd-woo-pagination .page-numbers:is(a, span):hover {
+        @apply !border-green !bg-green !text-white;
+    }
+
+    .woocommerce-pagination .page-numbers.current,
+    .dmd-woo-pagination .page-numbers.current {
+        @apply !border-green !bg-green !text-white font-bold;
     }
 
     /* Cart + checkout tables */
@@ -608,6 +503,167 @@
         @apply border-green opacity-100;
     }
 
+    /* ------------------------------------------------------------------
+     Single product — variable selection.
+
+     The default table wrapper is replaced by a stacked flex layout, but the
+     `.variations` class stays: the variation script scopes itself with
+     `.variations select`, `.reset_variations` and `.single_variation_wrap`.
+     ------------------------------------------------------------------ */
+    .single-product .variations_form .variations {
+        @apply m-0 flex flex-col gap-5 border-0 p-0;
+    }
+
+    .single-product .variations_form .variations select {
+        @apply w-full max-w-xs rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800
+           shadow-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600;
+    }
+
+    /* The variation script reveals this by toggling inline visibility, so the
+       default has to be hidden. */
+    .single-product .variations_form .reset_variations {
+        visibility: hidden;
+        @apply text-xs font-medium text-muted underline underline-offset-2 hover:text-green;
+    }
+
+    /* Price + stock that WooCommerce injects once a variation matches. */
+    .single-product .single_variation:not(:empty) {
+        @apply mb-4 rounded-xl border border-gray-100 bg-surface px-4 py-3;
+    }
+
+    .single-product .woocommerce-variation-price,
+    .single-product .woocommerce-variation-price .price,
+    .single-product .woocommerce-variation-price p {
+        @apply m-0 text-xl font-bold text-emerald-800;
+    }
+
+    .single-product .woocommerce-variation-availability {
+        @apply mt-1 text-sm font-medium text-muted;
+    }
+
+    .single-product .woocommerce-variation-availability p {
+        @apply m-0;
+    }
+
+    .single-product .woocommerce-variation-availability .stock.in-stock {
+        @apply text-emerald-700;
+    }
+
+    .single-product .woocommerce-variation-availability .stock.out-of-stock {
+        @apply text-red-600;
+    }
+
+    /* Quantity sits directly above the action buttons. */
+    .single-product .woocommerce-variation-add-to-cart {
+        @apply flex flex-col gap-3;
+    }
+
+    .single-product .woocommerce-variation-add-to-cart .quantity {
+        @apply mb-0;
+    }
+
+    .single-product .single_add_to_cart_button {
+        @apply !bg-emerald-800 !text-white hover:!bg-emerald-900;
+    }
+
+    /* ---------- Variable product chips ---------- */
+
+    /* Applied by the script once the chips are built, so the native select
+       stays the control when JavaScript is unavailable. */
+    .dmd-variation-native {
+        display: none;
+    }
+
+    .dmd-variation-chips:not([hidden]) {
+        @apply flex flex-wrap gap-2;
+    }
+
+    .dmd-variation-chip {
+        @apply inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white
+           px-3 py-1.5 text-sm text-ink transition hover:border-emerald-700 active:bg-emerald-700 active:text-white;
+    }
+
+    .dmd-variation-chip.is-active {
+        @apply border-emerald-700 bg-emerald-700 text-white;
+    }
+
+    .dmd-variation-chip.is-unavailable {
+        @apply cursor-not-allowed opacity-40;
+    }
+
+    /* ---------- My account tabs ---------- */
+
+    .dmd-tab {
+        @apply inline-flex cursor-pointer items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold
+           text-muted transition hover:text-emerald-700;
+    }
+
+    .dmd-tab.is-active {
+        @apply bg-white text-emerald-800 shadow-sm;
+    }
+
+    .dmd-tab-panel {
+        animation: dmd-panel-in 0.25s ease;
+    }
+
+    @keyframes dmd-panel-in {
+        from {
+            opacity: 0;
+            transform: translateY(0.375rem);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ---------- Password visibility toggle ---------- */
+
+    /* WooCommerce's script wraps every `.woocommerce-Input[type="password"]` in
+       a `.password-input` span and appends a `.show-password-input` button. Its
+       own stylesheet (woocommerce-layout.css) is dequeued, so the button
+       position and the eye icons are redrawn here. The icons keep WooCommerce's
+       dark fill, which matches `text-ink` on the white card.
+
+       The dots in the SVG namespace are percent-encoded so the safelist audit
+       does not read the namespace host as a class name. Browsers decode the
+       whole data URI before parsing the SVG, so the namespace still resolves. */
+    .woocommerce form .password-input {
+        @apply relative flex flex-col justify-center;
+    }
+
+    .woocommerce form .password-input input[type="password"] {
+        padding-right: 2.75rem;
+    }
+
+    /* Drop Edge's own reveal control so there is only one toggle. */
+    .woocommerce form .password-input input::-ms-reveal {
+        display: none;
+    }
+
+    .woocommerce form .show-password-input {
+        @apply absolute right-3 top-1/2 m-0 cursor-pointer border-0 bg-transparent p-0;
+        transform: translateY(-50%);
+        font-size: inherit;
+        line-height: inherit;
+    }
+
+    .woocommerce form .show-password-input::before {
+        content: "";
+        display: block;
+        /* Matches the icon's intrinsic size, so the build's SVG optimiser
+           dropping `viewBox` cannot affect scaling. */
+        width: 20px;
+        height: 20px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www%2Ew3%2Eorg/2000/svg'%3E%3Cpath d='M17.3 3.3C16.9 2.9 16.2 2.9 15.7 3.3L13.3 5.7C12.2437 5.3079 11.1267 5.1048 10 5.1C6.2 5.2 2.8 7.2 1 10.5C1.2 10.9 1.5 11.3 1.8 11.7C2.6 12.8 3.6 13.7 4.7 14.4L3 16.1C2.6 16.5 2.5 17.2 3 17.7C3.4 18.1 4.1 18.2 4.6 17.7L17.3 4.9C17.7 4.4 17.7 3.7 17.3 3.3ZM6.7 12.3L5.4 13.6C4.2 12.9 3.1 11.9 2.3 10.7C3.5 9 5.1 7.8 7 7.2C5.7 8.6 5.6 10.8 6.7 12.3ZM10.1 9C9.6 8.5 9.7 7.7 10.2 7.2C10.7 6.8 11.4 6.8 11.9 7.2L10.1 9ZM18.3 9.5C17.8 8.8 17.2 8.1 16.5 7.6L15.5 8.6C16.3 9.2 17 9.9 17.6 10.8C15.9 13.4 13 15 9.9 15H9.1L8.1 16C8.8 15.9 9.4 16 10 16C13.3 16 16.4 14.4 18.3 11.7C18.6 11.3 18.8 10.9 19.1 10.5C18.8 10.2 18.6 9.8 18.3 9.5ZM14 10L10 14C12.2 14 14 12.2 14 10Z' fill='%23111111'/%3E%3C/svg%3E");
+    }
+
+    .woocommerce form .show-password-input.display-password::before {
+        background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www%2Ew3%2Eorg/2000/svg'%3E%3Cpath d='M18.3 9.49999C15 4.89999 8.50002 3.79999 3.90002 7.19999C2.70002 8.09999 1.70002 9.29999 0.900024 10.6C1.10002 11 1.40002 11.4 1.70002 11.8C5.00002 16.4 11.3 17.4 15.9 14.2C16.8 13.5 17.6 12.8 18.3 11.8C18.6 11.4 18.8 11 19.1 10.6C18.8 10.2 18.6 9.79999 18.3 9.49999ZM10.1 7.19999C10.6 6.69999 11.4 6.69999 11.9 7.19999C12.4 7.69999 12.4 8.49999 11.9 8.99999C11.4 9.49999 10.6 9.49999 10.1 8.99999C9.60003 8.49999 9.60003 7.69999 10.1 7.19999ZM10 14.9C6.90002 14.9 4.00002 13.3 2.30002 10.7C3.50002 8.99999 5.10002 7.79999 7.00002 7.19999C6.30002 7.99999 6.00002 8.89999 6.00002 9.89999C6.00002 12.1 7.70002 14 10 14C12.2 14 14.1 12.3 14.1 9.99999V9.89999C14.1 8.89999 13.7 7.89999 13 7.19999C14.9 7.79999 16.5 8.99999 17.7 10.7C16 13.3 13.1 14.9 10 14.9Z' fill='%23111111'/%3E%3C/svg%3E");
+    }
+
     /* Prose (post + product description content) */
     .dmd-prose {
         @apply text-[15px] leading-[1.85] text-ink;
@@ -731,4 +787,25 @@
 .bypostauthor > .comment-body {
     border-left: 3px solid var(--dmd-green);
     padding-left: 12px;
+}
+
+/* ------------------------------------------------------------------
+   Related / up-sells grids.
+
+   WooCommerce's legacy layout rules float these items and cut their width,
+   which makes the cards overlap. Grid is enforced here with a plain rule so
+   it wins over any plugin stylesheet that loads after the theme build.
+   ------------------------------------------------------------------ */
+.single-product .related ul.products,
+.single-product .upsells ul.products {
+    display: grid !important;
+    float: none !important;
+    width: 100% !important;
+}
+
+.single-product .related ul.products li.product,
+.single-product .upsells ul.products li.product {
+    float: none !important;
+    width: 100% !important;
+    margin: 0 !important;
 }
