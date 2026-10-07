@@ -1,0 +1,16 @@
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary
+
+# Development files left out of `npm run zip` (git archive).
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/AGENTS.md export-ignore
+/GEMINI.md export-ignore
+/README.md export-ignore
+/package.json export-ignore
+/package-lock.json export-ignore
+/tailwind.config.js export-ignore
+/tools export-ignore
+/assets/css/tailwind.src.css export-ignore

@@ -1,13 +1,13 @@
 === Digital Mudir Dokan ===
 
 Contributors: organicusers
-Requires at least: 6.0
-Tested up to: 6.7
+Requires at least: 6.4
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GNU General Public License v2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Tags: e-commerce, grocery, woocommerce, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, rtl-language-support
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Tags: e-commerce, grocery, woocommerce, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, theme-options
 
 A WooCommerce-first theme for grocery and organic food shops, built with Tailwind CSS and semantic HTML5.
 
@@ -23,7 +23,7 @@ copy, so mixed-script product names and prices set correctly without extra work.
 
 Features:
 
-* Hero slider with up to four slides, managed in the Customizer. Autoplay pauses
+* Hero slider with up to five slides, managed in the Customizer. Autoplay pauses
   on hover, on keyboard focus and when the tab is hidden, and is skipped entirely
   for visitors who prefer reduced motion. Without JavaScript the slider degrades
   to a horizontal snap scroller, so every slide stays reachable.
@@ -39,6 +39,12 @@ Features:
   automatically when Yoast, Rank Math, SEOPress or AIOSEO is active.
 * Semantic HTML5 landmarks throughout, a skip link, visible keyboard focus and
   labelled navigation regions.
+* A "Mudir Dokan" admin dashboard with a setup checklist, one-click creation of
+  the About, Contact, All categories and policy pages, and settings for those
+  pages, shop rules (minimum order, free-delivery progress bar, simplified
+  checkout, WhatsApp ordering, low-stock warning), maintenance mode and
+  Google Analytics 4 / Meta Pixel tracking.
+* Full-width live product search with categories, images and prices.
 
 == Installation ==
 
@@ -100,6 +106,14 @@ Tailwind CSS is a build-time dependency only and is not redistributed in the
 theme. Tailwind CSS is licensed MIT, Copyright Tailwind Labs Inc.
 
 == Changelog ==
+
+= 1.1.0 =
+* Added the Mudir Dokan admin dashboard, About and Contact page templates, and
+  the shop, maintenance and analytics options.
+* Live search now works for logged-out visitors and spans the header width.
+* Search results use a full-width grid with a slide-out filter panel.
+* Homepage sections are all configurable in the Customizer.
+* Security, accessibility and performance fixes from a pre-release audit.
 
 = 1.0.0 =
 * Initial release.

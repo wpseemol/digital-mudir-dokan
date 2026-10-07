@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DMD_VERSION', '1.0.0' );
+define( 'DMD_VERSION', '1.1.0' );
 define( 'DMD_DIR', get_template_directory() );
 define( 'DMD_URI', get_template_directory_uri() );
 
