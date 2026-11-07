@@ -1,6 +1,6 @@
-/* 
- * Forced WooCommerce overrides
- * These styles are loaded with high priority to ensure they override WooCommerce defaults.
+/*
+ * Forced WooCommerce overrides + cart/checkout page themes.
+ * Themes are selected in Mudir Dokan → Shop & checkout.
  */
 
 .woocommerce-cart .wc-proceed-to-checkout a.checkout-button,
@@ -18,7 +18,184 @@
   visibility: visible !important;
 }
 
-/* Ensure currency symbol is treated correctly */
 .woocommerce-Price-amount {
   display: inline-block !important;
+}
+
+/* ------------------------------------------------------------------
+   Shared cart / checkout shell
+   ------------------------------------------------------------------ */
+.dmd-cart-theme-classic .wp-block-woocommerce-cart,
+.dmd-checkout-theme-classic .wp-block-woocommerce-checkout,
+.dmd-cart-theme-compact .wp-block-woocommerce-cart,
+.dmd-checkout-theme-compact .wp-block-woocommerce-checkout,
+.dmd-cart-theme-market .wp-block-woocommerce-cart,
+.dmd-checkout-theme-market .wp-block-woocommerce-checkout {
+  --dmd-cc-radius: 12px;
+  --dmd-cc-border: #e5e7eb;
+  --dmd-cc-surface: #ffffff;
+  --dmd-cc-muted: #6b7280;
+  --dmd-cc-accent: #113d21;
+}
+
+.dmd-cart-theme-classic .wc-block-cart__main,
+.dmd-cart-theme-classic .wc-block-cart__sidebar,
+.dmd-checkout-theme-classic .wc-block-checkout__main,
+.dmd-checkout-theme-classic .wc-block-checkout__sidebar,
+.dmd-cart-theme-classic .dmd-cart .woocommerce-cart-form,
+.dmd-cart-theme-classic .dmd-cart .cart-collaterals .cart_totals {
+  background: var(--dmd-cc-surface);
+  border: 1px solid var(--dmd-cc-border);
+  border-radius: var(--dmd-cc-radius);
+  padding: 1.25rem;
+}
+
+/* ------------------------------------------------------------------
+   Compact — denser list, soft gray panels
+   ------------------------------------------------------------------ */
+.dmd-cart-theme-compact,
+.dmd-checkout-theme-compact {
+  --dmd-cc-radius: 8px;
+  --dmd-cc-border: #e8ebe9;
+  --dmd-cc-surface: #f6f7f6;
+  --dmd-cc-accent: #0f3a22;
+}
+
+.dmd-cart-theme-compact .wp-block-woocommerce-cart,
+.dmd-checkout-theme-compact .wp-block-woocommerce-checkout {
+  gap: 1rem !important;
+}
+
+.dmd-cart-theme-compact .wc-block-cart-items,
+.dmd-cart-theme-compact .wc-block-cart__sidebar,
+.dmd-checkout-theme-compact .wc-block-components-checkout-step,
+.dmd-checkout-theme-compact .wc-block-checkout__sidebar,
+.dmd-cart-theme-compact .dmd-cart .woocommerce-cart-form > div,
+.dmd-cart-theme-compact .dmd-cart .cart-collaterals .cart_totals {
+  background: #fff;
+  border: 1px solid var(--dmd-cc-border);
+  border-radius: var(--dmd-cc-radius);
+  box-shadow: none;
+  padding: 0.85rem 1rem;
+}
+
+.dmd-cart-theme-compact .wc-block-cart-items__header,
+.dmd-cart-theme-compact .shop_table thead th {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dmd-cc-muted);
+}
+
+.dmd-cart-theme-compact .wc-block-cart-items__row,
+.dmd-cart-theme-compact .shop_table td {
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.dmd-cart-theme-compact .wc-block-components-product-image,
+.dmd-cart-theme-compact .product-thumbnail img {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 6px;
+}
+
+.dmd-cart-theme-compact .wc-block-cart__submit-button,
+.dmd-checkout-theme-compact .wc-block-components-checkout-place-order-button,
+.dmd-cart-theme-compact .checkout-button {
+  border-radius: 999px !important;
+  padding: 0.75rem 1.25rem !important;
+  font-size: 0.95rem !important;
+}
+
+.dmd-checkout-theme-compact .wc-block-components-checkout-step__title {
+  font-size: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.dmd-checkout-theme-compact .wc-block-components-text-input input,
+.dmd-checkout-theme-compact .wc-block-components-combobox input {
+  border-radius: 6px !important;
+  min-height: 2.5rem;
+}
+
+/* ------------------------------------------------------------------
+   Market — grocery feel, green accents, roomy cards
+   ------------------------------------------------------------------ */
+.dmd-cart-theme-market,
+.dmd-checkout-theme-market {
+  --dmd-cc-radius: 16px;
+  --dmd-cc-border: #d7e5db;
+  --dmd-cc-surface: #f3f8f4;
+  --dmd-cc-accent: #113d21;
+}
+
+.dmd-cart-theme-market .bg-surface.py-6,
+.dmd-checkout-theme-market .bg-surface.py-6 {
+  background: linear-gradient(180deg, #e8f3eb 0%, #f8faf8 100%) !important;
+}
+
+.dmd-cart-theme-market .wc-block-cart__main,
+.dmd-cart-theme-market .wc-block-cart__sidebar,
+.dmd-checkout-theme-market .wc-block-checkout__main > *,
+.dmd-checkout-theme-market .wc-block-checkout__sidebar,
+.dmd-cart-theme-market .dmd-cart .woocommerce-cart-form > div,
+.dmd-cart-theme-market .dmd-cart .cart-collaterals .cart_totals,
+.dmd-checkout-theme-market .dmd-checkout-details > section,
+.dmd-checkout-theme-market .dmd-order-review {
+  background: #fff;
+  border: 1px solid var(--dmd-cc-border);
+  border-radius: var(--dmd-cc-radius);
+  box-shadow: 0 10px 30px -18px rgba(17, 61, 33, 0.35);
+  padding: 1.5rem;
+}
+
+.dmd-cart-theme-market .wc-block-components-product-image img,
+.dmd-cart-theme-market .product-thumbnail img {
+  border-radius: 12px;
+  border: 1px solid var(--dmd-cc-border);
+}
+
+.dmd-cart-theme-market .wc-block-components-product-name,
+.dmd-cart-theme-market .product-name a {
+  color: var(--dmd-cc-accent) !important;
+  font-weight: 600;
+}
+
+.dmd-cart-theme-market .wc-block-cart__submit-button,
+.dmd-checkout-theme-market .wc-block-components-checkout-place-order-button,
+.dmd-cart-theme-market .checkout-button,
+.dmd-checkout-theme-market #place_order {
+  background: var(--dmd-cc-accent) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 18px -10px rgba(17, 61, 33, 0.7);
+  font-size: 1.05rem !important;
+  padding: 0.95rem 1.4rem !important;
+}
+
+.dmd-checkout-theme-market .wc-block-components-checkout-step__title,
+.dmd-cart-theme-market .wc-block-components-title,
+.dmd-cart-theme-market .cart_totals h2 {
+  color: var(--dmd-cc-accent) !important;
+  font-family: inherit;
+  font-weight: 700 !important;
+}
+
+.dmd-checkout-theme-market .wc-block-components-radio-control-accordion-option,
+.dmd-checkout-theme-market .wc-block-components-radio-control__option {
+  border: 1px solid var(--dmd-cc-border) !important;
+  border-radius: 12px !important;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem 1rem !important;
+}
+
+.dmd-checkout-theme-market .wc-block-components-radio-control__option-checked {
+  border-color: var(--dmd-cc-accent) !important;
+  background: #f0f7f2;
+}
+
+.dmd-cart-theme-market .dmd-cart-empty,
+.dmd-cart-theme-compact .dmd-cart-empty {
+  border-color: var(--dmd-cc-border);
+  background: #fff;
 }
