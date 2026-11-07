@@ -189,15 +189,14 @@ function dmd_cart_checkout_i18n_map() {
 
 	// Extra variants WooCommerce uses interchangeably.
 	$extras = array(
-		'Place order'          => 'checkout_label_place_order',
-		'PLACE ORDER'          => 'checkout_label_place_order',
-		'Coupon code'          => 'cart_label_coupon_placeholder',
-		'Apply coupon'         => 'cart_label_apply_coupon',
-		'Your cart is empty'   => 'cart_empty_title',
-		'Return to cart'       => 'cart_label_proceed',
-		'Phone'                => 'checkout_label_phone',
-		'State'                => 'checkout_label_state',
-		'Postcode / ZIP'       => 'checkout_label_postcode',
+		'Place order'                       => 'checkout_label_place_order',
+		'PLACE ORDER'                       => 'checkout_label_place_order',
+		'Coupon code'                       => 'cart_label_coupon_placeholder',
+		'Apply coupon'                      => 'cart_label_apply_coupon',
+		'Your cart is empty'                => 'cart_empty_title',
+		'Phone'                             => 'checkout_label_phone',
+		'State'                             => 'checkout_label_state',
+		'Postcode / ZIP'                    => 'checkout_label_postcode',
 		'Apartment, suite, etc. (optional)' => 'checkout_label_address_2',
 	);
 	foreach ( $extras as $source => $key ) {
