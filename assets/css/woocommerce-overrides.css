@@ -94,15 +94,39 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-/* Floating labels act as placeholders — keep them muted and readable */
+/*
+ * Outlined floating labels — empty = muted placeholder inside;
+ * filled/focused = label sits on the top border with a cutout (Material style).
+ */
+.dmd-checkout-theme-classic .wc-block-components-text-input,
+.dmd-checkout-theme-compact .wc-block-components-text-input,
+.dmd-checkout-theme-market .wc-block-components-text-input {
+  --dmd-float-label-bg: #ffffff;
+  overflow: visible;
+}
+
+.dmd-checkout-theme-classic .wc-block-components-checkout-step__content,
+.dmd-checkout-theme-compact .wc-block-components-checkout-step__content,
+.dmd-checkout-theme-market .wc-block-components-checkout-step__content {
+  overflow: visible;
+  padding-top: 0.35rem;
+}
+
+.dmd-checkout-theme-compact .wc-block-components-text-input {
+  --dmd-float-label-bg: #f3f5f4;
+}
+
 .dmd-checkout-theme-classic .wc-block-components-text-input label,
 .dmd-checkout-theme-compact .wc-block-components-text-input label,
 .dmd-checkout-theme-market .wc-block-components-text-input label,
 .dmd-cart-theme-classic .wc-block-components-text-input label,
 .dmd-cart-theme-compact .wc-block-components-text-input label,
 .dmd-cart-theme-market .wc-block-components-text-input label {
-  color: #aeb6bf !important;
+  color: #a8b0b8 !important;
   font-weight: 400 !important;
+  z-index: 1;
+  pointer-events: none;
+  transition: color 0.15s ease, top 0.15s ease, transform 0.15s ease, background-color 0.15s ease, padding 0.15s ease;
 }
 
 .dmd-checkout-theme-classic .wc-block-components-text-input.is-active label,
@@ -111,7 +135,20 @@
 .dmd-cart-theme-classic .wc-block-components-text-input.is-active label,
 .dmd-cart-theme-compact .wc-block-components-text-input.is-active label,
 .dmd-cart-theme-market .wc-block-components-text-input.is-active label {
-  color: #b8c0c8 !important;
+  top: 0 !important;
+  left: 0.7rem !important;
+  transform: translateY(-50%) scale(0.82) !important;
+  transform-origin: left center !important;
+  background: var(--dmd-float-label-bg, #fff) !important;
+  padding: 0 0.4rem !important;
+  line-height: 1.1 !important;
+  max-width: calc(100% - 1.5rem);
+  color: #9aa3ad !important;
+}
+
+.dmd-checkout-theme-compact .wc-block-components-text-input.is-active input:focus + label,
+.dmd-checkout-theme-compact .wc-block-components-text-input.is-active input:focus-visible + label {
+  background: #ffffff !important;
 }
 
 .dmd-checkout-theme-classic .wc-block-components-text-input input::placeholder,
@@ -123,16 +160,8 @@
 .dmd-checkout-theme-classic .dmd-field::placeholder,
 .dmd-checkout-theme-compact .dmd-field::placeholder,
 .dmd-checkout-theme-market .dmd-field::placeholder {
-  color: #aeb6bf !important;
+  color: #a8b0b8 !important;
   opacity: 1;
-}
-
-/* Room for floating label above the typed value */
-.dmd-checkout-theme-classic .wc-block-components-text-input input,
-.dmd-checkout-theme-compact .wc-block-components-text-input input,
-.dmd-checkout-theme-market .wc-block-components-text-input input {
-  padding-top: 1.35rem !important;
-  padding-bottom: 0.45rem !important;
 }
 
 /* Classic inputs — flat white, clear border */
@@ -153,11 +182,6 @@
   background: #ffffff !important;
   box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04) !important;
   padding: 0.65rem 0.9rem !important;
-}
-
-.dmd-checkout-theme-classic .wc-block-components-text-input input {
-  padding-top: 1.35rem !important;
-  padding-bottom: 0.45rem !important;
 }
 
 .dmd-checkout-theme-classic .wc-block-components-text-input.is-active input,
@@ -252,11 +276,6 @@
   padding: 0.55rem 1rem !important;
 }
 
-.dmd-checkout-theme-compact .wc-block-components-text-input input {
-  padding-top: 1.35rem !important;
-  padding-bottom: 0.45rem !important;
-}
-
 .dmd-checkout-theme-compact .select2-container .select2-selection--single,
 .dmd-checkout-theme-compact .woocommerce form select {
   min-height: 3rem;
@@ -345,17 +364,62 @@
   font-weight: 700 !important;
 }
 
-.dmd-checkout-theme-market .wc-block-components-radio-control-accordion-option,
+/* Market radios — keep WC left gutter so the circle does not overlap text */
 .dmd-checkout-theme-market .wc-block-components-radio-control__option {
   border: 1px solid var(--dmd-cc-border) !important;
   border-radius: 12px !important;
   margin-bottom: 0.5rem;
-  padding: 0.75rem 1rem !important;
+  padding: 0.9rem 1rem 0.9rem 3rem !important;
+  box-shadow: none !important;
 }
 
-.dmd-checkout-theme-market .wc-block-components-radio-control__option-checked {
+.dmd-checkout-theme-market .wc-block-components-radio-control-accordion-option {
+  border: 1px solid var(--dmd-cc-border) !important;
+  border-radius: 12px !important;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+  box-shadow: none !important;
+}
+
+.dmd-checkout-theme-market .wc-block-components-radio-control-accordion-option .wc-block-components-radio-control__option {
+  border: 0 !important;
+  border-radius: 0 !important;
+  margin-bottom: 0 !important;
+  background: transparent !important;
+}
+
+.dmd-checkout-theme-market .wc-block-components-radio-control__option-checked,
+.dmd-checkout-theme-market .wc-block-components-radio-control-accordion-option--checked-option-highlighted {
   border-color: var(--dmd-cc-accent) !important;
   background: #f0f7f2;
+}
+
+.dmd-checkout-theme-market .wc-block-components-radio-control--highlight-checked label.wc-block-components-radio-control__option--checked-option-highlighted,
+.dmd-checkout-theme-market .wc-block-components-radio-control--highlight-checked .wc-block-components-radio-control-accordion-option--checked-option-highlighted {
+  box-shadow: none !important;
+}
+
+.dmd-checkout-theme-market .wc-block-components-radio-control__input {
+  top: 50% !important;
+  left: 1rem !important;
+  transform: translateY(-50%) !important;
+  border-color: #6b7c72 !important;
+  background: #fff !important;
+}
+
+.dmd-checkout-theme-market .wc-block-components-radio-control__input:checked {
+  border-color: var(--dmd-cc-accent) !important;
+}
+
+.dmd-checkout-theme-market .wc-block-components-radio-control__input:checked::before {
+  background: var(--dmd-cc-accent) !important;
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.dmd-checkout-theme-market .wc-block-components-radio-control__input:focus {
+  outline: 2px solid rgba(17, 61, 33, 0.35) !important;
+  outline-offset: 2px !important;
 }
 
 .dmd-cart-theme-market .dmd-cart-empty,
@@ -382,11 +446,6 @@
   background: #ffffff !important;
   box-shadow: 0 6px 16px -12px rgba(17, 61, 33, 0.4) !important;
   padding: 0.75rem 1rem !important;
-}
-
-.dmd-checkout-theme-market .wc-block-components-text-input input {
-  padding-top: 1.4rem !important;
-  padding-bottom: 0.5rem !important;
 }
 
 .dmd-checkout-theme-market .wc-block-components-text-input.is-active input,
