@@ -156,9 +156,10 @@ function dmd_assets() {
 		'dmd-live-search',
 		'dmd_ajax_object',
 		array(
-			'ajax_url'  => admin_url( 'admin-ajax.php' ),
-			'nonce'     => wp_create_nonce( 'dmd_search_nonce' ),
-			'searching' => __( 'খুঁজছি…', 'digital-mudir-dokan' ),
+			'ajax_url'     => admin_url( 'admin-ajax.php' ),
+			'nonce'        => wp_create_nonce( 'dmd_search_nonce' ),
+			'searching'    => __( 'খুঁজছি…', 'digital-mudir-dokan' ),
+			'searchError'  => __( 'সার্চ ব্যর্থ হয়েছে। আবার চেষ্টা করুন।', 'digital-mudir-dokan' ),
 		)
 	);
 

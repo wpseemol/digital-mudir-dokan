@@ -94,7 +94,48 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-/* Classic inputs — flat white, thin border */
+/* Floating labels act as placeholders — keep them muted and readable */
+.dmd-checkout-theme-classic .wc-block-components-text-input label,
+.dmd-checkout-theme-compact .wc-block-components-text-input label,
+.dmd-checkout-theme-market .wc-block-components-text-input label,
+.dmd-cart-theme-classic .wc-block-components-text-input label,
+.dmd-cart-theme-compact .wc-block-components-text-input label,
+.dmd-cart-theme-market .wc-block-components-text-input label {
+  color: #aeb6bf !important;
+  font-weight: 400 !important;
+}
+
+.dmd-checkout-theme-classic .wc-block-components-text-input.is-active label,
+.dmd-checkout-theme-compact .wc-block-components-text-input.is-active label,
+.dmd-checkout-theme-market .wc-block-components-text-input.is-active label,
+.dmd-cart-theme-classic .wc-block-components-text-input.is-active label,
+.dmd-cart-theme-compact .wc-block-components-text-input.is-active label,
+.dmd-cart-theme-market .wc-block-components-text-input.is-active label {
+  color: #b8c0c8 !important;
+}
+
+.dmd-checkout-theme-classic .wc-block-components-text-input input::placeholder,
+.dmd-checkout-theme-compact .wc-block-components-text-input input::placeholder,
+.dmd-checkout-theme-market .wc-block-components-text-input input::placeholder,
+.dmd-checkout-theme-classic .woocommerce form .input-text::placeholder,
+.dmd-checkout-theme-compact .woocommerce form .input-text::placeholder,
+.dmd-checkout-theme-market .woocommerce form .input-text::placeholder,
+.dmd-checkout-theme-classic .dmd-field::placeholder,
+.dmd-checkout-theme-compact .dmd-field::placeholder,
+.dmd-checkout-theme-market .dmd-field::placeholder {
+  color: #aeb6bf !important;
+  opacity: 1;
+}
+
+/* Room for floating label above the typed value */
+.dmd-checkout-theme-classic .wc-block-components-text-input input,
+.dmd-checkout-theme-compact .wc-block-components-text-input input,
+.dmd-checkout-theme-market .wc-block-components-text-input input {
+  padding-top: 1.35rem !important;
+  padding-bottom: 0.45rem !important;
+}
+
+/* Classic inputs — flat white, clear border */
 .dmd-checkout-theme-classic .wc-block-components-text-input input,
 .dmd-checkout-theme-classic .wc-block-components-textarea textarea,
 .dmd-checkout-theme-classic .wc-block-components-combobox input,
@@ -106,21 +147,28 @@
 .dmd-cart-theme-classic .wc-block-components-totals-coupon__form input,
 .dmd-cart-theme-classic .coupon .input-text,
 .dmd-cart-theme-classic .dmd-field {
-  min-height: 2.75rem;
-  border: 1px solid #d1d5db !important;
-  border-radius: 8px !important;
+  min-height: 3rem;
+  border: 1.5px solid #d1d5db !important;
+  border-radius: 10px !important;
   background: #ffffff !important;
-  box-shadow: none !important;
-  padding: 0.65rem 0.85rem !important;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04) !important;
+  padding: 0.65rem 0.9rem !important;
+}
+
+.dmd-checkout-theme-classic .wc-block-components-text-input input {
+  padding-top: 1.35rem !important;
+  padding-bottom: 0.45rem !important;
 }
 
 .dmd-checkout-theme-classic .wc-block-components-text-input.is-active input,
+.dmd-checkout-theme-classic .wc-block-components-text-input input:focus,
 .dmd-checkout-theme-classic .woocommerce form .input-text:focus,
-.dmd-checkout-theme-classic .dmd-field:focus,
-.dmd-cart-theme-classic .coupon .input-text:focus {
+.dmd-checkout-theme-classic .woocommerce form .input-text:focus-visible,
+.dmd-checkout-theme-classic .dmd-field:focus-visible,
+.dmd-cart-theme-classic .coupon .input-text:focus-visible {
   border-color: #113d21 !important;
-  box-shadow: none !important;
-  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(17, 61, 33, 0.16) !important;
+  outline: 2px solid transparent !important;
 }
 
 /* ------------------------------------------------------------------
@@ -186,39 +234,53 @@
   margin-bottom: 0.5rem !important;
 }
 
-/* Compact inputs — soft filled panels, almost borderless */
+/* Compact inputs — soft fill with a visible border so empty fields read clearly */
 .dmd-checkout-theme-compact .wc-block-components-text-input input,
 .dmd-checkout-theme-compact .wc-block-components-textarea textarea,
 .dmd-checkout-theme-compact .wc-block-components-combobox input,
-.dmd-checkout-theme-compact .select2-container .select2-selection--single,
 .dmd-checkout-theme-compact .woocommerce form .input-text,
-.dmd-checkout-theme-compact .woocommerce form select,
 .dmd-checkout-theme-compact .woocommerce form textarea,
 .dmd-checkout-theme-compact .dmd-field,
 .dmd-cart-theme-compact .wc-block-components-totals-coupon__form input,
 .dmd-cart-theme-compact .coupon .input-text,
 .dmd-cart-theme-compact .dmd-field {
-  min-height: 2.5rem;
-  border: 1px solid transparent !important;
-  border-radius: 999px !important;
-  background: #eef1ef !important;
+  min-height: 3rem;
+  border: 1.5px solid #d5dbd7 !important;
+  border-radius: 12px !important;
+  background: #f3f5f4 !important;
+  box-shadow: none !important;
+  padding: 0.55rem 1rem !important;
+}
+
+.dmd-checkout-theme-compact .wc-block-components-text-input input {
+  padding-top: 1.35rem !important;
+  padding-bottom: 0.45rem !important;
+}
+
+.dmd-checkout-theme-compact .select2-container .select2-selection--single,
+.dmd-checkout-theme-compact .woocommerce form select {
+  min-height: 3rem;
+  border: 1.5px solid #d5dbd7 !important;
+  border-radius: 12px !important;
+  background: #f3f5f4 !important;
   box-shadow: none !important;
   padding: 0.55rem 1rem !important;
 }
 
 .dmd-checkout-theme-compact .wc-block-components-textarea textarea,
 .dmd-checkout-theme-compact .woocommerce form textarea {
-  border-radius: 16px !important;
+  border-radius: 12px !important;
 }
 
 .dmd-checkout-theme-compact .wc-block-components-text-input.is-active input,
-.dmd-checkout-theme-compact .woocommerce form .input-text:focus,
-.dmd-checkout-theme-compact .dmd-field:focus,
-.dmd-cart-theme-compact .coupon .input-text:focus {
-  background: #e4e9e6 !important;
-  border-color: #cfd6d2 !important;
-  box-shadow: inset 0 0 0 1px #0f3a22 !important;
-  outline: none !important;
+.dmd-checkout-theme-compact .wc-block-components-text-input input:focus,
+.dmd-checkout-theme-compact .woocommerce form .input-text:focus-visible,
+.dmd-checkout-theme-compact .dmd-field:focus-visible,
+.dmd-cart-theme-compact .coupon .input-text:focus-visible {
+  background: #ffffff !important;
+  border-color: #0f3a22 !important;
+  box-shadow: 0 0 0 3px rgba(15, 58, 34, 0.14) !important;
+  outline: 2px solid transparent !important;
 }
 
 /* ------------------------------------------------------------------
@@ -302,7 +364,7 @@
   background: #fff;
 }
 
-/* Market inputs — soft green glow, elevated rounded boxes */
+/* Market inputs — soft green border, elevated rounded boxes */
 .dmd-checkout-theme-market .wc-block-components-text-input input,
 .dmd-checkout-theme-market .wc-block-components-textarea textarea,
 .dmd-checkout-theme-market .wc-block-components-combobox input,
@@ -314,25 +376,30 @@
 .dmd-cart-theme-market .wc-block-components-totals-coupon__form input,
 .dmd-cart-theme-market .coupon .input-text,
 .dmd-cart-theme-market .dmd-field {
-  min-height: 3rem;
-  border: 1px solid #d7e5db !important;
+  min-height: 3.15rem;
+  border: 1.5px solid #c9d9ce !important;
   border-radius: 14px !important;
   background: #ffffff !important;
-  box-shadow: 0 8px 18px -12px rgba(17, 61, 33, 0.45) !important;
+  box-shadow: 0 6px 16px -12px rgba(17, 61, 33, 0.4) !important;
   padding: 0.75rem 1rem !important;
 }
 
-.dmd-checkout-theme-market .wc-block-components-text-input.is-active input,
-.dmd-checkout-theme-market .woocommerce form .input-text:focus,
-.dmd-checkout-theme-market .dmd-field:focus,
-.dmd-cart-theme-market .coupon .input-text:focus {
-  border-color: #113d21 !important;
-  box-shadow: 0 0 0 3px rgba(17, 61, 33, 0.14), 0 10px 22px -12px rgba(17, 61, 33, 0.5) !important;
-  outline: none !important;
+.dmd-checkout-theme-market .wc-block-components-text-input input {
+  padding-top: 1.4rem !important;
+  padding-bottom: 0.5rem !important;
 }
 
-.dmd-checkout-theme-market .wc-block-components-text-input label,
+.dmd-checkout-theme-market .wc-block-components-text-input.is-active input,
+.dmd-checkout-theme-market .wc-block-components-text-input input:focus,
+.dmd-checkout-theme-market .woocommerce form .input-text:focus-visible,
+.dmd-checkout-theme-market .dmd-field:focus-visible,
+.dmd-cart-theme-market .coupon .input-text:focus-visible {
+  border-color: #113d21 !important;
+  box-shadow: 0 0 0 3px rgba(17, 61, 33, 0.16), 0 8px 18px -12px rgba(17, 61, 33, 0.45) !important;
+  outline: 2px solid transparent !important;
+}
+
 .dmd-checkout-theme-market .woocommerce form .form-row label {
-  font-weight: 600;
-  color: #113d21;
+  font-weight: 500;
+  color: #6b7280;
 }

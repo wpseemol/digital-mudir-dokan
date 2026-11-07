@@ -107,14 +107,38 @@ function dmd_cart_checkout_label_defs() {
 /**
  * Read one cart/checkout label, falling back to its Bangla default.
  *
+ * Empty saved values intentionally fall back so “leave empty” works.
+ *
  * @param string $key Option key.
  * @return string
  */
 function dmd_checkout_label( $key ) {
-	$defs = dmd_cart_checkout_label_defs();
+	$defs    = dmd_cart_checkout_label_defs();
 	$default = isset( $defs[ $key ] ) ? $defs[ $key ][1] : '';
 	$value   = dmd_option( $key, $default );
-	return is_string( $value ) ? $value : $default;
+
+	if ( ! is_string( $value ) || '' === trim( $value ) ) {
+		return $default;
+	}
+
+	return $value;
+}
+
+/**
+ * Whether cart/checkout label overrides should run on this request.
+ *
+ * @return bool
+ */
+function dmd_cart_checkout_should_override_labels() {
+	if ( is_admin() && ! wp_doing_ajax() ) {
+		return false;
+	}
+
+	if ( ! function_exists( 'is_cart' ) ) {
+		return false;
+	}
+
+	return is_cart() || ( is_checkout() && ! is_wc_endpoint_url( 'order-received' ) );
 }
 
 /**
@@ -153,6 +177,10 @@ add_filter( 'body_class', 'dmd_cart_checkout_body_class', 20 );
  * @return array
  */
 function dmd_cart_checkout_block_attrs( $parsed_block ) {
+	if ( ! dmd_cart_checkout_should_override_labels() ) {
+		return $parsed_block;
+	}
+
 	static $map = null;
 
 	if ( null === $map ) {
@@ -238,7 +266,7 @@ function dmd_cart_checkout_i18n_map() {
  * @return string
  */
 function dmd_cart_checkout_gettext( $translation, $text, $domain ) {
-	if ( 'woocommerce' !== $domain ) {
+	if ( 'woocommerce' !== $domain || ! dmd_cart_checkout_should_override_labels() ) {
 		return $translation;
 	}
 	$map = dmd_cart_checkout_i18n_map();

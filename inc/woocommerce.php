@@ -852,6 +852,10 @@ function dmd_live_search_product_card( $product ) {
  * @return string|WP_Error
  */
 function dmd_live_search_panel_html( $search_query = '' ) {
+	if ( ! function_exists( 'WC' ) || ! WC()->query ) {
+		return new WP_Error( 'dmd_no_wc', __( 'WooCommerce is required for live search.', 'digital-mudir-dokan' ) );
+	}
+
 	$is_search = mb_strlen( $search_query ) >= 2;
 
 	$product_args = array(

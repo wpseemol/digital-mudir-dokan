@@ -19,6 +19,12 @@
 			return;
 		}
 
+		input.attr({
+			'aria-autocomplete': 'list',
+			'aria-controls': 'dmd-live-search-results',
+			'aria-expanded': 'false'
+		});
+
 		function items() {
 			return panel.find('[data-dmd-ls-item], .dmd-ls-popular__btn');
 		}
@@ -58,6 +64,7 @@
 
 		function close() {
 			panel.addClass('hidden').attr('aria-hidden', 'true');
+			input.attr('aria-expanded', 'false');
 			wrap.removeClass('is-search-open');
 			if (header.length) {
 				header.removeClass('is-search-open');
@@ -67,6 +74,7 @@
 
 		function show(html) {
 			panel.html(html).removeClass('hidden').attr('aria-hidden', 'false');
+			input.attr('aria-expanded', 'true');
 			wrap.addClass('is-search-open');
 			if (header.length) {
 				header.addClass('is-search-open').removeClass('is-hidden');
@@ -116,7 +124,7 @@
 					}
 				}).fail(function (xhr, status) {
 					if ('abort' !== status) {
-						close();
+						show('<p class="m-0 p-5 text-sm text-muted">' + (dmd_ajax_object.searchError || 'Search failed. Try again.') + '</p>');
 					}
 				});
 			}, delay);
@@ -156,11 +164,16 @@
 			}
 
 			var list = items();
+			var inSearch = $(e.target).closest('.dmd-header-search, #dmd-live-search-results').length > 0;
 
 			if ('Escape' === e.key) {
 				e.preventDefault();
 				close();
 				input.trigger('focus');
+				return;
+			}
+
+			if (!inSearch) {
 				return;
 			}
 
@@ -176,6 +189,7 @@
 				return;
 			}
 
+			// Enter opens a highlighted suggestion; otherwise the form submits normally.
 			if ('Enter' === e.key && activeIndex >= 0) {
 				e.preventDefault();
 				openItem(list.eq(activeIndex));
