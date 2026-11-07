@@ -9,6 +9,10 @@
 defined( 'ABSPATH' ) || exit;
 
 do_action( 'woocommerce_before_cart' );
+
+$dmd_l = function ( $key ) {
+	return function_exists( 'dmd_checkout_label' ) ? dmd_checkout_label( $key ) : '';
+};
 ?>
 <div class="dmd-cart grid gap-8 grid-cols-1 lg:grid-cols-12 lg:items-start">
 
@@ -17,15 +21,15 @@ do_action( 'woocommerce_before_cart' );
 
 		<div class="overflow-x-auto rounded-lg border border-line bg-white">
 			<table class="shop_table shop_table_responsive cart woocommerce-cart-form__contents" cellspacing="0">
-				<caption class="screen-reader-text"><?php esc_html_e( 'Products in your cart', 'digital-mudir-dokan' ); ?></caption>
+				<caption class="screen-reader-text"><?php echo esc_html( $dmd_l( 'cart_label_items_heading' ) ); ?></caption>
 				<thead>
 					<tr>
 						<th class="product-remove"><span class="screen-reader-text"><?php esc_html_e( 'Remove item', 'digital-mudir-dokan' ); ?></span></th>
 						<th class="product-thumbnail"><span class="screen-reader-text"><?php esc_html_e( 'Image', 'digital-mudir-dokan' ); ?></span></th>
-						<th class="product-name" scope="col"><?php esc_html_e( 'Product', 'digital-mudir-dokan' ); ?></th>
-						<th class="product-price" scope="col"><?php esc_html_e( 'Price', 'digital-mudir-dokan' ); ?></th>
-						<th class="product-quantity" scope="col"><?php esc_html_e( 'Quantity', 'digital-mudir-dokan' ); ?></th>
-						<th class="product-subtotal" scope="col"><?php esc_html_e( 'Subtotal', 'digital-mudir-dokan' ); ?></th>
+						<th class="product-name" scope="col"><?php echo esc_html( $dmd_l( 'cart_label_product' ) ); ?></th>
+						<th class="product-price" scope="col"><?php echo esc_html( $dmd_l( 'cart_label_price' ) ); ?></th>
+						<th class="product-quantity" scope="col"><?php echo esc_html( $dmd_l( 'cart_label_quantity' ) ); ?></th>
+						<th class="product-subtotal" scope="col"><?php echo esc_html( $dmd_l( 'cart_label_subtotal' ) ); ?></th>
 					</tr>
 				</thead>
 
@@ -71,7 +75,7 @@ do_action( 'woocommerce_before_cart' );
 									?>
 								</td>
 
-								<td class="product-name" data-title="<?php esc_attr_e( 'Product', 'digital-mudir-dokan' ); ?>">
+								<td class="product-name" data-title="<?php echo esc_attr( $dmd_l( 'cart_label_product' ) ); ?>">
 									<?php
 									if ( ! $product_permalink ) {
 										echo wp_kses_post( apply_filters( 'woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key ) . '&nbsp;' );
@@ -89,11 +93,11 @@ do_action( 'woocommerce_before_cart' );
 									?>
 								</td>
 
-								<td class="product-price" data-title="<?php esc_attr_e( 'Price', 'digital-mudir-dokan' ); ?>">
+								<td class="product-price" data-title="<?php echo esc_attr( $dmd_l( 'cart_label_price' ) ); ?>">
 									<?php echo apply_filters( 'woocommerce_cart_item_price', WC()->cart->get_product_price( $_product ), $cart_item, $cart_item_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 								</td>
 
-								<td class="product-quantity" data-title="<?php esc_attr_e( 'Quantity', 'digital-mudir-dokan' ); ?>">
+								<td class="product-quantity" data-title="<?php echo esc_attr( $dmd_l( 'cart_label_quantity' ) ); ?>">
 									<?php
 									if ( $_product->is_sold_individually() ) {
 										$min_quantity = 1;
@@ -119,7 +123,7 @@ do_action( 'woocommerce_before_cart' );
 									?>
 								</td>
 
-								<td class="product-subtotal font-semibold" data-title="<?php esc_attr_e( 'Subtotal', 'digital-mudir-dokan' ); ?>">
+								<td class="product-subtotal font-semibold" data-title="<?php echo esc_attr( $dmd_l( 'cart_label_subtotal' ) ); ?>">
 									<?php echo apply_filters( 'woocommerce_cart_item_subtotal', WC()->cart->get_product_subtotal( $_product, $cart_item['quantity'] ), $cart_item, $cart_item_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 								</td>
 							</tr>
@@ -135,14 +139,14 @@ do_action( 'woocommerce_before_cart' );
 							<div class="flex flex-wrap items-center justify-between gap-3">
 								<?php if ( wc_coupons_enabled() ) : ?>
 									<div class="coupon flex flex-wrap items-center gap-2">
-										<label class="screen-reader-text" for="coupon_code"><?php esc_html_e( 'Coupon code', 'digital-mudir-dokan' ); ?></label>
-										<input type="text" name="coupon_code" class="dmd-field input-text w-44" id="coupon_code" value="" placeholder="<?php esc_attr_e( 'Coupon code', 'digital-mudir-dokan' ); ?>" />
-										<button type="submit" class="dmd-btn dmd-btn--outline" name="apply_coupon" value="<?php esc_attr_e( 'Apply coupon', 'digital-mudir-dokan' ); ?>"><?php esc_html_e( 'Apply coupon', 'digital-mudir-dokan' ); ?></button>
+										<label class="screen-reader-text" for="coupon_code"><?php echo esc_html( $dmd_l( 'cart_label_coupon_placeholder' ) ); ?></label>
+										<input type="text" name="coupon_code" class="dmd-field input-text w-44" id="coupon_code" value="" placeholder="<?php echo esc_attr( $dmd_l( 'cart_label_coupon_placeholder' ) ); ?>" />
+										<button type="submit" class="dmd-btn dmd-btn--outline" name="apply_coupon" value="<?php echo esc_attr( $dmd_l( 'cart_label_apply_coupon' ) ); ?>"><?php echo esc_html( $dmd_l( 'cart_label_apply_coupon' ) ); ?></button>
 										<?php do_action( 'woocommerce_cart_coupon' ); ?>
 									</div>
 								<?php endif; ?>
 
-								<button type="submit" class="dmd-btn dmd-btn--ghost" name="update_cart" value="<?php esc_attr_e( 'Update cart', 'digital-mudir-dokan' ); ?>"><?php esc_html_e( 'Update cart', 'digital-mudir-dokan' ); ?></button>
+								<button type="submit" class="dmd-btn dmd-btn--ghost" name="update_cart" value="<?php echo esc_attr( $dmd_l( 'cart_label_update' ) ); ?>"><?php echo esc_html( $dmd_l( 'cart_label_update' ) ); ?></button>
 
 								<?php do_action( 'woocommerce_cart_actions' ); ?>
 								<?php wp_nonce_field( 'woocommerce-cart', 'woocommerce-cart-nonce' ); ?>
@@ -158,7 +162,7 @@ do_action( 'woocommerce_before_cart' );
 		<?php do_action( 'woocommerce_after_cart_table' ); ?>
 	</form>
 
-	<aside class="cart-collaterals lg:col-span-4 lg:sticky lg:top-6" aria-label="<?php esc_attr_e( 'Order summary', 'digital-mudir-dokan' ); ?>">
+	<aside class="cart-collaterals lg:col-span-4 lg:sticky lg:top-6" aria-label="<?php echo esc_attr( $dmd_l( 'cart_label_totals_heading' ) ); ?>">
 		<?php do_action( 'woocommerce_cart_collaterals' ); ?>
 	</aside>
 </div>
@@ -169,4 +173,3 @@ if ( function_exists( 'woocommerce_cross_sell_display' ) ) {
 }
 
 do_action( 'woocommerce_after_cart' );
-

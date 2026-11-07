@@ -113,6 +113,11 @@ function dmd_sanitize_options( $input ) {
 					$clean[ $id ] = trim( (string) $value );
 				}
 				break;
+			case 'select':
+				$choices = isset( $field['choices'] ) && is_array( $field['choices'] ) ? $field['choices'] : array();
+				$value   = sanitize_key( (string) $value );
+				$clean[ $id ] = array_key_exists( $value, $choices ) ? $value : ( isset( $field['default'] ) ? $field['default'] : '' );
+				break;
 			default:
 				$clean[ $id ] = sanitize_text_field( $value );
 		}
@@ -437,6 +442,20 @@ function dmd_admin_field( $id, $field, $value ) {
 						'price' === $field['type'] ? '0.01' : '1',
 						'price' === $field['type'] && function_exists( 'get_woocommerce_currency_symbol' ) ? ' <span class="dmd-field__unit">' . esc_html( html_entity_decode( get_woocommerce_currency_symbol() ) ) . '</span>' : ''
 					);
+					break;
+
+				case 'select':
+					$choices = isset( $field['choices'] ) && is_array( $field['choices'] ) ? $field['choices'] : array();
+					echo '<select id="' . esc_attr( $input ) . '" name="' . esc_attr( $name ) . '">';
+					foreach ( $choices as $choice_value => $choice_label ) {
+						printf(
+							'<option value="%1$s" %2$s>%3$s</option>',
+							esc_attr( $choice_value ),
+							selected( (string) $value, (string) $choice_value, false ),
+							esc_html( $choice_label )
+						);
+					}
+					echo '</select>';
 					break;
 
 				default:

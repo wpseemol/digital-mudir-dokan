@@ -400,4 +400,5 @@ if ( is_admin() ) {
 if ( class_exists( 'WooCommerce' ) ) {
 	require DMD_DIR . '/inc/woocommerce.php';
 	require DMD_DIR . '/inc/woocommerce-features.php';
+	require DMD_DIR . '/inc/cart-checkout-ui.php';
 }

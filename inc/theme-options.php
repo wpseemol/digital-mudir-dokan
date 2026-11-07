@@ -259,6 +259,23 @@ function dmd_option_fields() {
 				'label'   => __( 'Order notes field', 'digital-mudir-dokan' ),
 				'default' => 1,
 			),
+			'h_page_themes'        => array(
+				'type'  => 'heading',
+				'label' => __( 'Cart & checkout page themes', 'digital-mudir-dokan' ),
+				'desc'  => __( 'Pick a look for each page. Labels below stay editable in Bangla or English.', 'digital-mudir-dokan' ),
+			),
+			'cart_theme'           => array(
+				'type'    => 'select',
+				'label'   => __( 'Cart page theme', 'digital-mudir-dokan' ),
+				'default' => 'classic',
+				'choices' => function_exists( 'dmd_cart_checkout_themes' ) ? dmd_cart_checkout_themes() : array( 'classic' => __( 'Classic', 'digital-mudir-dokan' ) ),
+			),
+			'checkout_theme'       => array(
+				'type'    => 'select',
+				'label'   => __( 'Checkout page theme', 'digital-mudir-dokan' ),
+				'default' => 'classic',
+				'choices' => function_exists( 'dmd_cart_checkout_themes' ) ? dmd_cart_checkout_themes() : array( 'classic' => __( 'Classic', 'digital-mudir-dokan' ) ),
+			),
 			'h_product'            => array(
 				'type'  => 'heading',
 				'label' => __( 'Product page', 'digital-mudir-dokan' ),
@@ -351,6 +368,42 @@ function dmd_option_fields() {
 	$about           = $fields['about'];
 	$position        = array_search( 'h_stats', array_keys( $about ), true ) + 1;
 	$fields['about'] = array_slice( $about, 0, $position, true ) + $stat_fields + array_slice( $about, $position, null, true );
+
+	// Cart & checkout editable labels (defined in inc/cart-checkout-ui.php).
+	if ( function_exists( 'dmd_cart_checkout_label_defs' ) ) {
+		$label_fields = array(
+			'h_cart_labels' => array(
+				'type'  => 'heading',
+				'label' => __( 'Cart page labels', 'digital-mudir-dokan' ),
+				'desc'  => __( 'Every heading and button on the cart page. Leave empty to use the Bangla default.', 'digital-mudir-dokan' ),
+			),
+		);
+		$checkout_heading_added = false;
+		foreach ( dmd_cart_checkout_label_defs() as $id => $def ) {
+			if ( ! $checkout_heading_added && 0 === strpos( $id, 'checkout_' ) ) {
+				$label_fields['h_checkout_labels'] = array(
+					'type'  => 'heading',
+					'label' => __( 'Checkout page labels', 'digital-mudir-dokan' ),
+					'desc'  => __( 'Section titles, order summary, buttons and form fields on checkout.', 'digital-mudir-dokan' ),
+				);
+				$checkout_heading_added = true;
+			}
+			$label_fields[ $id ] = array(
+				'type'    => 'text',
+				'label'   => $def[0],
+				'default' => $def[1],
+				'half'    => true,
+			);
+		}
+
+		$shop     = $fields['shop'];
+		$insert   = array_search( 'h_product', array_keys( $shop ), true );
+		if ( false === $insert ) {
+			$fields['shop'] = $shop + $label_fields;
+		} else {
+			$fields['shop'] = array_slice( $shop, 0, $insert, true ) + $label_fields + array_slice( $shop, $insert, null, true );
+		}
+	}
 
 	return apply_filters( 'dmd_option_fields', $fields );
 }
