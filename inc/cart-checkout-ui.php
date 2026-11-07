@@ -11,16 +11,36 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Available page themes (slug => label).
+ * Available page themes.
  *
+ * @param bool $flat When true, return slug => admin label for select fields.
  * @return array
  */
-function dmd_cart_checkout_themes() {
-	return array(
-		'classic' => __( 'Classic — clean table & white cards', 'digital-mudir-dokan' ),
-		'compact' => __( 'Compact — tight list, soft panels', 'digital-mudir-dokan' ),
-		'market'  => __( 'Market — grocery style, green accents', 'digital-mudir-dokan' ),
+function dmd_cart_checkout_themes( $flat = true ) {
+	$themes = array(
+		'classic' => array(
+			'label' => __( 'Classic', 'digital-mudir-dokan' ),
+			'desc'  => __( 'Clean table & white cards', 'digital-mudir-dokan' ),
+		),
+		'compact' => array(
+			'label' => __( 'Compact', 'digital-mudir-dokan' ),
+			'desc'  => __( 'Tight list, soft panels', 'digital-mudir-dokan' ),
+		),
+		'market'  => array(
+			'label' => __( 'Market', 'digital-mudir-dokan' ),
+			'desc'  => __( 'Grocery style, green accents', 'digital-mudir-dokan' ),
+		),
 	);
+
+	if ( ! $flat ) {
+		return $themes;
+	}
+
+	$flat_list = array();
+	foreach ( $themes as $slug => $theme ) {
+		$flat_list[ $slug ] = $theme['label'] . ' — ' . $theme['desc'];
+	}
+	return $flat_list;
 }
 
 /**

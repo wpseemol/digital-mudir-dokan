@@ -114,6 +114,7 @@ function dmd_sanitize_options( $input ) {
 				}
 				break;
 			case 'select':
+			case 'theme_picker':
 				$choices = isset( $field['choices'] ) && is_array( $field['choices'] ) ? $field['choices'] : array();
 				$value   = sanitize_key( (string) $value );
 				$clean[ $id ] = array_key_exists( $value, $choices ) ? $value : ( isset( $field['default'] ) ? $field['default'] : '' );
@@ -342,6 +343,90 @@ function dmd_admin_settings_tab( $tab ) {
 }
 
 /**
+ * Visual theme picker: 3 cards on the left, live mock preview on the right.
+ *
+ * @param string $id    Option key.
+ * @param string $name  Input name.
+ * @param string $input Input id.
+ * @param array  $field Field definition.
+ * @param mixed  $value Current value.
+ */
+function dmd_admin_theme_picker( $id, $name, $input, $field, $value ) {
+	$themes  = function_exists( 'dmd_cart_checkout_themes' ) ? dmd_cart_checkout_themes( false ) : array();
+	$context = isset( $field['context'] ) ? $field['context'] : 'cart';
+	$value   = $value && isset( $themes[ $value ] ) ? $value : 'classic';
+
+	if ( ! $themes ) {
+		echo '<select id="' . esc_attr( $input ) . '" name="' . esc_attr( $name ) . '"><option value="classic">Classic</option></select>';
+		return;
+	}
+	?>
+	<div class="dmd-theme-picker" data-dmd-theme-picker data-context="<?php echo esc_attr( $context ); ?>">
+		<div class="dmd-theme-picker__options" role="radiogroup" aria-label="<?php echo esc_attr( $field['label'] ); ?>">
+			<?php foreach ( $themes as $slug => $theme ) : ?>
+				<label class="dmd-theme-card<?php echo $slug === $value ? ' is-selected' : ''; ?>">
+					<input type="radio"
+						name="<?php echo esc_attr( $name ); ?>"
+						id="<?php echo esc_attr( $input . '-' . $slug ); ?>"
+						value="<?php echo esc_attr( $slug ); ?>"
+						<?php checked( $value, $slug ); ?>
+						data-dmd-theme-option />
+					<span class="dmd-theme-card__thumb dmd-theme-card__thumb--<?php echo esc_attr( $slug ); ?>" aria-hidden="true">
+						<span class="dmd-thumb-row"></span>
+						<span class="dmd-thumb-row"></span>
+						<span class="dmd-thumb-side"></span>
+					</span>
+					<span class="dmd-theme-card__meta">
+						<span class="dmd-theme-card__name"><?php echo esc_html( $theme['label'] ); ?></span>
+						<span class="dmd-theme-card__desc"><?php echo esc_html( $theme['desc'] ); ?></span>
+					</span>
+					<span class="dmd-theme-card__check" aria-hidden="true">✓</span>
+				</label>
+			<?php endforeach; ?>
+		</div>
+
+		<div class="dmd-theme-picker__preview" data-dmd-theme-preview>
+			<p class="dmd-theme-picker__preview-label">
+				<?php
+				echo 'checkout' === $context
+					? esc_html__( 'Checkout preview', 'digital-mudir-dokan' )
+					: esc_html__( 'Cart preview', 'digital-mudir-dokan' );
+				?>
+			</p>
+			<div class="dmd-theme-live is-<?php echo esc_attr( $value ); ?>" data-dmd-theme-live data-context="<?php echo esc_attr( $context ); ?>">
+				<?php if ( 'checkout' === $context ) : ?>
+					<div class="dmd-theme-live__main">
+						<div class="dmd-theme-live__step"></div>
+						<div class="dmd-theme-live__step"></div>
+						<div class="dmd-theme-live__step dmd-theme-live__step--short"></div>
+						<div class="dmd-theme-live__btn"></div>
+					</div>
+					<aside class="dmd-theme-live__side">
+						<div class="dmd-theme-live__title"></div>
+						<div class="dmd-theme-live__line"></div>
+						<div class="dmd-theme-live__line dmd-theme-live__line--short"></div>
+						<div class="dmd-theme-live__total"></div>
+					</aside>
+				<?php else : ?>
+					<div class="dmd-theme-live__main">
+						<div class="dmd-theme-live__item"><span></span><span></span></div>
+						<div class="dmd-theme-live__item"><span></span><span></span></div>
+						<div class="dmd-theme-live__item"><span></span><span></span></div>
+					</div>
+					<aside class="dmd-theme-live__side">
+						<div class="dmd-theme-live__title"></div>
+						<div class="dmd-theme-live__line"></div>
+						<div class="dmd-theme-live__line dmd-theme-live__line--short"></div>
+						<div class="dmd-theme-live__btn"></div>
+					</aside>
+				<?php endif; ?>
+			</div>
+		</div>
+	</div>
+	<?php
+}
+
+/**
  * Render one field row.
  *
  * @param string $id    Option key.
@@ -456,6 +541,10 @@ function dmd_admin_field( $id, $field, $value ) {
 						);
 					}
 					echo '</select>';
+					break;
+
+				case 'theme_picker':
+					dmd_admin_theme_picker( $id, $name, $input, $field, $value );
 					break;
 
 				default:

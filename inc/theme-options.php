@@ -265,15 +265,17 @@ function dmd_option_fields() {
 				'desc'  => __( 'Pick a look for each page. Labels below stay editable in Bangla or English.', 'digital-mudir-dokan' ),
 			),
 			'cart_theme'           => array(
-				'type'    => 'select',
+				'type'    => 'theme_picker',
 				'label'   => __( 'Cart page theme', 'digital-mudir-dokan' ),
 				'default' => 'classic',
+				'context' => 'cart',
 				'choices' => function_exists( 'dmd_cart_checkout_themes' ) ? dmd_cart_checkout_themes() : array( 'classic' => __( 'Classic', 'digital-mudir-dokan' ) ),
 			),
 			'checkout_theme'       => array(
-				'type'    => 'select',
+				'type'    => 'theme_picker',
 				'label'   => __( 'Checkout page theme', 'digital-mudir-dokan' ),
 				'default' => 'classic',
+				'context' => 'checkout',
 				'choices' => function_exists( 'dmd_cart_checkout_themes' ) ? dmd_cart_checkout_themes() : array( 'classic' => __( 'Classic', 'digital-mudir-dokan' ) ),
 			),
 			'h_product'            => array(
