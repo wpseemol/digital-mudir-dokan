@@ -542,8 +542,8 @@
 	position: relative;
 	display: grid;
 	grid-template-columns: 1.6fr 1fr;
-	gap: 4px;
-	height: 72px;
+	gap: 5px;
+	height: 78px;
 	padding: 8px;
 	border-radius: 8px;
 	overflow: hidden;
@@ -562,15 +562,13 @@
 	background: linear-gradient(180deg, #e8f3eb, #f7fbf8);
 }
 
-.dmd-thumb-row,
+.dmd-thumb-input,
 .dmd-thumb-side {
 	display: block;
-	border-radius: 4px;
 	background: #fff;
-	border: 1px solid #e5e7eb;
 }
 
-.dmd-thumb-row {
+.dmd-thumb-input {
 	grid-column: 1;
 	height: 18px;
 }
@@ -580,15 +578,35 @@
 	grid-row: 1 / span 3;
 }
 
-.dmd-theme-card__thumb--compact .dmd-thumb-row {
-	height: 14px;
-	border-radius: 999px;
+/* Classic thumb inputs — flat thin border */
+.dmd-theme-card__thumb--classic .dmd-thumb-input,
+.dmd-theme-card__thumb--classic .dmd-thumb-side {
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	box-shadow: none;
 }
 
-.dmd-theme-card__thumb--market .dmd-thumb-row,
+/* Compact thumb inputs — soft filled pills */
+.dmd-theme-card__thumb--compact .dmd-thumb-input {
+	height: 16px;
+	border: 0;
+	border-radius: 999px;
+	background: #e4e9e6;
+	box-shadow: none;
+}
+
+.dmd-theme-card__thumb--compact .dmd-thumb-side {
+	border: 0;
+	border-radius: 12px;
+	background: #e4e9e6;
+}
+
+/* Market thumb inputs — elevated green glow */
+.dmd-theme-card__thumb--market .dmd-thumb-input,
 .dmd-theme-card__thumb--market .dmd-thumb-side {
-	border-color: #d7e5db;
-	box-shadow: 0 4px 10px -8px rgba(17, 61, 33, 0.5);
+	border: 1px solid #d7e5db;
+	border-radius: 10px;
+	box-shadow: 0 6px 12px -8px rgba(17, 61, 33, 0.55);
 }
 
 .dmd-theme-card__meta {
@@ -676,7 +694,7 @@
 }
 
 .dmd-theme-live__item,
-.dmd-theme-live__step,
+.dmd-theme-live__input,
 .dmd-theme-live__title,
 .dmd-theme-live__line,
 .dmd-theme-live__total,
@@ -709,13 +727,21 @@
 	background: #e8ece9;
 }
 
-.dmd-theme-live__step {
-	height: 28px;
+.dmd-theme-live__input {
+	height: 30px;
+	background: #fff;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	box-shadow: none;
 }
 
-.dmd-theme-live__step--short,
+.dmd-theme-live__input--short,
 .dmd-theme-live__line--short {
 	width: 65%;
+}
+
+.dmd-theme-live__input--coupon {
+	width: 70%;
 }
 
 .dmd-theme-live__title {
@@ -741,18 +767,27 @@
 	background: var(--dmd-green);
 }
 
-/* Compact variant */
+/* Compact variant — soft filled pill inputs */
 .dmd-theme-live.is-compact {
 	background: #f3f5f4;
 	gap: 6px;
 }
 
 .dmd-theme-live.is-compact .dmd-theme-live__item,
-.dmd-theme-live.is-compact .dmd-theme-live__step,
 .dmd-theme-live.is-compact .dmd-theme-live__side {
-	border-radius: 999px;
+	border: 0;
+	border-radius: 14px;
+	background: #eef1ef;
 	padding-top: 4px;
 	padding-bottom: 4px;
+}
+
+.dmd-theme-live.is-compact .dmd-theme-live__input {
+	border: 0;
+	border-radius: 999px;
+	background: #e4e9e6;
+	box-shadow: none;
+	height: 26px;
 }
 
 .dmd-theme-live.is-compact .dmd-theme-live__btn {
@@ -765,7 +800,7 @@
 	height: 22px;
 }
 
-/* Market variant */
+/* Market variant — shadowed rounded inputs */
 .dmd-theme-live.is-market {
 	background: linear-gradient(180deg, #eef7f0, #ffffff);
 	border-color: #d7e5db;
@@ -773,11 +808,18 @@
 }
 
 .dmd-theme-live.is-market .dmd-theme-live__item,
-.dmd-theme-live.is-market .dmd-theme-live__step,
 .dmd-theme-live.is-market .dmd-theme-live__side {
 	border-color: #d7e5db;
 	border-radius: 12px;
 	box-shadow: 0 6px 14px -12px rgba(17, 61, 33, 0.4);
+}
+
+.dmd-theme-live.is-market .dmd-theme-live__input {
+	border: 1px solid #d7e5db;
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: 0 8px 16px -10px rgba(17, 61, 33, 0.45);
+	height: 32px;
 }
 
 .dmd-theme-live.is-market .dmd-theme-live__btn {

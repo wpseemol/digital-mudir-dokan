@@ -372,8 +372,8 @@ function dmd_admin_theme_picker( $id, $name, $input, $field, $value ) {
 						<?php checked( $value, $slug ); ?>
 						data-dmd-theme-option />
 					<span class="dmd-theme-card__thumb dmd-theme-card__thumb--<?php echo esc_attr( $slug ); ?>" aria-hidden="true">
-						<span class="dmd-thumb-row"></span>
-						<span class="dmd-thumb-row"></span>
+						<span class="dmd-thumb-input"></span>
+						<span class="dmd-thumb-input"></span>
 						<span class="dmd-thumb-side"></span>
 					</span>
 					<span class="dmd-theme-card__meta">
@@ -396,9 +396,9 @@ function dmd_admin_theme_picker( $id, $name, $input, $field, $value ) {
 			<div class="dmd-theme-live is-<?php echo esc_attr( $value ); ?>" data-dmd-theme-live data-context="<?php echo esc_attr( $context ); ?>">
 				<?php if ( 'checkout' === $context ) : ?>
 					<div class="dmd-theme-live__main">
-						<div class="dmd-theme-live__step"></div>
-						<div class="dmd-theme-live__step"></div>
-						<div class="dmd-theme-live__step dmd-theme-live__step--short"></div>
+						<div class="dmd-theme-live__input"></div>
+						<div class="dmd-theme-live__input"></div>
+						<div class="dmd-theme-live__input dmd-theme-live__input--short"></div>
 						<div class="dmd-theme-live__btn"></div>
 					</div>
 					<aside class="dmd-theme-live__side">
@@ -411,7 +411,7 @@ function dmd_admin_theme_picker( $id, $name, $input, $field, $value ) {
 					<div class="dmd-theme-live__main">
 						<div class="dmd-theme-live__item"><span></span><span></span></div>
 						<div class="dmd-theme-live__item"><span></span><span></span></div>
-						<div class="dmd-theme-live__item"><span></span><span></span></div>
+						<div class="dmd-theme-live__input dmd-theme-live__input--coupon"></div>
 					</div>
 					<aside class="dmd-theme-live__side">
 						<div class="dmd-theme-live__title"></div>

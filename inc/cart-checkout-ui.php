@@ -20,15 +20,15 @@ function dmd_cart_checkout_themes( $flat = true ) {
 	$themes = array(
 		'classic' => array(
 			'label' => __( 'Classic', 'digital-mudir-dokan' ),
-			'desc'  => __( 'Clean table & white cards', 'digital-mudir-dokan' ),
+			'desc'  => __( 'Thin bordered inputs, flat white cards', 'digital-mudir-dokan' ),
 		),
 		'compact' => array(
 			'label' => __( 'Compact', 'digital-mudir-dokan' ),
-			'desc'  => __( 'Tight list, soft panels', 'digital-mudir-dokan' ),
+			'desc'  => __( 'Soft filled pill inputs, dense panels', 'digital-mudir-dokan' ),
 		),
 		'market'  => array(
 			'label' => __( 'Market', 'digital-mudir-dokan' ),
-			'desc'  => __( 'Grocery style, green accents', 'digital-mudir-dokan' ),
+			'desc'  => __( 'Shadowed rounded inputs, green glow', 'digital-mudir-dokan' ),
 		),
 	);
 

@@ -50,6 +50,79 @@
   padding: 1.25rem;
 }
 
+/* Shared input targets for every cart/checkout theme */
+.dmd-checkout-theme-classic .wc-block-components-text-input input,
+.dmd-checkout-theme-classic .wc-block-components-textarea textarea,
+.dmd-checkout-theme-classic .wc-block-components-combobox .components-combobox-control__input,
+.dmd-checkout-theme-classic .wc-block-components-combobox input,
+.dmd-checkout-theme-classic .select2-container .select2-selection--single,
+.dmd-checkout-theme-classic .woocommerce form .input-text,
+.dmd-checkout-theme-classic .woocommerce form select,
+.dmd-checkout-theme-classic .woocommerce form textarea,
+.dmd-checkout-theme-classic .dmd-field,
+.dmd-cart-theme-classic .wc-block-components-text-input input,
+.dmd-cart-theme-classic .wc-block-components-totals-coupon__form input,
+.dmd-cart-theme-classic .coupon .input-text,
+.dmd-cart-theme-classic .dmd-field,
+.dmd-checkout-theme-compact .wc-block-components-text-input input,
+.dmd-checkout-theme-compact .wc-block-components-textarea textarea,
+.dmd-checkout-theme-compact .wc-block-components-combobox .components-combobox-control__input,
+.dmd-checkout-theme-compact .wc-block-components-combobox input,
+.dmd-checkout-theme-compact .select2-container .select2-selection--single,
+.dmd-checkout-theme-compact .woocommerce form .input-text,
+.dmd-checkout-theme-compact .woocommerce form select,
+.dmd-checkout-theme-compact .woocommerce form textarea,
+.dmd-checkout-theme-compact .dmd-field,
+.dmd-cart-theme-compact .wc-block-components-text-input input,
+.dmd-cart-theme-compact .wc-block-components-totals-coupon__form input,
+.dmd-cart-theme-compact .coupon .input-text,
+.dmd-cart-theme-compact .dmd-field,
+.dmd-checkout-theme-market .wc-block-components-text-input input,
+.dmd-checkout-theme-market .wc-block-components-textarea textarea,
+.dmd-checkout-theme-market .wc-block-components-combobox .components-combobox-control__input,
+.dmd-checkout-theme-market .wc-block-components-combobox input,
+.dmd-checkout-theme-market .select2-container .select2-selection--single,
+.dmd-checkout-theme-market .woocommerce form .input-text,
+.dmd-checkout-theme-market .woocommerce form select,
+.dmd-checkout-theme-market .woocommerce form textarea,
+.dmd-checkout-theme-market .dmd-field,
+.dmd-cart-theme-market .wc-block-components-text-input input,
+.dmd-cart-theme-market .wc-block-components-totals-coupon__form input,
+.dmd-cart-theme-market .coupon .input-text,
+.dmd-cart-theme-market .dmd-field {
+  width: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+/* Classic inputs — flat white, thin border */
+.dmd-checkout-theme-classic .wc-block-components-text-input input,
+.dmd-checkout-theme-classic .wc-block-components-textarea textarea,
+.dmd-checkout-theme-classic .wc-block-components-combobox input,
+.dmd-checkout-theme-classic .select2-container .select2-selection--single,
+.dmd-checkout-theme-classic .woocommerce form .input-text,
+.dmd-checkout-theme-classic .woocommerce form select,
+.dmd-checkout-theme-classic .woocommerce form textarea,
+.dmd-checkout-theme-classic .dmd-field,
+.dmd-cart-theme-classic .wc-block-components-totals-coupon__form input,
+.dmd-cart-theme-classic .coupon .input-text,
+.dmd-cart-theme-classic .dmd-field {
+  min-height: 2.75rem;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  padding: 0.65rem 0.85rem !important;
+}
+
+.dmd-checkout-theme-classic .wc-block-components-text-input.is-active input,
+.dmd-checkout-theme-classic .woocommerce form .input-text:focus,
+.dmd-checkout-theme-classic .dmd-field:focus,
+.dmd-cart-theme-classic .coupon .input-text:focus {
+  border-color: #113d21 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
 /* ------------------------------------------------------------------
    Compact — denser list, soft gray panels
    ------------------------------------------------------------------ */
@@ -113,10 +186,39 @@
   margin-bottom: 0.5rem !important;
 }
 
+/* Compact inputs — soft filled panels, almost borderless */
 .dmd-checkout-theme-compact .wc-block-components-text-input input,
-.dmd-checkout-theme-compact .wc-block-components-combobox input {
-  border-radius: 6px !important;
+.dmd-checkout-theme-compact .wc-block-components-textarea textarea,
+.dmd-checkout-theme-compact .wc-block-components-combobox input,
+.dmd-checkout-theme-compact .select2-container .select2-selection--single,
+.dmd-checkout-theme-compact .woocommerce form .input-text,
+.dmd-checkout-theme-compact .woocommerce form select,
+.dmd-checkout-theme-compact .woocommerce form textarea,
+.dmd-checkout-theme-compact .dmd-field,
+.dmd-cart-theme-compact .wc-block-components-totals-coupon__form input,
+.dmd-cart-theme-compact .coupon .input-text,
+.dmd-cart-theme-compact .dmd-field {
   min-height: 2.5rem;
+  border: 1px solid transparent !important;
+  border-radius: 999px !important;
+  background: #eef1ef !important;
+  box-shadow: none !important;
+  padding: 0.55rem 1rem !important;
+}
+
+.dmd-checkout-theme-compact .wc-block-components-textarea textarea,
+.dmd-checkout-theme-compact .woocommerce form textarea {
+  border-radius: 16px !important;
+}
+
+.dmd-checkout-theme-compact .wc-block-components-text-input.is-active input,
+.dmd-checkout-theme-compact .woocommerce form .input-text:focus,
+.dmd-checkout-theme-compact .dmd-field:focus,
+.dmd-cart-theme-compact .coupon .input-text:focus {
+  background: #e4e9e6 !important;
+  border-color: #cfd6d2 !important;
+  box-shadow: inset 0 0 0 1px #0f3a22 !important;
+  outline: none !important;
 }
 
 /* ------------------------------------------------------------------
@@ -198,4 +300,39 @@
 .dmd-cart-theme-compact .dmd-cart-empty {
   border-color: var(--dmd-cc-border);
   background: #fff;
+}
+
+/* Market inputs — soft green glow, elevated rounded boxes */
+.dmd-checkout-theme-market .wc-block-components-text-input input,
+.dmd-checkout-theme-market .wc-block-components-textarea textarea,
+.dmd-checkout-theme-market .wc-block-components-combobox input,
+.dmd-checkout-theme-market .select2-container .select2-selection--single,
+.dmd-checkout-theme-market .woocommerce form .input-text,
+.dmd-checkout-theme-market .woocommerce form select,
+.dmd-checkout-theme-market .woocommerce form textarea,
+.dmd-checkout-theme-market .dmd-field,
+.dmd-cart-theme-market .wc-block-components-totals-coupon__form input,
+.dmd-cart-theme-market .coupon .input-text,
+.dmd-cart-theme-market .dmd-field {
+  min-height: 3rem;
+  border: 1px solid #d7e5db !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 18px -12px rgba(17, 61, 33, 0.45) !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.dmd-checkout-theme-market .wc-block-components-text-input.is-active input,
+.dmd-checkout-theme-market .woocommerce form .input-text:focus,
+.dmd-checkout-theme-market .dmd-field:focus,
+.dmd-cart-theme-market .coupon .input-text:focus {
+  border-color: #113d21 !important;
+  box-shadow: 0 0 0 3px rgba(17, 61, 33, 0.14), 0 10px 22px -12px rgba(17, 61, 33, 0.5) !important;
+  outline: none !important;
+}
+
+.dmd-checkout-theme-market .wc-block-components-text-input label,
+.dmd-checkout-theme-market .woocommerce form .form-row label {
+  font-weight: 600;
+  color: #113d21;
 }
