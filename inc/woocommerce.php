@@ -767,117 +767,274 @@ add_action( 'woocommerce_after_add_to_cart_form', 'dmd_single_order_now', 5 );
  * ------------------------------------------------------------------------- */
 
 /**
- * Handle live search requests.
+ * Popular search terms shown when the search panel opens empty.
+ *
+ * @return string[]
+ */
+function dmd_live_search_popular_terms() {
+	$defaults = array( 'চাল', 'ডাল', 'তেল', 'মসলা', 'ডিম', 'মধু', 'আটা', 'চিনি' );
+	$terms    = array();
+
+	foreach ( dmd_get_top_categories( 6, true ) as $cat ) {
+		$terms[] = $cat->name;
+	}
+
+	$terms = array_values( array_unique( array_filter( array_merge( $terms, $defaults ) ) ) );
+
+	/**
+	 * Filter popular search suggestions in the live-search panel.
+	 *
+	 * @param string[] $terms Suggestion labels.
+	 */
+	return array_slice( apply_filters( 'dmd_live_search_popular_terms', $terms ), 0, 8 );
+}
+
+/**
+ * Primary product category name for a product, or empty string.
+ *
+ * @param WC_Product $product Product.
+ * @return string
+ */
+function dmd_live_search_product_category_name( $product ) {
+	$terms = get_the_terms( $product->get_id(), 'product_cat' );
+	if ( empty( $terms ) || is_wp_error( $terms ) ) {
+		return '';
+	}
+	$default = (int) get_option( 'default_product_cat' );
+	foreach ( $terms as $term ) {
+		if ( (int) $term->term_id !== $default ) {
+			return $term->name;
+		}
+	}
+	return $terms[0]->name;
+}
+
+/**
+ * Render one product card inside the live-search panel.
+ *
+ * @param WC_Product $product Product.
+ */
+function dmd_live_search_product_card( $product ) {
+	$cat = dmd_live_search_product_category_name( $product );
+	?>
+	<a class="dmd-ls-product group flex flex-col overflow-hidden rounded-xl border border-line bg-white text-ink no-underline transition hover:border-green/40 hover:shadow-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-green"
+		href="<?php echo esc_url( $product->get_permalink() ); ?>"
+		data-dmd-ls-item>
+		<span class="relative aspect-square overflow-hidden bg-surface">
+			<?php
+			echo wp_kses_post(
+				$product->get_image(
+					'woocommerce_thumbnail',
+					array(
+						'class'   => 'h-full w-full object-contain p-3 mix-blend-multiply transition duration-300 group-hover:scale-105',
+						'loading' => 'lazy',
+						'alt'     => $product->get_name(),
+					)
+				)
+			);
+			?>
+		</span>
+		<span class="flex flex-1 flex-col gap-1 p-3">
+			<?php if ( $cat ) : ?>
+				<span class="text-[10px] font-semibold uppercase tracking-wider text-muted"><?php echo esc_html( $cat ); ?></span>
+			<?php endif; ?>
+			<span class="line-clamp-2 text-sm font-semibold leading-snug text-ink"><?php echo esc_html( $product->get_name() ); ?></span>
+			<span class="mt-auto text-sm font-bold text-ink"><?php echo wp_kses_post( $product->get_price_html() ); ?></span>
+		</span>
+	</a>
+	<?php
+}
+
+/**
+ * Markup for the live-search overlay (discover or typed results).
+ *
+ * @param string $search_query Search term; empty opens the discover panel.
+ * @return string|WP_Error
+ */
+function dmd_live_search_panel_html( $search_query = '' ) {
+	$is_search = mb_strlen( $search_query ) >= 2;
+
+	$product_args = array(
+		'post_type'      => 'product',
+		'post_status'    => 'publish',
+		'posts_per_page' => $is_search ? 8 : 6,
+		'tax_query'      => WC()->query->get_tax_query(), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+	);
+
+	if ( $is_search ) {
+		$product_args['s'] = $search_query;
+	} else {
+		$product_args['meta_key'] = 'total_sales'; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+		$product_args['orderby']  = array(
+			'meta_value_num' => 'DESC',
+			'date'           => 'DESC',
+		);
+	}
+
+	$query = new WP_Query( $product_args );
+
+	if ( $is_search ) {
+		$categories = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'name__like' => $search_query,
+				'hide_empty' => true,
+				'number'     => 8,
+				'exclude'    => array( (int) get_option( 'default_product_cat' ) ),
+			)
+		);
+	} else {
+		$categories = dmd_get_top_categories( 8, true );
+	}
+	$categories = is_wp_error( $categories ) ? array() : $categories;
+
+	if ( $is_search && ! $query->have_posts() && ! $categories ) {
+		/* translators: %s: search term. */
+		return new WP_Error( 'dmd_no_results', sprintf( __( '“%s” এর জন্য কিছু পাওয়া যায়নি।', 'digital-mudir-dokan' ), $search_query ) );
+	}
+
+	$shop_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+	$footer_url = $is_search
+		? add_query_arg(
+			array(
+				's'         => $search_query,
+				'post_type' => 'product',
+			),
+			home_url( '/' )
+		)
+		: $shop_url;
+
+	$popular = $is_search ? array() : dmd_live_search_popular_terms();
+
+	ob_start();
+	?>
+	<div class="dmd-ls-panel">
+		<div class="dmd-ls-panel__body">
+			<aside class="dmd-ls-panel__aside">
+				<?php if ( $popular ) : ?>
+					<section class="dmd-ls-block" aria-labelledby="dmd-ls-popular-title">
+						<h3 id="dmd-ls-popular-title" class="dmd-ls-block__title"><?php esc_html_e( 'জনপ্রিয় সার্চ', 'digital-mudir-dokan' ); ?></h3>
+						<ul class="dmd-ls-popular">
+							<?php foreach ( $popular as $term ) : ?>
+								<li>
+									<button type="button" class="dmd-ls-popular__btn" data-dmd-ls-suggest="<?php echo esc_attr( $term ); ?>">
+										<?php dmd_the_icon( 'search', 15 ); ?>
+										<span><?php echo esc_html( $term ); ?></span>
+									</button>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					</section>
+				<?php endif; ?>
+
+				<?php if ( $categories ) : ?>
+					<section class="dmd-ls-block" aria-labelledby="dmd-ls-cats-title">
+						<h3 id="dmd-ls-cats-title" class="dmd-ls-block__title"><?php esc_html_e( 'ক্যাটাগরি', 'digital-mudir-dokan' ); ?></h3>
+						<ul class="dmd-ls-cats">
+							<?php foreach ( $categories as $category ) : ?>
+								<?php
+								$thumb = dmd_get_term_image_url( $category, 'thumbnail' );
+								$link  = get_term_link( $category );
+								if ( is_wp_error( $link ) ) {
+									continue;
+								}
+								?>
+								<li>
+									<a class="dmd-ls-cat" href="<?php echo esc_url( $link ); ?>" data-dmd-ls-item>
+										<span class="dmd-ls-cat__thumb">
+											<?php if ( $thumb ) : ?>
+												<img src="<?php echo esc_url( $thumb ); ?>" alt="" width="36" height="36" loading="lazy" />
+											<?php else : ?>
+												<?php dmd_the_icon( 'grocery', 18 ); ?>
+											<?php endif; ?>
+										</span>
+										<span class="dmd-ls-cat__name"><?php echo esc_html( $category->name ); ?></span>
+										<span class="dmd-ls-cat__count"><?php echo esc_html( number_format_i18n( $category->count ) ); ?></span>
+									</a>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					</section>
+				<?php endif; ?>
+			</aside>
+
+			<div class="dmd-ls-panel__main">
+				<?php if ( $query->have_posts() ) : ?>
+					<div class="dmd-ls-products-head">
+						<h3 class="dmd-ls-block__title dmd-ls-block__title--row">
+							<?php if ( $is_search ) : ?>
+								<?php
+								printf(
+									/* translators: %s: number of matching products. */
+									esc_html( _n( '%s টি পণ্য', '%s টি পণ্য', $query->found_posts, 'digital-mudir-dokan' ) ),
+									esc_html( number_format_i18n( $query->found_posts ) )
+								);
+								?>
+							<?php else : ?>
+								<?php dmd_the_icon( 'fire', 16, 'text-amber-500' ); ?>
+								<?php esc_html_e( 'ট্রেন্ডিং পণ্য', 'digital-mudir-dokan' ); ?>
+							<?php endif; ?>
+						</h3>
+					</div>
+					<div class="dmd-ls-products">
+						<?php
+						while ( $query->have_posts() ) :
+							$query->the_post();
+							$product = wc_get_product( get_the_ID() );
+							if ( $product ) {
+								dmd_live_search_product_card( $product );
+							}
+						endwhile;
+						wp_reset_postdata();
+						?>
+					</div>
+				<?php else : ?>
+					<p class="m-0 p-6 text-sm text-muted"><?php esc_html_e( 'এখনো কোনো পণ্য নেই।', 'digital-mudir-dokan' ); ?></p>
+				<?php endif; ?>
+			</div>
+		</div>
+
+		<footer class="dmd-ls-panel__footer">
+			<p class="dmd-ls-keys" aria-hidden="true">
+				<kbd>↑</kbd><kbd>↓</kbd>
+				<span><?php esc_html_e( 'সরান', 'digital-mudir-dokan' ); ?></span>
+				<kbd>↵</kbd>
+				<span><?php esc_html_e( 'খুলুন', 'digital-mudir-dokan' ); ?></span>
+				<kbd>esc</kbd>
+				<span><?php esc_html_e( 'বন্ধ', 'digital-mudir-dokan' ); ?></span>
+			</p>
+			<a class="dmd-ls-browse" href="<?php echo esc_url( $footer_url ); ?>">
+				<?php
+				if ( $is_search ) {
+					/* translators: %s: search term. */
+					printf( esc_html__( '“%s” এর সব ফলাফল', 'digital-mudir-dokan' ), esc_html( $search_query ) );
+				} else {
+					esc_html_e( 'সব পণ্য দেখুন', 'digital-mudir-dokan' );
+				}
+				?>
+				<?php dmd_the_icon( 'arrow-r', 16 ); ?>
+			</a>
+		</footer>
+	</div>
+	<?php
+
+	return ob_get_clean();
+}
+
+/**
+ * Handle live search / discover panel requests.
  */
 function dmd_ajax_live_search() {
 	check_ajax_referer( 'dmd_search_nonce', 'nonce' );
 
 	$search_query = isset( $_POST['query'] ) ? sanitize_text_field( wp_unslash( $_POST['query'] ) ) : '';
+	$html         = dmd_live_search_panel_html( $search_query );
 
-	if ( mb_strlen( $search_query ) < 2 ) {
-		wp_send_json_error( __( 'Type at least 2 characters.', 'digital-mudir-dokan' ) );
+	if ( is_wp_error( $html ) ) {
+		wp_send_json_error( $html->get_error_message() );
 	}
 
-	$query = new WP_Query(
-		array(
-			'post_type'      => 'product',
-			'post_status'    => 'publish',
-			'posts_per_page' => 8,
-			's'              => $search_query,
-			'tax_query'      => WC()->query->get_tax_query(), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- respects catalog visibility.
-		)
-	);
-
-	$categories = get_terms(
-		array(
-			'taxonomy'   => 'product_cat',
-			'name__like' => $search_query,
-			'hide_empty' => false,
-			'number'     => 6,
-		)
-	);
-	$categories = is_wp_error( $categories ) ? array() : $categories;
-
-	if ( ! $query->have_posts() && ! $categories ) {
-		/* translators: %s: search term. */
-		wp_send_json_error( sprintf( __( 'No products found for “%s”.', 'digital-mudir-dokan' ), $search_query ) );
-	}
-
-	$search_url = add_query_arg(
-		array(
-			's'         => $search_query,
-			'post_type' => 'product',
-		),
-		home_url( '/' )
-	);
-
-	ob_start();
-	?>
-	<div class="flex flex-col gap-4 p-4 lg:flex-row lg:gap-6 lg:p-5">
-		<?php if ( $categories ) : ?>
-			<div class="shrink-0 lg:w-56">
-				<p class="mb-2 text-xs font-semibold uppercase tracking-wider text-muted"><?php esc_html_e( 'Categories', 'digital-mudir-dokan' ); ?></p>
-				<ul class="m-0 flex list-none flex-wrap gap-2 p-0 lg:flex-col lg:gap-1">
-					<?php foreach ( $categories as $category ) : ?>
-						<li class="list-none">
-							<a class="dmd-chip lg:w-full lg:justify-between lg:rounded-lg lg:border-0 lg:bg-surface" href="<?php echo esc_url( get_term_link( $category ) ); ?>">
-								<?php echo esc_html( $category->name ); ?>
-								<span class="text-xs text-muted"><?php echo esc_html( number_format_i18n( $category->count ) ); ?></span>
-							</a>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			</div>
-		<?php endif; ?>
-
-		<?php if ( $query->have_posts() ) : ?>
-			<div class="min-w-0 flex-1">
-				<p class="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
-					<?php
-					printf(
-						/* translators: %s: number of matching products. */
-						esc_html( _n( '%s product', '%s products', $query->found_posts, 'digital-mudir-dokan' ) ),
-						esc_html( number_format_i18n( $query->found_posts ) )
-					);
-					?>
-				</p>
-				<ul class="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2 xl:grid-cols-4">
-					<?php
-					while ( $query->have_posts() ) :
-						$query->the_post();
-						$product = wc_get_product( get_the_ID() );
-						if ( ! $product ) {
-							continue;
-						}
-						?>
-						<li class="list-none">
-							<a class="dmd-search-result flex items-center gap-3 rounded-lg border border-transparent p-2 text-ink hover:border-line hover:bg-surface hover:text-ink" href="<?php echo esc_url( get_permalink() ); ?>">
-								<span class="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md bg-surface">
-									<?php echo wp_kses_post( $product->get_image( 'thumbnail', array( 'class' => 'h-full w-full object-contain mix-blend-multiply' ) ) ); ?>
-								</span>
-								<span class="min-w-0">
-									<span class="line-clamp-2 block text-sm font-medium leading-snug"><?php the_title(); ?></span>
-									<span class="dmd-search-price mt-0.5 block text-sm font-semibold text-green"><?php echo wp_kses_post( $product->get_price_html() ); ?></span>
-								</span>
-							</a>
-						</li>
-					<?php endwhile; ?>
-				</ul>
-			</div>
-		<?php endif; ?>
-	</div>
-
-	<a class="flex items-center justify-center gap-1 border-t border-line bg-surface/60 px-4 py-3 text-sm font-semibold text-green hover:bg-green-soft hover:text-green" href="<?php echo esc_url( $search_url ); ?>">
-		<?php
-		/* translators: %s: search term. */
-		printf( esc_html__( 'View all results for “%s”', 'digital-mudir-dokan' ), esc_html( $search_query ) );
-		?>
-		<?php dmd_the_icon( 'chevron-r', 14 ); ?>
-	</a>
-	<?php
-	wp_reset_postdata();
-
-	wp_send_json_success( ob_get_clean() );
+	wp_send_json_success( $html );
 }
 add_action( 'wp_ajax_dmd_live_search', 'dmd_ajax_live_search' );
 add_action( 'wp_ajax_nopriv_dmd_live_search', 'dmd_ajax_live_search' );

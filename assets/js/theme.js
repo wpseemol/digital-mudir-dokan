@@ -68,7 +68,7 @@
 	}
 
 	/* ------------------------------------------------------------------
-	 * Header — shadow once the page scrolls under it
+	 * Header — hide while scrolling down, reveal when scrolling up
 	 * ------------------------------------------------------------------ */
 	function initStickyHeader() {
 		var header = document.getElementById('dmd-header');
@@ -77,9 +77,37 @@
 		}
 
 		var ticking = false;
+		var lastY = window.scrollY || 0;
+		var hideAfter = 72;
+		var minDelta = 6;
+
+		function menuIsOpen() {
+			var toggle = document.querySelector('.dmd-menu-toggle[aria-expanded="true"]');
+			return !!toggle;
+		}
+
+		function searchIsOpen() {
+			return header.classList.contains('is-search-open');
+		}
 
 		function update() {
-			header.classList.toggle('is-stuck', window.scrollY > 8);
+			var y = window.scrollY || 0;
+			var delta = y - lastY;
+
+			header.classList.toggle('is-stuck', y > 8);
+
+			// Always show near the top, while the drawer/search panel is open.
+			if (y <= hideAfter || menuIsOpen() || searchIsOpen()) {
+				header.classList.remove('is-hidden');
+			} else if (Math.abs(delta) >= minDelta) {
+				if (delta > 0) {
+					header.classList.add('is-hidden');
+				} else {
+					header.classList.remove('is-hidden');
+				}
+			}
+
+			lastY = y < 0 ? 0 : y;
 			ticking = false;
 		}
 

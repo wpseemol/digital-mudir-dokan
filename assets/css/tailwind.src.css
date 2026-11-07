@@ -183,7 +183,7 @@
 
     /* ---------- Header ---------- */
     .dmd-header {
-        @apply sticky top-0 z-40 bg-white transition-shadow duration-200;
+        @apply sticky top-0 z-40 bg-white transition-[transform,box-shadow] duration-300 ease-out will-change-transform;
     }
     .admin-bar .dmd-header {
         top: 46px;
@@ -200,6 +200,14 @@
     }
     .dmd-header.is-stuck {
         @apply shadow-soft;
+    }
+    .dmd-header.is-hidden {
+        @apply -translate-y-full shadow-none pointer-events-none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .dmd-header {
+            transition: none;
+        }
     }
     .dmd-primary-menu {
         @apply gap-x-1 py-1;
@@ -239,6 +247,72 @@
     .dmd-search-form button[type="submit"] {
         @apply absolute right-1 top-1 bottom-1 inline-flex w-11 items-center justify-center rounded-md bg-green text-white
            transition-colors hover:bg-green-dark;
+    }
+
+    /* ---------- Live search overlay ---------- */
+    .dmd-ls-panel {
+        @apply flex max-h-[min(78vh,720px)] flex-col;
+    }
+    .dmd-ls-panel__body {
+        @apply grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[240px_minmax(0,1fr)];
+    }
+    .dmd-ls-panel__aside {
+        @apply max-h-[40vh] space-y-5 overflow-y-auto border-b border-line p-4 lg:max-h-none lg:border-b-0 lg:border-r lg:p-5;
+    }
+    .dmd-ls-panel__main {
+        @apply min-h-0 overflow-y-auto p-4 lg:p-5;
+    }
+    .dmd-ls-block__title {
+        @apply mb-3 mt-0 text-xs font-semibold uppercase tracking-wider text-muted;
+    }
+    .dmd-ls-block__title--row {
+        @apply mb-4 flex items-center gap-2 normal-case tracking-normal text-sm text-ink;
+    }
+    .dmd-ls-popular,
+    .dmd-ls-cats {
+        @apply m-0 flex list-none flex-col gap-1 p-0;
+    }
+    .dmd-ls-popular__btn,
+    .dmd-ls-cat {
+        @apply flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm text-ink no-underline
+           transition hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-green;
+    }
+    .dmd-ls-popular__btn.is-active,
+    .dmd-ls-cat.is-active,
+    .dmd-ls-product.is-active {
+        @apply bg-green-soft ring-2 ring-green;
+    }
+    .dmd-ls-popular__btn .dmd-icon {
+        @apply shrink-0 text-muted;
+    }
+    .dmd-ls-cat__thumb {
+        @apply flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-surface text-muted;
+    }
+    .dmd-ls-cat__thumb img {
+        @apply h-full w-full object-cover;
+    }
+    .dmd-ls-cat__name {
+        @apply min-w-0 flex-1 truncate font-medium;
+    }
+    .dmd-ls-cat__count {
+        @apply rounded-full bg-surface px-2 py-0.5 text-[11px] font-semibold text-muted;
+    }
+    .dmd-ls-products {
+        @apply grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4;
+    }
+    .dmd-ls-panel__footer {
+        @apply flex flex-wrap items-center justify-between gap-3 border-t border-line bg-surface/70 px-4 py-3;
+    }
+    .dmd-ls-keys {
+        @apply m-0 hidden items-center gap-1.5 text-xs text-muted sm:flex;
+    }
+    .dmd-ls-keys kbd {
+        @apply inline-flex min-w-[1.5rem] items-center justify-center rounded border border-line bg-white px-1.5 py-0.5
+           font-sans text-[11px] font-semibold text-ink shadow-sm;
+    }
+    .dmd-ls-browse {
+        @apply inline-flex items-center gap-2 rounded-lg bg-green px-3.5 py-2 text-sm font-semibold text-white no-underline
+           transition hover:bg-green-dark hover:text-white;
     }
 
     /* ---------- Hero ---------- */

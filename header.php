@@ -77,7 +77,7 @@ $dmd_categories = $dmd_has_wc ? dmd_get_top_categories() : array();
 					<?php get_search_form(); ?>
 				</div>
 
-				<div id="dmd-live-search-results" class="absolute inset-x-0 top-full z-50 -mt-1 hidden max-h-[75vh] overflow-y-auto rounded-xl border border-line bg-white shadow-lift" role="region" aria-live="polite" aria-label="<?php esc_attr_e( 'Search suggestions', 'digital-mudir-dokan' ); ?>"></div>
+				<div id="dmd-live-search-results" class="dmd-ls-results absolute inset-x-0 top-full z-50 mt-2 hidden max-h-[min(78vh,720px)] overflow-hidden rounded-2xl border border-line bg-white shadow-lift" role="region" aria-live="polite" aria-hidden="true" aria-label="<?php esc_attr_e( 'Search suggestions', 'digital-mudir-dokan' ); ?>"></div>
 
 				<div class="order-3 ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:order-4 lg:ml-0">
 					<?php if ( function_exists( 'wc_get_page_permalink' ) ) : ?>
